@@ -3,7 +3,7 @@
 // IMPORTANT: Navigation requests ("/") must be network-first to avoid serving a stale
 // cached index.html after a new deploy (otherwise production can appear "not updated").
 
-const CACHE_NAME = 'reliefanchor-runtime-v3';
+const CACHE_NAME = 'reliefanchor-runtime-v4';
 
 const PRECACHE_URLS = [
   '/',
@@ -50,6 +50,37 @@ function isSameOrigin(url) {
   } catch {
     return false;
   }
+}
+
+function pathnameOf(req) {
+  try {
+    return new URL(req.url).pathname;
+  } catch {
+    return '';
+  }
+}
+
+function hasExt(pathname, exts) {
+  return exts.some((ext) => pathname.endsWith(ext));
+}
+
+// Safari sometimes reports request.destination as "" (empty), which can cause stale JS/CSS to be served.
+function isScriptOrStyleRequest(req) {
+  const path = pathnameOf(req);
+  return (
+    req.destination === 'script' ||
+    req.destination === 'style' ||
+    hasExt(path, ['.js', '.mjs', '.css'])
+  );
+}
+
+function isImageOrFontRequest(req) {
+  const path = pathnameOf(req);
+  return (
+    req.destination === 'image' ||
+    req.destination === 'font' ||
+    hasExt(path, ['.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.otf'])
+  );
 }
 
 async function networkFirst(req, fallbackUrl) {
@@ -102,20 +133,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // IMPORTANT: Network-first for JS/CSS to avoid mixing cached assets across deploys
-  // (prevents React "Invalid hook call" / useState null issues).
-  if (request.destination === 'script' || request.destination === 'style') {
+  // Network-first for JS/CSS to avoid mixing cached assets across deploys.
+  if (isScriptOrStyleRequest(request)) {
     event.respondWith(networkFirst(request));
     return;
   }
 
   // Cache-first for static assets that are safe to keep stale longer
-  if (request.destination === 'image' || request.destination === 'font') {
+  if (isImageOrFontRequest(request)) {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  // Default: try cache, fallback to network
+  // Default
   event.respondWith(cacheFirst(request));
 });
 
