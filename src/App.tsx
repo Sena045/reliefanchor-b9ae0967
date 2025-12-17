@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AppProvider } from '@/context/AppContext';
 import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -8,11 +9,30 @@ import { MoodPage } from '@/pages/MoodPage';
 import { ToolsPage } from '@/pages/ToolsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { PremiumPage } from '@/pages/PremiumPage';
+import { AuthPage } from '@/pages/AuthPage';
 import { Toaster } from '@/components/ui/toaster';
+import { Skeleton } from '@/components/Skeleton';
 
 function AppContent() {
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="space-y-4 w-64">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
 
   if (showPremium) {
     return <PremiumPage onClose={() => setShowPremium(false)} />;
@@ -39,11 +59,19 @@ function AppContent() {
   );
 }
 
-export default function App() {
+function AuthenticatedApp() {
   return (
     <AppProvider>
       <AppContent />
-      <Toaster />
     </AppProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AuthenticatedApp />
+      <Toaster />
+    </AuthProvider>
   );
 }

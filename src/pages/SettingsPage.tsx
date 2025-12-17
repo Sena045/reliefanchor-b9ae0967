@@ -1,15 +1,31 @@
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LANGUAGES, Language } from '@/types';
+import { LANGUAGES } from '@/types';
 
 export function SettingsPage() {
-  const { settings, setLanguage, isPremium } = useApp();
+  const { profile, setLanguage, isPremium, premiumUntil } = useApp();
+  const { signOut, user } = useAuth();
 
   return (
     <div className="p-4 space-y-4 max-w-lg mx-auto safe-top">
       <div className="pt-4"><h1 className="text-xl font-semibold">Settings</h1></div>
+
+      {/* Account */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Account</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+          <Button variant="outline" size="sm" onClick={signOut} className="w-full">
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="pb-2">
@@ -22,7 +38,7 @@ export function SettingsPage() {
           {LANGUAGES.map((lang) => (
             <Button 
               key={lang.code} 
-              variant={settings.language === lang.code ? 'default' : 'outline'} 
+              variant={profile.language === lang.code ? 'default' : 'outline'} 
               className="justify-start"
               onClick={() => setLanguage(lang.code)}
             >
@@ -43,6 +59,11 @@ export function SettingsPage() {
           {isPremium ? (
             <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
               <p className="text-sm font-medium text-amber-600">✓ You have Premium access</p>
+              {premiumUntil && (
+                <p className="text-xs text-amber-600/80 mt-1">
+                  Expires: {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">

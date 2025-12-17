@@ -21,8 +21,8 @@ const moodConfig: Record<MoodType, { icon: typeof Smile; color: string; value: n
 const moodKeys: MoodType[] = ['happy', 'calm', 'sad', 'anxious', 'angry'];
 
 export function MoodPage() {
-  const { settings, addMood, getMoods } = useApp();
-  const { t } = useTranslation(settings.language);
+  const { profile, addMood, getMoods } = useApp();
+  const { t } = useTranslation(profile.language);
   const { toast } = useToast();
   
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
@@ -59,8 +59,8 @@ export function MoodPage() {
     
     addMood(selectedMood, note);
     toast({
-      title: settings.language === 'hi' ? 'मूड लॉग किया!' : 'Mood logged!',
-      description: settings.language === 'hi' 
+      title: profile.language === 'hi' ? 'मूड लॉग किया!' : 'Mood logged!',
+      description: profile.language === 'hi' 
         ? 'आपका मूड सहेज लिया गया है।' 
         : 'Your mood has been saved.',
     });
@@ -177,7 +177,7 @@ export function MoodPage() {
             </div>
           ) : (
             <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
-              {settings.language === 'hi' 
+              {profile.language === 'hi' 
                 ? 'अभी तक कोई मूड लॉग नहीं किया।' 
                 : 'No moods logged yet.'}
             </div>
@@ -190,7 +190,7 @@ export function MoodPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">
-              {settings.language === 'hi' ? 'हाल की प्रविष्टियाँ' : 'Recent Entries'}
+              {profile.language === 'hi' ? 'हाल की प्रविष्टियाँ' : 'Recent Entries'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
