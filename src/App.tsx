@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthPage } from '@/pages/AuthPage';
 import { Toaster } from '@/components/ui/toaster';
 import { Skeleton } from '@/components/Skeleton';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -96,6 +97,7 @@ export default function App() {
     <AuthProvider>
       <AuthenticatedApp />
       <Toaster />
+      <UpdatePrompt />
     </AuthProvider>
   );
 }
