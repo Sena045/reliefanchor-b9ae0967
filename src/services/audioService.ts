@@ -3,9 +3,9 @@ type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire';
 interface AudioNodes {
   context: AudioContext;
   gainNode: GainNode;
-  noiseNode?: AudioBufferSourceNode;
-  oscillators?: OscillatorNode[];
-  intervals?: NodeJS.Timeout[];
+  sourceNodes: AudioBufferSourceNode[];
+  oscillators: OscillatorNode[];
+  intervals: ReturnType<typeof setInterval>[];
 }
 
 let audioNodes: AudioNodes | null = null;
@@ -21,7 +21,7 @@ function createBrownNoise(context: AudioContext): AudioBuffer {
     const white = Math.random() * 2 - 1;
     output[i] = (lastOut + 0.02 * white) / 1.02;
     lastOut = output[i];
-    output[i] *= 3.5;
+    output[i] *= 1.5; // Reduced from 3.5
   }
   
   return buffer;
@@ -34,11 +34,11 @@ function createRainNoise(context: AudioContext): AudioBuffer {
   
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
-    output[i] = white * 0.5;
+    output[i] = white * 0.25; // Reduced from 0.5
     
     if (Math.random() < 0.001) {
       for (let j = 0; j < 100 && i + j < bufferSize; j++) {
-        output[i + j] = (Math.random() * 2 - 1) * (1 - j / 100);
+        output[i + j] = (Math.random() * 2 - 1) * (1 - j / 100) * 0.4;
       }
     }
   }
@@ -65,12 +65,12 @@ function createForestNoise(context: AudioContext, gainNode: GainNode): Oscillato
     lfoGain.connect(osc.frequency);
     lfo.start();
     
-    oscGain.gain.value = 0.05;
+    oscGain.gain.value = 0.02; // Reduced from 0.05
     osc.connect(oscGain);
     oscGain.connect(gainNode);
     osc.start();
     
-    oscillators.push(osc);
+    oscillators.push(osc, lfo);
   });
   
   return oscillators;
@@ -83,25 +83,21 @@ function createRainOnTent(context: AudioContext, masterGain: GainNode): AudioBuf
   const leftChannel = buffer.getChannelData(0);
   const rightChannel = buffer.getChannelData(1);
   
-  // Filtered rain with tent resonance
   let lastL = 0, lastR = 0;
   for (let i = 0; i < bufferSize; i++) {
-    // Pink-ish noise for rain
     const whiteL = Math.random() * 2 - 1;
     const whiteR = Math.random() * 2 - 1;
     lastL = (lastL + 0.1 * whiteL) / 1.1;
     lastR = (lastR + 0.1 * whiteR) / 1.1;
     
-    // Add tent fabric resonance (slight filter)
-    leftChannel[i] = lastL * 0.4;
-    rightChannel[i] = lastR * 0.4;
+    leftChannel[i] = lastL * 0.15; // Reduced from 0.4
+    rightChannel[i] = lastR * 0.15;
     
-    // Random droplets hitting tent
-    if (Math.random() < 0.003) {
+    if (Math.random() < 0.002) {
       const dropLength = 50 + Math.random() * 100;
       for (let j = 0; j < dropLength && i + j < bufferSize; j++) {
         const decay = 1 - j / dropLength;
-        const drop = (Math.random() * 2 - 1) * decay * 0.6;
+        const drop = (Math.random() * 2 - 1) * decay * 0.2; // Reduced from 0.6
         leftChannel[i + j] += drop * (0.5 + Math.random() * 0.5);
         rightChannel[i + j] += drop * (0.5 + Math.random() * 0.5);
       }
@@ -109,7 +105,7 @@ function createRainOnTent(context: AudioContext, masterGain: GainNode): AudioBuf
   }
   
   const rainGain = context.createGain();
-  rainGain.gain.value = 0.35;
+  rainGain.gain.value = 0.2; // Reduced from 0.35
   
   const noiseNode = context.createBufferSource();
   noiseNode.buffer = buffer;
@@ -127,18 +123,16 @@ function createCampfireCrackle(context: AudioContext, masterGain: GainNode): Aud
   const leftChannel = buffer.getChannelData(0);
   const rightChannel = buffer.getChannelData(1);
   
-  // Base fire rumble
   let lastOut = 0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     lastOut = (lastOut + 0.03 * white) / 1.03;
-    leftChannel[i] = lastOut * 0.15;
-    rightChannel[i] = lastOut * 0.15;
+    leftChannel[i] = lastOut * 0.08; // Reduced from 0.15
+    rightChannel[i] = lastOut * 0.08;
     
-    // Random crackles and pops
-    if (Math.random() < 0.0008) {
+    if (Math.random() < 0.0006) {
       const crackleLength = 20 + Math.random() * 80;
-      const intensity = 0.3 + Math.random() * 0.5;
+      const intensity = 0.15 + Math.random() * 0.2; // Reduced from 0.3-0.8
       for (let j = 0; j < crackleLength && i + j < bufferSize; j++) {
         const decay = Math.pow(1 - j / crackleLength, 2);
         const crackle = (Math.random() * 2 - 1) * decay * intensity;
@@ -147,12 +141,11 @@ function createCampfireCrackle(context: AudioContext, masterGain: GainNode): Aud
       }
     }
     
-    // Occasional bigger pops
-    if (Math.random() < 0.0002) {
+    if (Math.random() < 0.0001) {
       const popLength = 100 + Math.random() * 200;
       for (let j = 0; j < popLength && i + j < bufferSize; j++) {
         const decay = Math.pow(1 - j / popLength, 1.5);
-        const pop = (Math.random() * 2 - 1) * decay * 0.7;
+        const pop = (Math.random() * 2 - 1) * decay * 0.3; // Reduced from 0.7
         leftChannel[i + j] += pop;
         rightChannel[i + j] += pop;
       }
@@ -160,7 +153,7 @@ function createCampfireCrackle(context: AudioContext, masterGain: GainNode): Aud
   }
   
   const fireGain = context.createGain();
-  fireGain.gain.value = 0.5;
+  fireGain.gain.value = 0.25; // Reduced from 0.5
   
   const noiseNode = context.createBufferSource();
   noiseNode.buffer = buffer;
@@ -179,17 +172,15 @@ function createVinylCrackle(context: AudioContext, masterGain: GainNode): AudioB
   const rightChannel = buffer.getChannelData(1);
   
   for (let i = 0; i < bufferSize; i++) {
-    // Constant low hiss
-    const hiss = (Math.random() * 2 - 1) * 0.02;
+    const hiss = (Math.random() * 2 - 1) * 0.01; // Reduced from 0.02
     leftChannel[i] = hiss;
     rightChannel[i] = hiss;
     
-    // Random pops and clicks
-    if (Math.random() < 0.0005) {
+    if (Math.random() < 0.0003) {
       const clickLength = 5 + Math.random() * 15;
       for (let j = 0; j < clickLength && i + j < bufferSize; j++) {
         const decay = 1 - j / clickLength;
-        const click = (Math.random() > 0.5 ? 1 : -1) * decay * 0.15;
+        const click = (Math.random() > 0.5 ? 1 : -1) * decay * 0.08; // Reduced from 0.15
         leftChannel[i + j] += click;
         rightChannel[i + j] += click;
       }
@@ -197,7 +188,7 @@ function createVinylCrackle(context: AudioContext, masterGain: GainNode): AudioB
   }
   
   const vinylGain = context.createGain();
-  vinylGain.gain.value = 0.25;
+  vinylGain.gain.value = 0.12; // Reduced from 0.25
   
   const noiseNode = context.createBufferSource();
   noiseNode.buffer = buffer;
@@ -212,7 +203,6 @@ function createVinylCrackle(context: AudioContext, masterGain: GainNode): AudioB
 function createWindInTrees(context: AudioContext, masterGain: GainNode): OscillatorNode[] {
   const oscillators: OscillatorNode[] = [];
   
-  // Multiple layers of wind
   [40, 60, 90, 130].forEach((freq, idx) => {
     const osc = context.createOscillator();
     const oscGain = context.createGain();
@@ -220,7 +210,6 @@ function createWindInTrees(context: AudioContext, masterGain: GainNode): Oscilla
     osc.type = 'sine';
     osc.frequency.value = freq;
     
-    // Slow modulation for natural feel
     const lfo = context.createOscillator();
     const lfoGain = context.createGain();
     lfo.frequency.value = 0.05 + Math.random() * 0.1;
@@ -229,25 +218,24 @@ function createWindInTrees(context: AudioContext, masterGain: GainNode): Oscilla
     lfoGain.connect(osc.frequency);
     lfo.start();
     
-    oscGain.gain.value = 0.015 - idx * 0.002;
+    oscGain.gain.value = 0.008 - idx * 0.001; // Reduced from 0.015
     osc.connect(oscGain);
     oscGain.connect(masterGain);
     osc.start();
     
-    oscillators.push(osc);
+    oscillators.push(osc, lfo);
   });
   
   return oscillators;
 }
 
-function playThunder(context: AudioContext, masterGain: GainNode) {
+function playThunder(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode {
   const duration = 3 + Math.random() * 2;
   const bufferSize = Math.floor(duration * context.sampleRate);
   const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
   const leftChannel = buffer.getChannelData(0);
   const rightChannel = buffer.getChannelData(1);
   
-  // Thunder rumble
   let lastOut = 0;
   for (let i = 0; i < bufferSize; i++) {
     const progress = i / bufferSize;
@@ -256,144 +244,162 @@ function playThunder(context: AudioContext, masterGain: GainNode) {
     const white = Math.random() * 2 - 1;
     lastOut = (lastOut + 0.05 * white) / 1.05;
     
-    leftChannel[i] = lastOut * envelope * 0.4;
-    rightChannel[i] = lastOut * envelope * 0.35;
+    leftChannel[i] = lastOut * envelope * 0.2; // Reduced from 0.4
+    rightChannel[i] = lastOut * envelope * 0.18;
   }
   
   const thunderGain = context.createGain();
-  thunderGain.gain.value = 0.3;
+  thunderGain.gain.value = 0.15; // Reduced from 0.3
   
   const thunderNode = context.createBufferSource();
   thunderNode.buffer = buffer;
   thunderNode.connect(thunderGain);
   thunderGain.connect(masterGain);
   thunderNode.start();
+  
+  return thunderNode;
 }
 
-function playOwl(context: AudioContext, masterGain: GainNode) {
-  const owlGain = context.createGain();
-  owlGain.gain.value = 0;
-  owlGain.connect(masterGain);
+function playOwl(context: AudioContext, masterGain: GainNode): OscillatorNode[] {
+  const oscillators: OscillatorNode[] = [];
   
-  // Two-note owl hoot
   [0, 0.6].forEach((delay) => {
     setTimeout(() => {
+      if (!audioNodes || currentNoise !== 'campfire') return;
+      
       const osc = context.createOscillator();
       osc.type = 'sine';
       osc.frequency.value = delay === 0 ? 420 : 340;
       
       const noteGain = context.createGain();
       noteGain.gain.setValueAtTime(0, context.currentTime);
-      noteGain.gain.linearRampToValueAtTime(0.08, context.currentTime + 0.05);
-      noteGain.gain.linearRampToValueAtTime(0.06, context.currentTime + 0.3);
+      noteGain.gain.linearRampToValueAtTime(0.04, context.currentTime + 0.05); // Reduced from 0.08
+      noteGain.gain.linearRampToValueAtTime(0.03, context.currentTime + 0.3);
       noteGain.gain.linearRampToValueAtTime(0, context.currentTime + 0.5);
       
       osc.connect(noteGain);
       noteGain.connect(masterGain);
       osc.start();
       osc.stop(context.currentTime + 0.5);
+      
+      oscillators.push(osc);
     }, delay * 1000);
   });
+  
+  return oscillators;
 }
 
-function createCampfireSoundscape(context: AudioContext, masterGain: GainNode): { oscillators: OscillatorNode[], intervals: NodeJS.Timeout[] } {
+function createCampfireSoundscape(context: AudioContext, masterGain: GainNode): { 
+  sourceNodes: AudioBufferSourceNode[], 
+  oscillators: OscillatorNode[], 
+  intervals: ReturnType<typeof setInterval>[] 
+} {
+  const sourceNodes: AudioBufferSourceNode[] = [];
   const oscillators: OscillatorNode[] = [];
-  const intervals: NodeJS.Timeout[] = [];
+  const intervals: ReturnType<typeof setInterval>[] = [];
   
-  // Start all layers
-  createRainOnTent(context, masterGain);
-  createCampfireCrackle(context, masterGain);
-  createVinylCrackle(context, masterGain);
+  // Start all layers and track nodes
+  sourceNodes.push(createRainOnTent(context, masterGain));
+  sourceNodes.push(createCampfireCrackle(context, masterGain));
+  sourceNodes.push(createVinylCrackle(context, masterGain));
   oscillators.push(...createWindInTrees(context, masterGain));
   
-  // Schedule thunder every 40-60 seconds
+  // Schedule thunder every 45-70 seconds
   const thunderInterval = setInterval(() => {
     if (audioNodes && currentNoise === 'campfire') {
-      playThunder(context, masterGain);
+      const node = playThunder(context, masterGain);
+      audioNodes.sourceNodes.push(node);
     }
-  }, 40000 + Math.random() * 20000);
+  }, 45000 + Math.random() * 25000);
   intervals.push(thunderInterval);
   
-  // Initial thunder after 5 seconds
+  // Initial thunder after 8 seconds
   setTimeout(() => {
     if (audioNodes && currentNoise === 'campfire') {
-      playThunder(context, masterGain);
+      const node = playThunder(context, masterGain);
+      audioNodes.sourceNodes.push(node);
     }
-  }, 5000);
+  }, 8000);
   
-  // Schedule owl hoots every 30-90 seconds
+  // Schedule owl hoots every 40-100 seconds
   const owlInterval = setInterval(() => {
     if (audioNodes && currentNoise === 'campfire') {
       playOwl(context, masterGain);
     }
-  }, 30000 + Math.random() * 60000);
+  }, 40000 + Math.random() * 60000);
   intervals.push(owlInterval);
   
-  // Initial owl after 15 seconds
+  // Initial owl after 20 seconds
   setTimeout(() => {
     if (audioNodes && currentNoise === 'campfire') {
       playOwl(context, masterGain);
     }
-  }, 15000);
+  }, 20000);
   
-  return { oscillators, intervals };
+  return { sourceNodes, oscillators, intervals };
 }
 
 export const audioService = {
   async playNoise(type: NoiseType, volume: number = 0.3): Promise<void> {
-    if (currentNoise && currentNoise !== type) {
+    // Stop existing audio first
+    if (audioNodes) {
       this.stopNoise();
     }
     
-    if (currentNoise === type) {
-      if (audioNodes) {
-        audioNodes.gainNode.gain.value = volume;
-      }
-      return;
-    }
-    
-    const context = new AudioContext();
-    const gainNode = context.createGain();
-    gainNode.gain.value = volume;
-    gainNode.connect(context.destination);
-    
-    audioNodes = { context, gainNode, intervals: [] };
-    currentNoise = type;
-    
-    if (type === 'brown') {
-      const buffer = createBrownNoise(context);
-      const noiseNode = context.createBufferSource();
-      noiseNode.buffer = buffer;
-      noiseNode.loop = true;
-      noiseNode.connect(gainNode);
-      noiseNode.start();
-      audioNodes.noiseNode = noiseNode;
-    } else if (type === 'rain') {
-      const buffer = createRainNoise(context);
-      const noiseNode = context.createBufferSource();
-      noiseNode.buffer = buffer;
-      noiseNode.loop = true;
-      noiseNode.connect(gainNode);
-      noiseNode.start();
-      audioNodes.noiseNode = noiseNode;
-    } else if (type === 'forest') {
-      const oscillators = createForestNoise(context, gainNode);
-      audioNodes.oscillators = oscillators;
+    try {
+      const context = new AudioContext();
       
-      const buffer = createBrownNoise(context);
-      const noiseNode = context.createBufferSource();
-      noiseNode.buffer = buffer;
-      noiseNode.loop = true;
-      const noiseGain = context.createGain();
-      noiseGain.gain.value = 0.1;
-      noiseNode.connect(noiseGain);
-      noiseGain.connect(gainNode);
-      noiseNode.start();
-      audioNodes.noiseNode = noiseNode;
-    } else if (type === 'campfire') {
-      const { oscillators, intervals } = createCampfireSoundscape(context, gainNode);
-      audioNodes.oscillators = oscillators;
-      audioNodes.intervals = intervals;
+      // Resume context if suspended (required for some browsers)
+      if (context.state === 'suspended') {
+        await context.resume();
+      }
+      
+      const gainNode = context.createGain();
+      gainNode.gain.value = Math.min(volume, 0.5); // Cap max volume
+      gainNode.connect(context.destination);
+      
+      audioNodes = { context, gainNode, sourceNodes: [], oscillators: [], intervals: [] };
+      currentNoise = type;
+      
+      if (type === 'brown') {
+        const buffer = createBrownNoise(context);
+        const noiseNode = context.createBufferSource();
+        noiseNode.buffer = buffer;
+        noiseNode.loop = true;
+        noiseNode.connect(gainNode);
+        noiseNode.start();
+        audioNodes.sourceNodes.push(noiseNode);
+      } else if (type === 'rain') {
+        const buffer = createRainNoise(context);
+        const noiseNode = context.createBufferSource();
+        noiseNode.buffer = buffer;
+        noiseNode.loop = true;
+        noiseNode.connect(gainNode);
+        noiseNode.start();
+        audioNodes.sourceNodes.push(noiseNode);
+      } else if (type === 'forest') {
+        const oscillators = createForestNoise(context, gainNode);
+        audioNodes.oscillators = oscillators;
+        
+        const buffer = createBrownNoise(context);
+        const noiseNode = context.createBufferSource();
+        noiseNode.buffer = buffer;
+        noiseNode.loop = true;
+        const noiseGain = context.createGain();
+        noiseGain.gain.value = 0.05; // Reduced from 0.1
+        noiseNode.connect(noiseGain);
+        noiseGain.connect(gainNode);
+        noiseNode.start();
+        audioNodes.sourceNodes.push(noiseNode);
+      } else if (type === 'campfire') {
+        const { sourceNodes, oscillators, intervals } = createCampfireSoundscape(context, gainNode);
+        audioNodes.sourceNodes = sourceNodes;
+        audioNodes.oscillators = oscillators;
+        audioNodes.intervals = intervals;
+      }
+    } catch (e) {
+      console.error('Error starting audio:', e);
+      this.stopNoise();
     }
   },
   
@@ -401,12 +407,23 @@ export const audioService = {
     if (!audioNodes) return;
     
     try {
-      audioNodes.noiseNode?.stop();
-      audioNodes.oscillators?.forEach(osc => osc.stop());
-      audioNodes.intervals?.forEach(interval => clearInterval(interval));
+      // Clear intervals first
+      audioNodes.intervals.forEach(interval => clearInterval(interval));
+      
+      // Stop all source nodes
+      audioNodes.sourceNodes.forEach(node => {
+        try { node.stop(); } catch {}
+      });
+      
+      // Stop all oscillators
+      audioNodes.oscillators.forEach(osc => {
+        try { osc.stop(); } catch {}
+      });
+      
+      // Close context
       audioNodes.context.close();
     } catch (e) {
-      // Ignore errors from already stopped nodes
+      console.error('Error stopping audio:', e);
     }
     
     audioNodes = null;
@@ -415,7 +432,7 @@ export const audioService = {
   
   setVolume(volume: number): void {
     if (audioNodes) {
-      audioNodes.gainNode.gain.value = volume;
+      audioNodes.gainNode.gain.value = Math.min(volume, 0.5); // Cap max volume
     }
   },
   
