@@ -2,12 +2,12 @@ export type PlanType = 'monthly' | 'yearly';
 
 export const PRICING = {
   monthly: {
-    USD: { amount: 499, currency: 'USD', symbol: '$', display: '4.99' },
-    INR: { amount: 14900, currency: 'INR', symbol: '₹', display: '149' },
+    USD: { amount: 799, currency: 'USD', symbol: '$', display: '7.99' },
+    INR: { amount: 24900, currency: 'INR', symbol: '₹', display: '249' },
   },
   yearly: {
-    USD: { amount: 4999, currency: 'USD', symbol: '$', display: '49.99' },
-    INR: { amount: 149900, currency: 'INR', symbol: '₹', display: '1,499' },
+    USD: { amount: 6999, currency: 'USD', symbol: '$', display: '69.99' },
+    INR: { amount: 199900, currency: 'INR', symbol: '₹', display: '1,999' },
   },
 };
 
