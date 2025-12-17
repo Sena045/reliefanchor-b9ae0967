@@ -82,10 +82,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
           
           // Check if premium has expired
           const premiumExpired = profileData.premium_until && new Date(profileData.premium_until) < new Date();
+          const computedIsPremium = profileData.is_premium && !premiumExpired;
+          
+          console.log('[Profile] Loaded:', {
+            is_premium_db: profileData.is_premium,
+            premium_until: profileData.premium_until,
+            premiumExpired,
+            computedIsPremium
+          });
           
           setProfile({
             language: (profileData.language as Language) || 'en',
-            isPremium: profileData.is_premium && !premiumExpired,
+            isPremium: computedIsPremium,
             premiumUntil: profileData.premium_until,
             messagesUsedToday: isNewDay ? 0 : profileData.messages_used_today,
             lastMessageDate: profileData.last_message_date,
