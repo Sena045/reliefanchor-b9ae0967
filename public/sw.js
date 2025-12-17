@@ -3,6 +3,13 @@
 // IMPORTANT: Navigation requests ("/") must be network-first to avoid serving a stale
 // cached index.html after a new deploy (otherwise production can appear "not updated").
 
+// Listen for skip waiting message from client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 const CACHE_NAME = 'reliefanchor-runtime-v4';
 
 const PRECACHE_URLS = [
