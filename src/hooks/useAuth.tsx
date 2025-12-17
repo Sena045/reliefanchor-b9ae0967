@@ -22,14 +22,10 @@ const getInitialRecoveryState = () => {
   const hashParams = new URLSearchParams(window.location.hash.substring(1));
   const searchParams = new URLSearchParams(window.location.search);
 
-  // Dedicated landing path for recovery
-  if (window.location.pathname === '/reset-password') return true;
-
   return (
     hashParams.get('type') === 'recovery' ||
     searchParams.get('type') === 'recovery' ||
-    searchParams.get('recovery') === '1' ||
-    searchParams.get('mode') === 'recovery'
+    searchParams.get('recovery') === '1'
   );
 };
 
@@ -44,13 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const searchParams = new URLSearchParams(window.location.search);
 
-      if (window.location.pathname === '/reset-password') return true;
-
-      // Primary: GoTrue adds type=recovery
       if (hashParams.get('type') === 'recovery' || searchParams.get('type') === 'recovery') return true;
-
-      // Secondary: our own marker to make the flow robust across providers/configs
-      if (searchParams.get('recovery') === '1' || searchParams.get('mode') === 'recovery') return true;
+      if (searchParams.get('recovery') === '1') return true;
 
       return false;
     };
@@ -99,9 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearPasswordRecovery = () => {
     setIsPasswordRecovery(false);
-    // If the user landed on /reset-password, bring them back to the app root.
-    const nextPath = window.location.pathname === '/reset-password' ? '/' : window.location.pathname;
-    window.history.replaceState(null, '', nextPath);
+    window.history.replaceState(null, '', window.location.pathname);
   };
 
   const signUp = async (email: string, password: string) => {
@@ -124,8 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
-    // Use a dedicated landing path so the app can reliably show the reset form.
-    const redirectUrl = `${window.location.origin}/reset-password?recovery=1`;
+    // Use root URL with recovery marker (system-managed URLs don't need manual setup)
+    const redirectUrl = `${window.location.origin}/?recovery=1`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
