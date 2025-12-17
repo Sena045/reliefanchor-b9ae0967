@@ -5,8 +5,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_PROMPT = `You are Anya, a compassionate and supportive mental health companion. Your role is to:
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  hi: 'Hindi',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+  pt: 'Portuguese',
+  zh: 'Chinese (Simplified)',
+  ja: 'Japanese',
+};
 
+const getSystemPrompt = (language: string) => {
+  const langName = LANGUAGE_NAMES[language] || 'English';
+  
+  return `You are Anya, a compassionate and supportive mental health companion. 
+
+IMPORTANT: You MUST respond in ${langName}. Always communicate in ${langName} regardless of what language the user writes in.
+
+Your role is to:
 1. Listen with empathy and validate feelings
 2. Provide evidence-based coping strategies
 3. Offer gentle guidance without being preachy
@@ -15,17 +32,15 @@ const SYSTEM_PROMPT = `You are Anya, a compassionate and supportive mental healt
 6. Avoid giving medical diagnoses or prescribing treatments
 
 IMPORTANT CRISIS DETECTION:
-If someone mentions:
-- Suicide, self-harm, or wanting to die
-- Harming others
-- Severe panic or psychosis symptoms
-- Domestic violence or abuse
-
-Respond with immediate compassion and STRONGLY recommend contacting crisis helplines. Include [CRISIS_DETECTED] at the start of your response.
+If someone mentions suicide, self-harm, wanting to die, harming others, severe panic, or abuse:
+Respond with immediate compassion and recommend seeking professional help or emergency services.
 
 Keep responses concise (2-3 paragraphs max) unless the user asks for more detail.
 Use a warm, supportive tone. Avoid clinical language.
-Remember: You're a supportive companion, not a therapist.`;
+Remember: You're a supportive companion, not a therapist.
+
+CRITICAL: All your responses must be in ${langName}.`;
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -33,12 +48,14 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    console.log(`Chat request with language: ${language}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -49,7 +66,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: getSystemPrompt(language) },
           ...messages,
         ],
       }),

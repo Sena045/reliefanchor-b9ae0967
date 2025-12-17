@@ -54,10 +54,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setChatHistory(prev => [...prev, userMessage]);
     
     storageService.incrementMessageCount();
-    setSettings(storageService.getState().settings);
+    const currentSettings = storageService.getState().settings;
+    setSettings(currentSettings);
     
     const allMessages = [...chatHistory, userMessage].map(m => ({ role: m.role, content: m.content }));
-    const response = await chatService.sendMessage(allMessages);
+    const response = await chatService.sendMessage(allMessages, currentSettings.language);
     
     const assistantMessage = storageService.addChat({ role: 'assistant', content: response, timestamp: Date.now() });
     setChatHistory(prev => [...prev, assistantMessage]);
