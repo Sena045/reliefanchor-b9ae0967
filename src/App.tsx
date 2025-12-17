@@ -5,8 +5,8 @@ import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthPage } from '@/pages/AuthPage';
 import { Toaster } from '@/components/ui/toaster';
-import { Skeleton } from '@/components/Skeleton';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
+import { SplashLoader } from '@/components/SplashLoader';
 
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -15,16 +15,6 @@ const MoodPage = lazy(() => import('@/pages/MoodPage').then(m => ({ default: m.M
 const ToolsPage = lazy(() => import('@/pages/ToolsPage').then(m => ({ default: m.ToolsPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
-
-const PageLoader = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="space-y-4 w-64">
-      <Skeleton className="h-8 w-full" />
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-4 w-1/2" />
-    </div>
-  </div>
-);
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -37,15 +27,7 @@ function AppContent() {
       new URLSearchParams(window.location.hash.substring(1)).get('type') === 'recovery');
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="space-y-4 w-64">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      </div>
-    );
+    return <SplashLoader />;
   }
 
   // Show AuthPage for password recovery even if user is logged in
@@ -55,7 +37,7 @@ function AppContent() {
 
   if (showPremium) {
     return (
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<SplashLoader />}>
         <PremiumPage onClose={() => setShowPremium(false)} />
       </Suspense>
     );
@@ -72,7 +54,7 @@ function AppContent() {
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       <ErrorBoundary>
-        <Suspense fallback={<PageLoader />}>
+        <Suspense fallback={<SplashLoader />}>
           {activeTab === 'home' && <HomePage onNavigate={handleNavigate} />}
           {activeTab === 'chat' && <ChatPage onShowPremium={() => setShowPremium(true)} />}
           {activeTab === 'mood' && <MoodPage />}
