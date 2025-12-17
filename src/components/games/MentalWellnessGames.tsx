@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Brain, Sparkles, Heart, RefreshCw, Circle, Lock, Crown } from 'lucide-react';
+import { Brain, Sparkles, Heart, RefreshCw, Circle, Lock, Crown, Zap, Box, Palette, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/context/AppContext';
 
@@ -38,6 +38,27 @@ const AFFIRMATIONS = [
   "I trust my journey.",
 ];
 
+const MOTIVATION_QUOTES = [
+  { quote: "The only way out is through.", author: "Robert Frost" },
+  { quote: "You are braver than you believe.", author: "A.A. Milne" },
+  { quote: "This too shall pass.", author: "Persian Proverb" },
+  { quote: "Be gentle with yourself.", author: "Unknown" },
+  { quote: "Progress, not perfection.", author: "Unknown" },
+  { quote: "You've survived 100% of your worst days.", author: "Unknown" },
+  { quote: "Healing is not linear.", author: "Unknown" },
+  { quote: "Small steps still move you forward.", author: "Unknown" },
+];
+
+const BODY_PARTS = [
+  { name: "Feet", instruction: "Curl your toes tightly, hold for 5 seconds, then release." },
+  { name: "Legs", instruction: "Tense your calf and thigh muscles, hold, then let go." },
+  { name: "Stomach", instruction: "Tighten your abdominal muscles, hold, then relax." },
+  { name: "Hands", instruction: "Make tight fists, hold for 5 seconds, then open." },
+  { name: "Arms", instruction: "Flex your biceps, hold the tension, then release." },
+  { name: "Shoulders", instruction: "Raise your shoulders to your ears, hold, then drop." },
+  { name: "Face", instruction: "Scrunch your face tightly, hold, then smooth it out." },
+];
+
 const MEMORY_EMOJIS = ['🌸', '🌿', '☀️', '🌙', '🦋', '🌊'];
 
 const BUBBLE_COLORS = [
@@ -49,11 +70,13 @@ const BUBBLE_COLORS = [
   'bg-amber-400/60',
 ];
 
+const BREATH_COLORS = ['#60A5FA', '#34D399', '#FBBF24', '#F472B6', '#A78BFA'];
+
 export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps) {
   const { isPremium } = useApp();
-  const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | 'bubble' | null>(null);
+  const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | 'bubble' | 'bodyscan' | 'motivation' | 'worrybox' | 'colorbreath' | null>(null);
 
-  const handleGameClick = (game: 'memory' | 'affirmation' | 'gratitude' | 'bubble', requiresPremium: boolean) => {
+  const handleGameClick = (game: typeof activeGame, requiresPremium: boolean) => {
     if (requiresPremium && !isPremium) {
       onShowPremium?.();
       return;
@@ -65,6 +88,7 @@ export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps)
     <div className="space-y-4">
       {!activeGame && (
         <div className="grid gap-3">
+          {/* Free Games */}
           <GameCard
             icon={Circle}
             title="Bubble Pop"
@@ -77,6 +101,8 @@ export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps)
             description="Discover your daily positive affirmation"
             onClick={() => handleGameClick('affirmation', false)}
           />
+          
+          {/* Premium Games */}
           <GameCard
             icon={Brain}
             title="Memory Match"
@@ -91,6 +117,34 @@ export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps)
             onClick={() => handleGameClick('gratitude', true)}
             isPremium={!isPremium}
           />
+          <GameCard
+            icon={Activity}
+            title="Body Scan Meditation"
+            description="Guided progressive muscle relaxation"
+            onClick={() => handleGameClick('bodyscan', true)}
+            isPremium={!isPremium}
+          />
+          <GameCard
+            icon={Zap}
+            title="Daily Motivation"
+            description="Inspiring quotes for your journey"
+            onClick={() => handleGameClick('motivation', true)}
+            isPremium={!isPremium}
+          />
+          <GameCard
+            icon={Box}
+            title="Worry Box"
+            description="Park your worries for later"
+            onClick={() => handleGameClick('worrybox', true)}
+            isPremium={!isPremium}
+          />
+          <GameCard
+            icon={Palette}
+            title="Color Breathing"
+            description="Visualize calm with color therapy"
+            onClick={() => handleGameClick('colorbreath', true)}
+            isPremium={!isPremium}
+          />
         </div>
       )}
       
@@ -98,6 +152,10 @@ export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps)
       {activeGame === 'memory' && <MemoryGame onBack={() => setActiveGame(null)} />}
       {activeGame === 'affirmation' && <AffirmationGame onBack={() => setActiveGame(null)} />}
       {activeGame === 'gratitude' && <GratitudeGame onBack={() => setActiveGame(null)} />}
+      {activeGame === 'bodyscan' && <BodyScanGame onBack={() => setActiveGame(null)} />}
+      {activeGame === 'motivation' && <MotivationGame onBack={() => setActiveGame(null)} />}
+      {activeGame === 'worrybox' && <WorryBoxGame onBack={() => setActiveGame(null)} />}
+      {activeGame === 'colorbreath' && <ColorBreathGame onBack={() => setActiveGame(null)} />}
     </div>
   );
 }
@@ -446,6 +504,328 @@ function GratitudeGame({ onBack }: { onBack: () => void }) {
             )}
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Body Scan Meditation Game
+function BodyScanGame({ onBack }: { onBack: () => void }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [timer, setTimer] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isActive && timer > 0) {
+      interval = setInterval(() => {
+        setTimer(t => t - 1);
+      }, 1000);
+    } else if (timer === 0 && isActive) {
+      if (currentStep < BODY_PARTS.length - 1) {
+        setCurrentStep(s => s + 1);
+        setTimer(10);
+      } else {
+        setIsActive(false);
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isActive, timer, currentStep]);
+
+  const startSession = () => {
+    setCurrentStep(0);
+    setTimer(10);
+    setIsActive(true);
+  };
+
+  const part = BODY_PARTS[currentStep];
+  const isComplete = !isActive && currentStep === BODY_PARTS.length - 1 && timer === 0;
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <Button variant="ghost" size="sm" onClick={onBack}>← Back</Button>
+        
+        {!isActive && !isComplete && (
+          <div className="text-center py-8 space-y-4">
+            <Activity className="h-16 w-16 text-primary mx-auto" />
+            <h3 className="text-lg font-medium">Body Scan Meditation</h3>
+            <p className="text-sm text-muted-foreground">
+              Relax each body part progressively to release tension
+            </p>
+            <Button onClick={startSession} size="lg">Begin Session</Button>
+          </div>
+        )}
+
+        {isActive && (
+          <div className="text-center space-y-6 py-4">
+            <div className="flex justify-center gap-1">
+              {BODY_PARTS.map((_, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'w-3 h-3 rounded-full transition-colors',
+                    i < currentStep ? 'bg-green-500' :
+                    i === currentStep ? 'bg-primary animate-pulse' : 'bg-muted'
+                  )}
+                />
+              ))}
+            </div>
+            
+            <div className="p-6 bg-primary/10 rounded-xl">
+              <p className="text-sm text-muted-foreground mb-2">Focus on your</p>
+              <h3 className="text-2xl font-bold text-primary mb-3">{part.name}</h3>
+              <p className="text-sm">{part.instruction}</p>
+            </div>
+            
+            <div className="text-4xl font-mono text-primary">{timer}s</div>
+            
+            <Button variant="outline" onClick={() => setIsActive(false)}>Pause</Button>
+          </div>
+        )}
+
+        {isComplete && (
+          <div className="text-center py-8 space-y-4">
+            <div className="text-4xl">🧘</div>
+            <h3 className="text-lg font-medium text-green-600">Session Complete!</h3>
+            <p className="text-sm text-muted-foreground">
+              Take a moment to notice how your body feels now.
+            </p>
+            <Button onClick={startSession}>Start Again</Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Daily Motivation Game
+function MotivationGame({ onBack }: { onBack: () => void }) {
+  const [quote, setQuote] = useState<typeof MOTIVATION_QUOTES[0] | null>(null);
+  const [isRevealing, setIsRevealing] = useState(false);
+
+  const revealQuote = () => {
+    setIsRevealing(true);
+    setQuote(null);
+    setTimeout(() => {
+      setQuote(MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)]);
+      setIsRevealing(false);
+    }, 1000);
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-6">
+        <Button variant="ghost" size="sm" onClick={onBack}>← Back</Button>
+        
+        <div className="flex flex-col items-center gap-6 py-4">
+          <div className={cn(
+            'w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/30 to-orange-400/30 flex items-center justify-center',
+            isRevealing && 'animate-pulse'
+          )}>
+            <Zap className="h-10 w-10 text-amber-500" />
+          </div>
+          
+          {quote && (
+            <div className="text-center p-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl animate-fade-in-up max-w-sm">
+              <p className="text-lg font-medium mb-2">"{quote.quote}"</p>
+              <p className="text-sm text-muted-foreground">— {quote.author}</p>
+            </div>
+          )}
+          
+          <Button onClick={revealQuote} disabled={isRevealing} size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+            {isRevealing ? 'Revealing...' : quote ? 'Another Quote' : 'Get Inspired'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Worry Box Game
+function WorryBoxGame({ onBack }: { onBack: () => void }) {
+  const [worries, setWorries] = useState<{ text: string; date: string }[]>(() => {
+    const stored = localStorage.getItem('worry_box');
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [input, setInput] = useState('');
+  const [showBox, setShowBox] = useState(false);
+
+  const addWorry = () => {
+    if (!input.trim()) return;
+    const updated = [{ text: input.trim(), date: new Date().toLocaleDateString() }, ...worries];
+    setWorries(updated);
+    localStorage.setItem('worry_box', JSON.stringify(updated));
+    setInput('');
+  };
+
+  const clearWorry = (index: number) => {
+    const updated = worries.filter((_, i) => i !== index);
+    setWorries(updated);
+    localStorage.setItem('worry_box', JSON.stringify(updated));
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <Button variant="ghost" size="sm" onClick={onBack}>← Back</Button>
+        
+        <div className="text-center py-2">
+          <Box className="h-12 w-12 text-purple-500 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">
+            Write down your worries to "park" them. Come back later to address or release them.
+          </p>
+        </div>
+        
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addWorry()}
+            placeholder="What's worrying you?"
+            className="flex-1 px-3 py-2 rounded-lg bg-muted text-sm"
+          />
+          <Button onClick={addWorry} size="sm" className="bg-purple-500 hover:bg-purple-600">
+            Park It
+          </Button>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {worries.length} worries in the box
+          </span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowBox(!showBox)}
+          >
+            {showBox ? 'Close Box' : 'Open Box'}
+          </Button>
+        </div>
+        
+        {showBox && worries.length > 0 && (
+          <div className="max-h-48 overflow-y-auto space-y-2 p-2 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
+            {worries.map((w, i) => (
+              <div key={i} className="flex items-start gap-2 p-2 bg-background rounded text-sm">
+                <div className="flex-1">
+                  <p>{w.text}</p>
+                  <p className="text-xs text-muted-foreground">{w.date}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => clearWorry(i)} className="text-xs h-6">
+                  Release
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {showBox && worries.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground py-4">
+            Your worry box is empty! 🎉
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Color Breathing Game
+function ColorBreathGame({ onBack }: { onBack: () => void }) {
+  const [isBreathing, setIsBreathing] = useState(false);
+  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [colorIndex, setColorIndex] = useState(0);
+  const [cycleCount, setCycleCount] = useState(0);
+
+  useEffect(() => {
+    if (!isBreathing) return;
+    
+    let timeout: NodeJS.Timeout;
+    
+    if (phase === 'inhale') {
+      timeout = setTimeout(() => setPhase('hold'), 4000);
+    } else if (phase === 'hold') {
+      timeout = setTimeout(() => setPhase('exhale'), 4000);
+    } else {
+      timeout = setTimeout(() => {
+        setPhase('inhale');
+        setColorIndex(i => (i + 1) % BREATH_COLORS.length);
+        setCycleCount(c => c + 1);
+      }, 4000);
+    }
+    
+    return () => clearTimeout(timeout);
+  }, [isBreathing, phase]);
+
+  const startBreathing = () => {
+    setIsBreathing(true);
+    setPhase('inhale');
+    setCycleCount(0);
+  };
+
+  const stopBreathing = () => {
+    setIsBreathing(false);
+  };
+
+  const currentColor = BREATH_COLORS[colorIndex];
+  const scale = phase === 'inhale' ? 'scale-110' : phase === 'hold' ? 'scale-110' : 'scale-75';
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <Button variant="ghost" size="sm" onClick={onBack}>← Back</Button>
+          {isBreathing && <span className="text-sm text-muted-foreground">Cycles: {cycleCount}</span>}
+        </div>
+        
+        <div className="flex flex-col items-center gap-6 py-4">
+          <div 
+            className={cn(
+              'w-40 h-40 rounded-full flex items-center justify-center transition-all duration-[4000ms] ease-in-out',
+              scale
+            )}
+            style={{ backgroundColor: isBreathing ? currentColor : '#94A3B8' }}
+          >
+            <span className="text-white font-medium text-lg">
+              {isBreathing ? (
+                phase === 'inhale' ? 'Breathe In' : 
+                phase === 'hold' ? 'Hold' : 'Breathe Out'
+              ) : 'Ready'}
+            </span>
+          </div>
+          
+          {isBreathing && (
+            <div className="flex gap-2">
+              {BREATH_COLORS.map((color, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'w-4 h-4 rounded-full transition-all',
+                    i === colorIndex ? 'ring-2 ring-offset-2 ring-primary' : ''
+                  )}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          )}
+          
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            {isBreathing 
+              ? 'Follow the color as it expands and contracts with your breath'
+              : 'Visualize calm colors while practicing deep breathing'
+            }
+          </p>
+          
+          <Button 
+            onClick={isBreathing ? stopBreathing : startBreathing}
+            size="lg"
+            className={cn(
+              isBreathing ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-blue-500 to-purple-500'
+            )}
+          >
+            {isBreathing ? 'Stop' : 'Start Color Breathing'}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
