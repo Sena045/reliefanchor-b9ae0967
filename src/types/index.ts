@@ -54,8 +54,8 @@ export const CRISIS_HELPLINES = {
 };
 
 export const PRICING = {
-  india: { amount: 499, currency: 'INR', symbol: '₹' },
-  global: { amount: 999, currency: 'USD', symbol: '$' },
+  india: { amount: 499, currency: 'INR', symbol: '₹', display: '499' },
+  global: { amount: 9.99, currency: 'USD', symbol: '$', display: '9.99' },
 };
 
 export const FREE_MESSAGES_PER_DAY = 5;
