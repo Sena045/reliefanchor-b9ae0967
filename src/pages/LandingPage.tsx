@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -85,11 +86,28 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
     }
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    toast({ title: 'Thanks!', description: "We'll keep you updated on new features." });
-    setEmail('');
+    
+    try {
+      const { error } = await supabase
+        .from('email_subscribers')
+        .insert({ email: email.trim().toLowerCase() });
+      
+      if (error) {
+        if (error.code === '23505') {
+          toast({ title: 'Already subscribed!', description: "You're already on our list." });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({ title: 'Thanks!', description: "We'll keep you updated on new features." });
+      }
+      setEmail('');
+    } catch (err) {
+      toast({ title: 'Oops!', description: 'Something went wrong. Please try again.', variant: 'destructive' });
+    }
   };
 
   return (
