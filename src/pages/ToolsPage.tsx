@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2, Check, RotateCcw, Timer, Waves } from 'lucide-react';
+import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2, Check, RotateCcw, Timer, Waves, Lock } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
@@ -88,7 +88,7 @@ interface ToolsPageProps {
 }
 
 export function ToolsPage({ onShowPremium }: ToolsPageProps) {
-  const { profile, addJournal } = useApp();
+  const { profile, addJournal, isPremium } = useApp();
   const { t } = useTranslation(profile.language);
   const { toast } = useToast();
   
@@ -126,7 +126,15 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
 
   const stopBreathing = () => setBreathingActive(false);
 
+  const premiumSounds = ['sleep', 'ocean'] as const;
+  
   const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep' | 'ocean') => {
+    // Check if sound is premium-only
+    if (premiumSounds.includes(type as any) && !isPremium) {
+      onShowPremium?.();
+      return;
+    }
+    
     if (playingSound === type) { 
       audioService.stopNoise(); 
       setPlayingSound(null);
@@ -342,21 +350,23 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
           <Card><CardContent className="p-6 space-y-4">
             <h2 className="text-lg font-medium mb-2">{t('sounds')}</h2>
             
-            {/* Featured sounds */}
+            {/* Featured sounds (Premium) */}
             <div className="grid grid-cols-2 gap-2">
               <Button 
                 variant={playingSound === 'sleep' ? 'default' : 'secondary'} 
-                className="h-16 flex-col"
+                className="h-16 flex-col relative"
                 onClick={() => toggleSound('sleep')}
               >
+                {!isPremium && <Lock className="h-3 w-3 absolute top-1 right-1 text-amber-500" />}
                 {playingSound === 'sleep' ? <VolumeX className="h-5 w-5 mb-1" /> : <Volume2 className="h-5 w-5 mb-1" />}
                 <span className="text-xs">{t('sleepMix')}</span>
               </Button>
               <Button 
                 variant={playingSound === 'ocean' ? 'default' : 'secondary'} 
-                className="h-16 flex-col"
+                className="h-16 flex-col relative"
                 onClick={() => toggleSound('ocean')}
               >
+                {!isPremium && <Lock className="h-3 w-3 absolute top-1 right-1 text-amber-500" />}
                 {playingSound === 'ocean' ? <VolumeX className="h-5 w-5 mb-1" /> : <Waves className="h-5 w-5 mb-1" />}
                 <span className="text-xs">{t('ocean')}</span>
               </Button>
