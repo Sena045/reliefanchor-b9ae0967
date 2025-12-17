@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AppProvider } from '@/context/AppContext';
 import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { HomePage } from '@/pages/HomePage';
-import { ChatPage } from '@/pages/ChatPage';
-import { MoodPage } from '@/pages/MoodPage';
-import { ToolsPage } from '@/pages/ToolsPage';
-import { SettingsPage } from '@/pages/SettingsPage';
-import { PremiumPage } from '@/pages/PremiumPage';
 import { AuthPage } from '@/pages/AuthPage';
 import { Toaster } from '@/components/ui/toaster';
 import { Skeleton } from '@/components/Skeleton';
+
+// Lazy load pages for better initial load performance
+const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
+const ChatPage = lazy(() => import('@/pages/ChatPage').then(m => ({ default: m.ChatPage })));
+const MoodPage = lazy(() => import('@/pages/MoodPage').then(m => ({ default: m.MoodPage })));
+const ToolsPage = lazy(() => import('@/pages/ToolsPage').then(m => ({ default: m.ToolsPage })));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
+
+const PageLoader = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="space-y-4 w-64">
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  </div>
+);
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -41,7 +53,11 @@ function AppContent() {
   }
 
   if (showPremium) {
-    return <PremiumPage onClose={() => setShowPremium(false)} />;
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <PremiumPage onClose={() => setShowPremium(false)} />
+      </Suspense>
+    );
   }
 
   const handleNavigate = (tab: string) => {
@@ -55,11 +71,13 @@ function AppContent() {
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       <ErrorBoundary>
-        {activeTab === 'home' && <HomePage onNavigate={handleNavigate} />}
-        {activeTab === 'chat' && <ChatPage onShowPremium={() => setShowPremium(true)} />}
-        {activeTab === 'mood' && <MoodPage />}
-        {activeTab === 'tools' && <ToolsPage onShowPremium={() => setShowPremium(true)} />}
-        {activeTab === 'settings' && <SettingsPage />}
+        <Suspense fallback={<PageLoader />}>
+          {activeTab === 'home' && <HomePage onNavigate={handleNavigate} />}
+          {activeTab === 'chat' && <ChatPage onShowPremium={() => setShowPremium(true)} />}
+          {activeTab === 'mood' && <MoodPage />}
+          {activeTab === 'tools' && <ToolsPage onShowPremium={() => setShowPremium(true)} />}
+          {activeTab === 'settings' && <SettingsPage />}
+        </Suspense>
       </ErrorBoundary>
     </Layout>
   );
