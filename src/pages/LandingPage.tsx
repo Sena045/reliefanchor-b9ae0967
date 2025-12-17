@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { BreathingDemo } from '@/components/BreathingDemo';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -174,6 +175,8 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         </div>
       </section>
 
+      {/* Breathing Demo Section */}
+      <BreathingDemo onGetStarted={onGetStarted} />
 
       {/* Email Capture Section */}
       <section className="px-4 py-16 bg-primary/5">
