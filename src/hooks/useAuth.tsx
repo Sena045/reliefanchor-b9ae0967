@@ -109,30 +109,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    // Update UI immediately (prevents "sign out did nothing" when network is slow)
+    setIsPasswordRecovery(false);
+    
+    try {
+      // Simple local sign out - let onAuthStateChange handle state updates
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('[auth] signOut error:', error);
+      }
+    } catch (error) {
+      console.error('[auth] signOut exception:', error);
+    }
+    
+    // Fallback: manually clear state if listener didn't fire
     setUser(null);
     setSession(null);
-    setIsPasswordRecovery(false);
-
-    // Always clear local session first (reliable even when offline)
-    try {
-      await supabase.auth.signOut({ scope: 'local' });
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.warn('[auth] local signOut failed', error);
-      }
-    }
-
-    // Best-effort: revoke everywhere without blocking the UI
-    setTimeout(() => {
-      supabase.auth.signOut({ scope: 'global' }).catch((error) => {
-        if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
-          console.warn('[auth] global signOut failed', error);
-        }
-      });
-    }, 0);
   };
 
   const resetPassword = async (email: string) => {
