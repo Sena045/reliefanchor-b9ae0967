@@ -4,6 +4,7 @@ import { AppProvider } from '@/context/AppContext';
 import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthPage } from '@/pages/AuthPage';
+import { LandingPage } from '@/pages/LandingPage';
 import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
@@ -20,19 +21,34 @@ function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
     (new URLSearchParams(window.location.search).get('recovery') === '1' ||
       new URLSearchParams(window.location.hash.substring(1)).get('type') === 'recovery');
 
+  // Check for referral code in URL (should show auth page)
+  const hasReferralCode = typeof window !== 'undefined' && 
+    new URLSearchParams(window.location.search).get('ref');
+
   if (authLoading) {
     return <SplashLoader />;
   }
 
   // Show AuthPage for password recovery even if user is logged in
-  if (!user || isPasswordRecovery || isRecoveryUrl) {
+  if (isPasswordRecovery || isRecoveryUrl) {
     return <AuthPage />;
+  }
+
+  // Not logged in
+  if (!user) {
+    // Show auth page if explicitly requested or has referral code
+    if (showAuth || hasReferralCode) {
+      return <AuthPage />;
+    }
+    // Show landing page by default
+    return <LandingPage onGetStarted={() => setShowAuth(true)} />;
   }
 
   if (showPremium) {

@@ -9,6 +9,7 @@ import { LANGUAGES } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { pushNotificationService } from '@/services/pushNotificationService';
 import { supabase } from '@/integrations/supabase/client';
+import { ReferralCard } from '@/components/ReferralCard';
 interface SettingsPageProps {
   onShowLegal?: (tab: 'privacy' | 'terms') => void;
 }
@@ -103,6 +104,9 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Referral Program */}
+      <ReferralCard />
 
       {/* Notifications */}
       {notificationsSupported && (

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft } from 'lucide-react';
+import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift } from 'lucide-react';
+import { referralService } from '@/services/referralService';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -34,6 +35,7 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
   
@@ -49,13 +51,21 @@ export function AuthPage() {
   const showReset = isPasswordRecovery || isRecoveryUrl;
 
   useEffect(() => {
+    // Check for referral code in URL
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref');
+    if (refCode) {
+      setReferralCode(refCode.toUpperCase());
+      setIsLogin(false); // Switch to signup mode when there's a referral
+    }
+
     // Detect iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
     
     // Check if already installed as PWA
     const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
-                               (window.navigator as any).standalone === true;
+                               (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     setIsStandalone(isInStandaloneMode);
 
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -114,6 +124,11 @@ export function AuthPage() {
 
     setLoading(true);
     try {
+      // Store referral code before signup so AppContext can apply it
+      if (!isLogin && referralCode) {
+        localStorage.setItem('pendingReferralCode', referralCode);
+      }
+
       const { error } = isLogin
         ? await signIn(email, password)
         : await signUp(email, password);
@@ -126,6 +141,8 @@ export function AuthPage() {
           message = 'Invalid email or password. Please try again.';
         }
         toast({ title: 'Error', description: message, variant: 'destructive' });
+        // Clear pending referral on error
+        localStorage.removeItem('pendingReferralCode');
       } else if (!isLogin) {
         toast({ title: 'Account created!', description: 'You are now signed in.' });
       }
@@ -352,6 +369,26 @@ export function AuthPage() {
                     >
                       Forgot password?
                     </button>
+                  </div>
+                )}
+
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Gift className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        placeholder="Referral Code (optional)"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                        className="pl-10 uppercase"
+                        disabled={loading}
+                        maxLength={8}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Have a friend's code? Enter it to give them free Premium days!
+                    </p>
                   </div>
                 )}
 
