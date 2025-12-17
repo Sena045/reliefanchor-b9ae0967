@@ -140,6 +140,14 @@ export function AuthPage() {
           <p className="mt-6 text-xs text-center text-muted-foreground">
             Your data is securely stored and never shared. Your mental health journey stays private.
           </p>
+
+          <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <p className="text-xs text-center text-muted-foreground">
+              <span className="font-medium text-foreground">📌 Bookmark it now!</span>
+              <br />
+              Press <kbd className="px-1.5 py-0.5 mx-1 rounded bg-muted text-[10px] font-mono">Ctrl+D</kbd> (or <kbd className="px-1.5 py-0.5 mx-1 rounded bg-muted text-[10px] font-mono">⌘+D</kbd> on Mac) to save ReliefAnchor for quick access.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
