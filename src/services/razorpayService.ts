@@ -1,6 +1,14 @@
+export type PlanType = 'monthly' | 'yearly';
+
 export const PRICING = {
-  USD: { amount: 999, currency: 'USD', symbol: '$', display: '9.99' },
-  INR: { amount: 49900, currency: 'INR', symbol: '₹', display: '499' },
+  monthly: {
+    USD: { amount: 499, currency: 'USD', symbol: '$', display: '4.99' },
+    INR: { amount: 14900, currency: 'INR', symbol: '₹', display: '149' },
+  },
+  yearly: {
+    USD: { amount: 4999, currency: 'USD', symbol: '$', display: '49.99' },
+    INR: { amount: 149900, currency: 'INR', symbol: '₹', display: '1,499' },
+  },
 };
 
 declare global {
@@ -27,6 +35,7 @@ function loadRazorpayScript(): Promise<void> {
 
 export const razorpayService = {
   async initiatePayment(
+    plan: PlanType,
     currency: 'USD' | 'INR',
     onSuccess: () => void,
     onCancel: () => void,
@@ -35,14 +44,17 @@ export const razorpayService = {
     try {
       await loadRazorpayScript();
       
-      const pricing = PRICING[currency];
+      const pricing = PRICING[plan][currency];
+      const description = plan === 'monthly' 
+        ? 'Premium Subscription - 1 Month' 
+        : 'Premium Subscription - 1 Year';
       
       const options = {
         key: RAZORPAY_KEY,
         amount: pricing.amount,
         currency: pricing.currency,
         name: 'ReliefAnchor',
-        description: 'Premium Subscription - 1 Year',
+        description,
         handler: () => onSuccess(),
         modal: { ondismiss: () => onCancel() },
         prefill: { email: '' },

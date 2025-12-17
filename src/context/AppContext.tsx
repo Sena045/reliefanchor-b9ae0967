@@ -19,7 +19,7 @@ interface AppContextType {
   
   isPremium: boolean;
   premiumUntil: Date | null;
-  activatePremium: () => Promise<void>;
+  activatePremium: (plan?: 'monthly' | 'yearly') => Promise<void>;
   
   canSendMessage: boolean;
   remainingMessages: number;
@@ -175,9 +175,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateProfile({ language });
   }, [updateProfile]);
 
-  const activatePremium = useCallback(async () => {
+  const activatePremium = useCallback(async (plan: 'monthly' | 'yearly' = 'yearly') => {
     const premiumUntil = new Date();
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
+    if (plan === 'monthly') {
+      premiumUntil.setMonth(premiumUntil.getMonth() + 1);
+    } else {
+      premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
+    }
     await updateProfile({ 
       isPremium: true, 
       premiumUntil: premiumUntil.toISOString() 
