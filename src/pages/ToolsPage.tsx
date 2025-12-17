@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX } from 'lucide-react';
+import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { audioService } from '@/services/audioService';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { MentalWellnessGames } from '@/components/games/MentalWellnessGames';
 
 const JOURNAL_PROMPTS = {
   en: ['What are you grateful for today?', 'What made you smile recently?', 'What challenge are you facing?', 'Describe your ideal peaceful moment.'],
@@ -25,6 +26,7 @@ const TAB_LABELS = {
   grounding: { en: 'Grounding', hi: 'ग्राउंडिंग' },
   sounds: { en: 'Sounds', hi: 'ध्वनि' },
   journal: { en: 'Journal', hi: 'जर्नल' },
+  games: { en: 'Games', hi: 'खेल' },
 } as const;
 
 export function ToolsPage() {
@@ -32,7 +34,7 @@ export function ToolsPage() {
   const { t } = useTranslation(settings.language);
   const { toast } = useToast();
   
-  const [activeTab, setActiveTab] = useState<'breathing' | 'grounding' | 'sounds' | 'journal'>('breathing');
+  const [activeTab, setActiveTab] = useState<'breathing' | 'grounding' | 'sounds' | 'journal' | 'games'>('breathing');
   const [breathingActive, setBreathingActive] = useState(false);
   const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
   const [groundingStep, setGroundingStep] = useState(0);
@@ -72,6 +74,7 @@ export function ToolsPage() {
     { id: 'grounding' as const, icon: Eye },
     { id: 'sounds' as const, icon: Volume2 },
     { id: 'journal' as const, icon: BookOpen },
+    { id: 'games' as const, icon: Gamepad2 },
   ];
 
   return (
@@ -139,6 +142,8 @@ export function ToolsPage() {
           <Button onClick={saveJournal} disabled={!journalText.trim()} className="w-full">{t('save')}</Button>
         </CardContent></Card>
       )}
+
+      {activeTab === 'games' && <MentalWellnessGames />}
     </div>
   );
 }

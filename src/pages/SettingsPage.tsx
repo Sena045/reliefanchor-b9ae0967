@@ -1,14 +1,12 @@
-import { Globe, Languages, Key, Phone } from 'lucide-react';
+import { Globe, Languages, Phone } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { CRISIS_HELPLINES, Region, Language } from '@/types';
 
 export function SettingsPage() {
-  const { settings, setRegion, setLanguage, geminiApiKey, setGeminiApiKey } = useApp();
+  const { settings, setRegion, setLanguage } = useApp();
   const { t } = useTranslation(settings.language);
   const helplines = CRISIS_HELPLINES[settings.region];
 
@@ -29,14 +27,6 @@ export function SettingsPage() {
           {(['en', 'hi'] as Language[]).map((l) => (
             <Button key={l} variant={settings.language === l ? 'default' : 'outline'} className="flex-1" onClick={() => setLanguage(l)}>{l === 'en' ? 'English' : 'हिंदी'}</Button>
           ))}
-        </CardContent>
-      </Card>
-
-      <Card><CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Key className="h-4 w-4" />{t('geminiApiKey')}</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          <Label htmlFor="apiKey">{t('enterApiKey')}</Label>
-          <Input id="apiKey" type="password" value={geminiApiKey} onChange={(e) => setGeminiApiKey(e.target.value)} placeholder="AIza..." />
-          <p className="text-xs text-muted-foreground">Get your key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" className="text-primary underline">Google AI Studio</a></p>
         </CardContent>
       </Card>
 

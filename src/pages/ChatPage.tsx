@@ -21,7 +21,6 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
     clearChat, 
     canSendMessage, 
     remainingMessages,
-    isGeminiReady 
   } = useApp();
   const { t } = useTranslation(settings.language);
   const { toast } = useToast();
@@ -40,15 +39,6 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
-    
-    if (!isGeminiReady) {
-      toast({
-        title: 'API Key Required',
-        description: 'Please set your Gemini API key in Settings to chat with Anya.',
-        variant: 'destructive',
-      });
-      return;
-    }
     
     const message = input.trim();
     setInput('');
