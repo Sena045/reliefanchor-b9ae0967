@@ -1,4 +1,7 @@
-type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep';
+type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep' | 'ocean';
+
+let sleepTimerId: ReturnType<typeof setTimeout> | null = null;
+let sleepTimerEndTime: number | null = null;
 
 interface AudioNodes {
   context: AudioContext;
@@ -780,9 +783,169 @@ function createSleepSound(context: AudioContext, masterGain: GainNode): {
   return { sources, oscillators, intervals, timeouts };
 }
 
+// Ocean waves - calming beach soundscape
+function createOceanSound(context: AudioContext, masterGain: GainNode): { 
+  sources: AudioBufferSourceNode[], 
+  oscillators: OscillatorNode[],
+  intervals: ReturnType<typeof setInterval>[],
+  timeouts: ReturnType<typeof setTimeout>[]
+} {
+  const sources: AudioBufferSourceNode[] = [];
+  const oscillators: OscillatorNode[] = [];
+  const intervals: ReturnType<typeof setInterval>[] = [];
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
+  
+  const pinkNoise = createNoiseBuffer(context, 8, 'pink');
+  const brownNoise = createNoiseBuffer(context, 8, 'brown');
+  
+  // === MAIN WAVE LAYER - Low rumble ===
+  const waveBase = context.createBufferSource();
+  waveBase.buffer = brownNoise;
+  waveBase.loop = true;
+  
+  const waveFilter = context.createBiquadFilter();
+  waveFilter.type = 'lowpass';
+  waveFilter.frequency.value = 300;
+  waveFilter.Q.value = 0.5;
+  
+  const waveGain = context.createGain();
+  waveGain.gain.value = 0.2;
+  
+  // Wave rhythm LFO (every 8-12 seconds)
+  const waveLFO = context.createOscillator();
+  waveLFO.frequency.value = 0.1;
+  const waveLFOGain = context.createGain();
+  waveLFOGain.gain.value = 0.08;
+  waveLFO.connect(waveLFOGain);
+  waveLFOGain.connect(waveGain.gain);
+  waveLFO.start();
+  oscillators.push(waveLFO);
+  
+  waveBase.connect(waveFilter);
+  waveFilter.connect(waveGain);
+  waveGain.connect(masterGain);
+  waveBase.start();
+  sources.push(waveBase);
+  
+  // === WAVE WASH - Mid frequencies ===
+  const washSource = context.createBufferSource();
+  washSource.buffer = pinkNoise;
+  washSource.loop = true;
+  
+  const washFilter = context.createBiquadFilter();
+  washFilter.type = 'bandpass';
+  washFilter.frequency.value = 600;
+  washFilter.Q.value = 0.8;
+  
+  const washGain = context.createGain();
+  washGain.gain.value = 0.08;
+  
+  // Slower wash rhythm
+  const washLFO = context.createOscillator();
+  washLFO.frequency.value = 0.08;
+  const washLFOGain = context.createGain();
+  washLFOGain.gain.value = 0.04;
+  washLFO.connect(washLFOGain);
+  washLFOGain.connect(washGain.gain);
+  washLFO.start();
+  oscillators.push(washLFO);
+  
+  washSource.connect(washFilter);
+  washFilter.connect(washGain);
+  washGain.connect(masterGain);
+  washSource.start();
+  sources.push(washSource);
+  
+  // === SHORE FOAM - High frequency texture ===
+  const foamSource = context.createBufferSource();
+  foamSource.buffer = createNoiseBuffer(context, 4, 'white');
+  foamSource.loop = true;
+  
+  const foamFilter = context.createBiquadFilter();
+  foamFilter.type = 'highpass';
+  foamFilter.frequency.value = 2000;
+  
+  const foamFilter2 = context.createBiquadFilter();
+  foamFilter2.type = 'lowpass';
+  foamFilter2.frequency.value = 6000;
+  
+  const foamGain = context.createGain();
+  foamGain.gain.value = 0.015;
+  
+  const foamLFO = context.createOscillator();
+  foamLFO.frequency.value = 0.12;
+  const foamLFOGain = context.createGain();
+  foamLFOGain.gain.value = 0.01;
+  foamLFO.connect(foamLFOGain);
+  foamLFOGain.connect(foamGain.gain);
+  foamLFO.start();
+  oscillators.push(foamLFO);
+  
+  foamSource.connect(foamFilter);
+  foamFilter.connect(foamFilter2);
+  foamFilter2.connect(foamGain);
+  foamGain.connect(masterGain);
+  foamSource.start();
+  sources.push(foamSource);
+  
+  // === DISTANT SEAGULLS (occasional) ===
+  const createSeagull = () => {
+    if (!audioNodes || currentNoise !== 'ocean') return;
+    
+    const now = context.currentTime;
+    const baseFreq = 1800 + Math.random() * 400;
+    
+    const gullOsc = context.createOscillator();
+    gullOsc.type = 'sine';
+    gullOsc.frequency.setValueAtTime(baseFreq, now);
+    gullOsc.frequency.linearRampToValueAtTime(baseFreq * 1.3, now + 0.15);
+    gullOsc.frequency.linearRampToValueAtTime(baseFreq * 0.9, now + 0.3);
+    gullOsc.frequency.linearRampToValueAtTime(baseFreq * 1.1, now + 0.4);
+    
+    const gullGain = context.createGain();
+    gullGain.gain.setValueAtTime(0, now);
+    gullGain.gain.linearRampToValueAtTime(0.008, now + 0.05);
+    gullGain.gain.linearRampToValueAtTime(0.005, now + 0.25);
+    gullGain.gain.linearRampToValueAtTime(0, now + 0.5);
+    
+    gullOsc.connect(gullGain);
+    gullGain.connect(masterGain);
+    gullOsc.start(now);
+    gullOsc.stop(now + 0.6);
+  };
+  
+  // Random seagulls every 15-30 seconds
+  const gullInterval = setInterval(() => {
+    if (Math.random() < 0.15) createSeagull();
+  }, 5000);
+  intervals.push(gullInterval);
+  
+  // === DEEP OCEAN RUMBLE ===
+  const deepSource = context.createBufferSource();
+  deepSource.buffer = brownNoise;
+  deepSource.loop = true;
+  
+  const deepFilter = context.createBiquadFilter();
+  deepFilter.type = 'lowpass';
+  deepFilter.frequency.value = 80;
+  deepFilter.Q.value = 0.3;
+  
+  const deepGain = context.createGain();
+  deepGain.gain.value = 0.15;
+  
+  deepSource.connect(deepFilter);
+  deepFilter.connect(deepGain);
+  deepGain.connect(masterGain);
+  deepSource.start();
+  sources.push(deepSource);
+  
+  return { sources, oscillators, intervals, timeouts };
+}
+
 export const audioService = {
   async playNoise(type: NoiseType, volume: number = 0.3): Promise<void> {
     this.stopNoise();
+    this.clearSleepTimer();
     
     try {
       const context = new AudioContext();
@@ -793,7 +956,7 @@ export const audioService = {
       
       const masterGain = context.createGain();
       masterGain.gain.setValueAtTime(0, context.currentTime);
-      masterGain.gain.linearRampToValueAtTime(Math.min(volume, 0.5), context.currentTime + 1.5); // Slower fade in for sleep
+      masterGain.gain.linearRampToValueAtTime(Math.min(volume, 0.5), context.currentTime + 1.5);
       masterGain.connect(context.destination);
       
       audioNodes = { 
@@ -823,6 +986,12 @@ export const audioService = {
         audioNodes.timeouts = result.timeouts;
       } else if (type === 'sleep') {
         const result = createSleepSound(context, masterGain);
+        audioNodes.sources = result.sources;
+        audioNodes.oscillators = result.oscillators;
+        audioNodes.intervals = result.intervals;
+        audioNodes.timeouts = result.timeouts;
+      } else if (type === 'ocean') {
+        const result = createOceanSound(context, masterGain);
         audioNodes.sources = result.sources;
         audioNodes.oscillators = result.oscillators;
         audioNodes.intervals = result.intervals;
@@ -878,4 +1047,44 @@ export const audioService = {
   isPlaying(): boolean {
     return audioNodes !== null;
   },
+  
+  // Sleep timer functionality
+  setSleepTimer(minutes: number): void {
+    this.clearSleepTimer();
+    const ms = minutes * 60 * 1000;
+    sleepTimerEndTime = Date.now() + ms;
+    
+    sleepTimerId = setTimeout(() => {
+      // Gradual fade out over 30 seconds
+      if (audioNodes) {
+        const fadeTime = 30;
+        audioNodes.masterGain.gain.linearRampToValueAtTime(
+          0,
+          audioNodes.context.currentTime + fadeTime
+        );
+        setTimeout(() => {
+          this.stopNoise();
+        }, fadeTime * 1000);
+      }
+      sleepTimerEndTime = null;
+    }, ms);
+  },
+  
+  clearSleepTimer(): void {
+    if (sleepTimerId) {
+      clearTimeout(sleepTimerId);
+      sleepTimerId = null;
+    }
+    sleepTimerEndTime = null;
+  },
+  
+  getSleepTimerRemaining(): number | null {
+    if (!sleepTimerEndTime) return null;
+    const remaining = sleepTimerEndTime - Date.now();
+    return remaining > 0 ? Math.ceil(remaining / 1000 / 60) : null;
+  },
+  
+  hasSleepTimer(): boolean {
+    return sleepTimerId !== null;
+  }
 };
