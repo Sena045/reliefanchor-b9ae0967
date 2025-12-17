@@ -387,10 +387,13 @@ export function AuthPage() {
             Your data is securely stored and never shared. Your mental health journey stays private.
           </p>
 
-          <p className="mt-2 text-xs text-center text-muted-foreground">
-            🌐 Available in 8 languages: English, Hindi, Spanish, French, German, Portuguese, Chinese & Japanese. 
-            Change language anytime in Settings.
-          </p>
+          <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <p className="text-xs text-center text-muted-foreground">
+              <span className="font-medium text-foreground">🌐 8 Languages Supported</span>
+              <br />
+              English, Hindi, Spanish, French, German, Portuguese, Chinese & Japanese. Change anytime in Settings.
+            </p>
+          </div>
 
           <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
             <p className="text-xs text-center text-muted-foreground">
