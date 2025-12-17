@@ -5,10 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Globe } from 'lucide-react';
-import { Language, LANGUAGES } from '@/types';
+import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft } from 'lucide-react';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -38,7 +36,7 @@ export function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
+  
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -129,11 +127,6 @@ export function AuthPage() {
         }
         toast({ title: 'Error', description: message, variant: 'destructive' });
       } else if (!isLogin) {
-        // Set language preference after signup
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user && selectedLanguage !== 'en') {
-          await supabase.from('profiles').update({ language: selectedLanguage }).eq('id', user.id);
-        }
         toast({ title: 'Account created!', description: 'You are now signed in.' });
       }
     } finally {
@@ -210,25 +203,8 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl border-primary/20 relative">
-        {/* Language selector at top right */}
-        <div className="absolute top-4 right-4 z-10">
-          <Select value={selectedLanguage} onValueChange={(val) => setSelectedLanguage(val as Language)}>
-            <SelectTrigger className="w-auto h-8 px-2 text-xs gap-1 border-muted">
-              <Globe className="h-3 w-3" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {LANGUAGES.map((lang) => (
-                <SelectItem key={lang.code} value={lang.code} className="text-sm">
-                  {lang.native}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <CardHeader className="text-center space-y-4 pt-12">
+      <Card className="w-full max-w-md shadow-xl border-primary/20">
+        <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Heart className="w-8 h-8 text-primary" />
           </div>
