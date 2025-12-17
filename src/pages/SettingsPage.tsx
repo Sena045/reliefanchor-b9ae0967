@@ -1,13 +1,35 @@
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LANGUAGES } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
-export function SettingsPage() {
-  const { profile, setLanguage, isPremium, premiumUntil } = useApp();
+interface SettingsPageProps {
+  onShowLegal?: (tab: 'privacy' | 'terms') => void;
+}
+
+export function SettingsPage({ onShowLegal }: SettingsPageProps) {
+  const { profile, setLanguage, isPremium, premiumUntil, moods, journals } = useApp();
   const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const exportData = () => {
+    const data = {
+      exportDate: new Date().toISOString(),
+      moods: moods.map(m => ({ ...m, date: new Date(m.timestamp).toISOString() })),
+      journals: journals.map(j => ({ ...j, date: new Date(j.timestamp).toISOString() })),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reliefanchor-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'Data exported successfully!' });
+  };
 
   return (
     <div className="p-4 space-y-4 max-w-lg mx-auto safe-top">
@@ -97,6 +119,32 @@ export function SettingsPage() {
               isPremium={!isPremium}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Data & Privacy */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Data & Privacy
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button variant="outline" size="sm" onClick={exportData} className="w-full justify-start">
+            <Download className="h-4 w-4 mr-2" />
+            Export My Data
+          </Button>
+          {onShowLegal && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => onShowLegal('privacy')} className="w-full justify-start">
+                Privacy Policy
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => onShowLegal('terms')} className="w-full justify-start">
+                Terms of Service
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

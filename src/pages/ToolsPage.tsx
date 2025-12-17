@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2, Check, RotateCcw } from 'lucide-react';
+import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2, Check, RotateCcw, Timer, Waves } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
@@ -99,6 +99,7 @@ export function ToolsPage() {
   const [groundingComplete, setGroundingComplete] = useState(false);
   const [playingSound, setPlayingSound] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.3);
+  const [sleepTimer, setSleepTimer] = useState<number | null>(null);
   const [journalText, setJournalText] = useState('');
   const [currentPrompt, setCurrentPrompt] = useState(JOURNAL_PROMPTS[lang]?.[0] || JOURNAL_PROMPTS.en[0]);
 
@@ -121,9 +122,25 @@ export function ToolsPage() {
 
   const stopBreathing = () => setBreathingActive(false);
 
-  const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep') => {
-    if (playingSound === type) { audioService.stopNoise(); setPlayingSound(null); }
-    else { await audioService.playNoise(type, volume); setPlayingSound(type); }
+  const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep' | 'ocean') => {
+    if (playingSound === type) { 
+      audioService.stopNoise(); 
+      setPlayingSound(null);
+      setSleepTimer(null);
+    } else { 
+      await audioService.playNoise(type, volume); 
+      setPlayingSound(type);
+    }
+  };
+
+  const handleSleepTimer = (minutes: number) => {
+    if (sleepTimer === minutes) {
+      audioService.clearSleepTimer();
+      setSleepTimer(null);
+    } else {
+      audioService.setSleepTimer(minutes);
+      setSleepTimer(minutes);
+    }
   };
 
   const saveJournal = () => {
@@ -321,18 +338,25 @@ export function ToolsPage() {
           <Card><CardContent className="p-6 space-y-4">
             <h2 className="text-lg font-medium mb-2">{t('sounds')}</h2>
             
-            {/* Featured: Sleep Mix */}
-            <Button 
-              variant={playingSound === 'sleep' ? 'default' : 'secondary'} 
-              className="w-full h-16 text-base"
-              onClick={() => toggleSound('sleep')}
-            >
-              {playingSound === 'sleep' ? <VolumeX className="h-5 w-5 mr-2" /> : <Volume2 className="h-5 w-5 mr-2" />}
-              <div className="text-left">
-                <div className="font-medium">{t('sleepMix')}</div>
-                <div className="text-xs opacity-80">Binaural beats + Rain + Thunder</div>
-              </div>
-            </Button>
+            {/* Featured sounds */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                variant={playingSound === 'sleep' ? 'default' : 'secondary'} 
+                className="h-16 flex-col"
+                onClick={() => toggleSound('sleep')}
+              >
+                {playingSound === 'sleep' ? <VolumeX className="h-5 w-5 mb-1" /> : <Volume2 className="h-5 w-5 mb-1" />}
+                <span className="text-xs">{t('sleepMix')}</span>
+              </Button>
+              <Button 
+                variant={playingSound === 'ocean' ? 'default' : 'secondary'} 
+                className="h-16 flex-col"
+                onClick={() => toggleSound('ocean')}
+              >
+                {playingSound === 'ocean' ? <VolumeX className="h-5 w-5 mb-1" /> : <Waves className="h-5 w-5 mb-1" />}
+                <span className="text-xs">{t('ocean')}</span>
+              </Button>
+            </div>
             
             <div className="grid grid-cols-2 gap-2">
               {(['rain', 'forest', 'brown', 'campfire'] as const).map((type) => (
@@ -344,8 +368,33 @@ export function ToolsPage() {
             </div>
             
             {playingSound && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Slider value={[volume]} onValueChange={([v]) => { setVolume(v); audioService.setVolume(v); }} max={1} step={0.1} />
+                
+                {/* Sleep Timer */}
+                <div className="flex items-center gap-2">
+                  <Timer className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Sleep timer:</span>
+                  <div className="flex gap-1 flex-1">
+                    {[15, 30, 60].map((mins) => (
+                      <Button
+                        key={mins}
+                        variant={sleepTimer === mins ? 'default' : 'outline'}
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => handleSleepTimer(mins)}
+                      >
+                        {mins}m
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                {sleepTimer && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Sound will fade out in {sleepTimer} minutes
+                  </p>
+                )}
+                
                 {playingSound === 'sleep' && (
                   <p className="text-xs text-muted-foreground text-center">
                     🎧 Use headphones for binaural beats effect

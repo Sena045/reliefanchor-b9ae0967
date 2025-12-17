@@ -8,7 +8,7 @@ type TranslationKey =
   | 'breathingExercise' | 'groundingExercise' | 'ambientSounds' | 'journalPrompt' | 'writeHere' | 'save'
   | 'language' | 'happy' | 'calm' | 'sad' | 'anxious' | 'angry' | 'rain' | 'forest' | 'brownNoise'
   | 'inhale' | 'hold' | 'exhale' | 'startBreathing' | 'stopBreathing' | 'games' | 'campfire'
-  | 'back' | 'next' | 'complete' | 'restart' | 'enterItems' | 'sleepMix';
+  | 'back' | 'next' | 'complete' | 'restart' | 'enterItems' | 'sleepMix' | 'ocean';
 
 const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -68,6 +68,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'Restart',
     enterItems: 'Enter items...',
     sleepMix: 'Sleep Mix',
+    ocean: 'Ocean Waves',
   },
   hi: {
     appName: 'रिलीफ़ एंकर',
@@ -126,6 +127,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'पुनः आरंभ',
     enterItems: 'आइटम दर्ज करें...',
     sleepMix: 'स्लीप मिक्स',
+    ocean: 'समुद्री लहरें',
   },
   es: {
     appName: 'ReliefAnchor',
@@ -184,6 +186,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'Reiniciar',
     enterItems: 'Ingresa elementos...',
     sleepMix: 'Mezcla Sueño',
+    ocean: 'Olas del Mar',
   },
   fr: {
     appName: 'ReliefAnchor',
@@ -242,6 +245,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'Recommencer',
     enterItems: 'Entrez des éléments...',
     sleepMix: 'Mix Sommeil',
+    ocean: 'Vagues de l\'Océan',
   },
   de: {
     appName: 'ReliefAnchor',
@@ -300,6 +304,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'Neustart',
     enterItems: 'Elemente eingeben...',
     sleepMix: 'Schlaf-Mix',
+    ocean: 'Meereswellen',
   },
   pt: {
     appName: 'ReliefAnchor',
@@ -358,6 +363,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'Reiniciar',
     enterItems: 'Digite itens...',
     sleepMix: 'Mix Sono',
+    ocean: 'Ondas do Mar',
   },
   zh: {
     appName: 'ReliefAnchor',
@@ -416,6 +422,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: '重新开始',
     enterItems: '输入项目...',
     sleepMix: '睡眠混音',
+    ocean: '海浪声',
   },
   ja: {
     appName: 'ReliefAnchor',
@@ -474,6 +481,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     restart: 'やり直す',
     enterItems: '項目を入力...',
     sleepMix: 'スリープミックス',
+    ocean: '波の音',
   },
 };
 
