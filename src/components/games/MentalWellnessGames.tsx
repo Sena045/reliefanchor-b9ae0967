@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Brain, Sparkles, Heart, RefreshCw } from 'lucide-react';
+import { Brain, Sparkles, Heart, RefreshCw, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MemoryCard {
@@ -9,6 +9,15 @@ interface MemoryCard {
   emoji: string;
   isFlipped: boolean;
   isMatched: boolean;
+}
+
+interface Bubble {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  speed: number;
 }
 
 const AFFIRMATIONS = [
@@ -26,13 +35,28 @@ const AFFIRMATIONS = [
 
 const MEMORY_EMOJIS = ['🌸', '🌿', '☀️', '🌙', '🦋', '🌊'];
 
+const BUBBLE_COLORS = [
+  'bg-pink-400/60',
+  'bg-purple-400/60', 
+  'bg-blue-400/60',
+  'bg-teal-400/60',
+  'bg-green-400/60',
+  'bg-amber-400/60',
+];
+
 export function MentalWellnessGames() {
-  const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | null>(null);
+  const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | 'bubble' | null>(null);
   
   return (
     <div className="space-y-4">
       {!activeGame && (
         <div className="grid gap-3">
+          <GameCard
+            icon={Circle}
+            title="Bubble Pop"
+            description="Pop calming bubbles for stress relief"
+            onClick={() => setActiveGame('bubble')}
+          />
           <GameCard
             icon={Brain}
             title="Memory Match"
@@ -54,6 +78,7 @@ export function MentalWellnessGames() {
         </div>
       )}
       
+      {activeGame === 'bubble' && <BubblePopGame onBack={() => setActiveGame(null)} />}
       {activeGame === 'memory' && <MemoryGame onBack={() => setActiveGame(null)} />}
       {activeGame === 'affirmation' && <AffirmationGame onBack={() => setActiveGame(null)} />}
       {activeGame === 'gratitude' && <GratitudeGame onBack={() => setActiveGame(null)} />}
@@ -77,6 +102,121 @@ function GameCard({ icon: Icon, title, description, onClick }: {
           <h3 className="font-medium">{title}</h3>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BubblePopGame({ onBack }: { onBack: () => void }) {
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [score, setScore] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const createBubble = useCallback((): Bubble => {
+    return {
+      id: Date.now() + Math.random(),
+      x: Math.random() * 80 + 10,
+      y: 100,
+      size: Math.random() * 30 + 30,
+      color: BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)],
+      speed: Math.random() * 1 + 0.5,
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const spawnInterval = setInterval(() => {
+      setBubbles(prev => [...prev.slice(-15), createBubble()]);
+    }, 800);
+
+    const moveInterval = setInterval(() => {
+      setBubbles(prev => 
+        prev
+          .map(b => ({ ...b, y: b.y - b.speed }))
+          .filter(b => b.y > -10)
+      );
+    }, 50);
+
+    return () => {
+      clearInterval(spawnInterval);
+      clearInterval(moveInterval);
+    };
+  }, [isPlaying, createBubble]);
+
+  const popBubble = (id: number) => {
+    setBubbles(prev => prev.filter(b => b.id !== id));
+    setScore(s => s + 1);
+  };
+
+  const startGame = () => {
+    setBubbles([]);
+    setScore(0);
+    setIsPlaying(true);
+  };
+
+  const stopGame = () => {
+    setIsPlaying(false);
+    setBubbles([]);
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <div className="flex justify-between items-center">
+          <Button variant="ghost" size="sm" onClick={onBack}>← Back</Button>
+          <span className="text-sm font-medium text-primary">Score: {score}</span>
+        </div>
+
+        <div 
+          className="relative h-64 bg-gradient-to-b from-primary/5 to-primary/20 rounded-xl overflow-hidden"
+        >
+          {!isPlaying && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+              {score > 0 && (
+                <p className="text-lg font-medium">You popped {score} bubbles!</p>
+              )}
+              <Button onClick={startGame} size="lg">
+                {score > 0 ? 'Play Again' : 'Start Popping'}
+              </Button>
+            </div>
+          )}
+
+          {isPlaying && (
+            <>
+              {bubbles.map(bubble => (
+                <button
+                  key={bubble.id}
+                  onClick={() => popBubble(bubble.id)}
+                  style={{
+                    left: `${bubble.x}%`,
+                    bottom: `${bubble.y}%`,
+                    width: bubble.size,
+                    height: bubble.size,
+                  }}
+                  className={cn(
+                    'absolute rounded-full transition-transform hover:scale-110 active:scale-90',
+                    'shadow-lg backdrop-blur-sm border border-white/30',
+                    'animate-pulse cursor-pointer',
+                    bubble.color
+                  )}
+                />
+              ))}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={stopGame}
+                className="absolute bottom-2 right-2"
+              >
+                Stop
+              </Button>
+            </>
+          )}
+        </div>
+
+        <p className="text-xs text-center text-muted-foreground">
+          Tap the bubbles as they float up. Relax and enjoy!
+        </p>
       </CardContent>
     </Card>
   );
