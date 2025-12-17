@@ -179,12 +179,13 @@ export function AuthPage() {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Success', description: 'Your password has been updated! Please sign in again.' });
+        // Sign out first to avoid a brief "home" flash while recovery mode is cleared
+        await signOut();
         clearPasswordRecovery();
         setPassword('');
         setConfirmPassword('');
         setIsLogin(true);
         setIsForgotPassword(false);
-        await signOut();
       }
     } finally {
       setLoading(false);
