@@ -50,8 +50,7 @@ const BUBBLE_COLORS = [
 ];
 
 export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps) {
-  const { profile } = useApp();
-  const isPremium = profile.isPremium;
+  const { isPremium } = useApp();
   const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | 'bubble' | null>(null);
 
   const handleGameClick = (game: 'memory' | 'affirmation' | 'gratitude' | 'bubble', requiresPremium: boolean) => {
