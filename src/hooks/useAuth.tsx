@@ -23,18 +23,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
-    // Check URL hash for recovery type on initial load
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    if (hashParams.get('type') === 'recovery') {
+    const detectPasswordRecoveryFromUrl = () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const searchParams = new URLSearchParams(window.location.search);
+      return hashParams.get('type') === 'recovery' || searchParams.get('type') === 'recovery';
+    };
+
+    // Detect recovery on initial load (hash-based or query-param based)
+    if (detectPasswordRecoveryFromUrl()) {
       setIsPasswordRecovery(true);
     }
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
+        // Some flows emit PASSWORD_RECOVERY, others only SIGNED_IN but still include type=recovery in URL.
+        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && detectPasswordRecoveryFromUrl())) {
           setIsPasswordRecovery(true);
         }
+
+        if (import.meta.env.DEV) {
+          // Helpful for debugging recovery redirects; does not log tokens.
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const searchParams = new URLSearchParams(window.location.search);
+          // eslint-disable-next-line no-console
+          console.log('[auth]', { event, type: hashParams.get('type') ?? searchParams.get('type'), path: window.location.pathname });
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
