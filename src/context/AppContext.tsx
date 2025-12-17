@@ -3,6 +3,7 @@ import { Language, MoodEntry, ChatMessage, JournalEntry, FREE_MESSAGES_PER_DAY }
 import { supabase } from '@/integrations/supabase/client';
 import { chatService } from '@/services/chatService';
 import { useAuth } from '@/hooks/useAuth';
+import { referralService } from '@/services/referralService';
 
 interface UserProfile {
   language: Language;
@@ -108,6 +109,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
               messages_used_today: 0,
               last_message_date: today,
             }).eq('id', user.id);
+          }
+
+          // Check for pending referral code
+          const pendingReferral = localStorage.getItem('pendingReferralCode');
+          if (pendingReferral) {
+            await referralService.applyReferralCode(pendingReferral, user.id);
+            localStorage.removeItem('pendingReferralCode');
           }
         }
 
