@@ -16,11 +16,24 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Check URL for recovery marker synchronously before first render
+const getInitialRecoveryState = () => {
+  if (typeof window === 'undefined') return false;
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const searchParams = new URLSearchParams(window.location.search);
+  return (
+    hashParams.get('type') === 'recovery' ||
+    searchParams.get('type') === 'recovery' ||
+    searchParams.get('recovery') === '1' ||
+    searchParams.get('mode') === 'recovery'
+  );
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(getInitialRecoveryState);
 
   useEffect(() => {
     const detectPasswordRecoveryFromUrl = () => {
