@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell, Trash2 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { LANGUAGES } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { pushNotificationService } from '@/services/pushNotificationService';
-
+import { supabase } from '@/integrations/supabase/client';
 interface SettingsPageProps {
   onShowLegal?: (tab: 'privacy' | 'terms') => void;
 }
@@ -66,6 +66,24 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: 'Data exported successfully!' });
+  };
+
+  const clearChatHistory = async () => {
+    if (!user) return;
+    
+    const confirmed = window.confirm('Are you sure you want to delete all your chat history? This cannot be undone.');
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from('chat_history')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast({ title: 'Failed to clear chat history', variant: 'destructive' });
+    } else {
+      toast({ title: 'Chat history cleared!' });
+    }
   };
 
   return (
@@ -192,6 +210,10 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
           <Button variant="outline" size="sm" onClick={exportData} className="w-full justify-start">
             <Download className="h-4 w-4 mr-2" />
             Export My Data
+          </Button>
+          <Button variant="outline" size="sm" onClick={clearChatHistory} className="w-full justify-start text-destructive hover:text-destructive">
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Chat History
           </Button>
           {onShowLegal && (
             <>
