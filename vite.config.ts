@@ -14,5 +14,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Prevent duplicate React copies (fixes "Invalid hook call" / useState null)
+    dedupe: ["react", "react-dom"],
   },
 }));
