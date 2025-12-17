@@ -6,9 +6,9 @@ interface ChatMessage {
 }
 
 export const chatService = {
-  async sendMessage(messages: ChatMessage[]): Promise<string> {
+  async sendMessage(messages: ChatMessage[], language: string = 'en'): Promise<string> {
     const { data, error } = await supabase.functions.invoke('chat', {
-      body: { messages },
+      body: { messages, language },
     });
 
     if (error) {
