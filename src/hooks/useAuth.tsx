@@ -109,21 +109,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    setIsPasswordRecovery(false);
-    
-    try {
-      // Simple local sign out - let onAuthStateChange handle state updates
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('[auth] signOut error:', error);
-      }
-    } catch (error) {
-      console.error('[auth] signOut exception:', error);
-    }
-    
-    // Fallback: manually clear state if listener didn't fire
+    // Clear local state immediately
     setUser(null);
     setSession(null);
+    setIsPasswordRecovery(false);
+    
+    // Clear Supabase's local storage (no API call needed)
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      // Ignore errors - session may already be invalid
+    }
   };
 
   const resetPassword = async (email: string) => {
