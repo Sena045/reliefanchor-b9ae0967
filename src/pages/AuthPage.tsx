@@ -40,6 +40,13 @@ export function AuthPage() {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
+  const isRecoveryUrl =
+    typeof window !== 'undefined' &&
+    (new URLSearchParams(window.location.search).get('recovery') === '1' ||
+      new URLSearchParams(window.location.hash.substring(1)).get('type') === 'recovery');
+
+  const showReset = isPasswordRecovery || isRecoveryUrl;
+
   useEffect(() => {
     // Detect iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -203,7 +210,7 @@ export function AuthPage() {
           <div>
             <CardTitle className="text-2xl font-bold">ReliefAnchor</CardTitle>
             <CardDescription className="mt-2">
-              {isPasswordRecovery
+              {showReset
                 ? 'Enter your new password below.'
                 : isForgotPassword 
                   ? 'Enter your email to reset your password.'
@@ -214,7 +221,7 @@ export function AuthPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isPasswordRecovery ? (
+          {showReset ? (
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">

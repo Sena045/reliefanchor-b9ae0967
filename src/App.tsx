@@ -18,6 +18,11 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
 
+  const isRecoveryUrl =
+    typeof window !== 'undefined' &&
+    (new URLSearchParams(window.location.search).get('recovery') === '1' ||
+      new URLSearchParams(window.location.hash.substring(1)).get('type') === 'recovery');
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -31,7 +36,7 @@ function AppContent() {
   }
 
   // Show AuthPage for password recovery even if user is logged in
-  if (!user || isPasswordRecovery) {
+  if (!user || isPasswordRecovery || isRecoveryUrl) {
     return <AuthPage />;
   }
 
