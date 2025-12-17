@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Star, Check, Download, Share } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -38,23 +38,6 @@ const FEATURES = [
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Sarah M.',
-    text: "ReliefAnchor helped me through my toughest days. Anya feels like a real friend who's always there.",
-    rating: 5,
-  },
-  {
-    name: 'James K.',
-    text: 'The breathing exercises and mood tracking have become part of my daily routine. Highly recommend!',
-    rating: 5,
-  },
-  {
-    name: 'Priya S.',
-    text: 'Love that it supports Hindi! Finally an app that speaks my language for mental wellness.',
-    rating: 5,
-  },
-];
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const { toast } = useToast();
@@ -191,30 +174,6 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="px-4 py-16">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            Loved by Users Worldwide
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <Card key={idx} className="border-primary/10">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-3">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">"{testimonial.text}"</p>
-                  <p className="text-sm font-medium">{testimonial.name}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Email Capture Section */}
       <section className="px-4 py-16 bg-primary/5">
