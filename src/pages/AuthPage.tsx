@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Loader2, Mail, Lock, ArrowRight, Download } from 'lucide-react';
+import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share } from 'lucide-react';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -26,8 +26,19 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
+    // Detect iOS
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+    
+    // Check if already installed as PWA
+    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
+                               (window.navigator as any).standalone === true;
+    setIsStandalone(isInStandaloneMode);
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
@@ -184,6 +195,19 @@ export function AuthPage() {
               <Download className="w-4 h-4 mr-2" />
               Install App
             </Button>
+          )}
+
+          {isIOS && !isStandalone && (
+            <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
+              <p className="text-xs text-center text-muted-foreground">
+                <span className="font-medium text-foreground flex items-center justify-center gap-1">
+                  <Download className="w-3 h-3" /> Install App
+                </span>
+                <span className="mt-1 block">
+                  Tap <Share className="w-3 h-3 inline mx-0.5" /> Share → <span className="font-medium">Add to Home Screen</span>
+                </span>
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
