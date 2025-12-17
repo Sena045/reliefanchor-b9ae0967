@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Brain, Sparkles, Heart, RefreshCw, Circle } from 'lucide-react';
+import { Brain, Sparkles, Heart, RefreshCw, Circle, Lock, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useApp } from '@/context/AppContext';
+
+interface MentalWellnessGamesProps {
+  onShowPremium?: () => void;
+}
 
 interface MemoryCard {
   id: number;
@@ -44,8 +49,18 @@ const BUBBLE_COLORS = [
   'bg-amber-400/60',
 ];
 
-export function MentalWellnessGames() {
+export function MentalWellnessGames({ onShowPremium }: MentalWellnessGamesProps) {
+  const { profile } = useApp();
+  const isPremium = profile.isPremium;
   const [activeGame, setActiveGame] = useState<'memory' | 'affirmation' | 'gratitude' | 'bubble' | null>(null);
+
+  const handleGameClick = (game: 'memory' | 'affirmation' | 'gratitude' | 'bubble', requiresPremium: boolean) => {
+    if (requiresPremium && !isPremium) {
+      onShowPremium?.();
+      return;
+    }
+    setActiveGame(game);
+  };
   
   return (
     <div className="space-y-4">
@@ -55,25 +70,27 @@ export function MentalWellnessGames() {
             icon={Circle}
             title="Bubble Pop"
             description="Pop calming bubbles for stress relief"
-            onClick={() => setActiveGame('bubble')}
-          />
-          <GameCard
-            icon={Brain}
-            title="Memory Match"
-            description="Match calming symbols to improve focus"
-            onClick={() => setActiveGame('memory')}
+            onClick={() => handleGameClick('bubble', false)}
           />
           <GameCard
             icon={Sparkles}
             title="Affirmation Spin"
             description="Discover your daily positive affirmation"
-            onClick={() => setActiveGame('affirmation')}
+            onClick={() => handleGameClick('affirmation', false)}
+          />
+          <GameCard
+            icon={Brain}
+            title="Memory Match"
+            description="Match calming symbols to improve focus"
+            onClick={() => handleGameClick('memory', true)}
+            isPremium={!isPremium}
           />
           <GameCard
             icon={Heart}
             title="Gratitude Jar"
             description="Collect and reflect on moments of joy"
-            onClick={() => setActiveGame('gratitude')}
+            onClick={() => handleGameClick('gratitude', true)}
+            isPremium={!isPremium}
           />
         </div>
       )}
@@ -86,20 +103,28 @@ export function MentalWellnessGames() {
   );
 }
 
-function GameCard({ icon: Icon, title, description, onClick }: {
+function GameCard({ icon: Icon, title, description, onClick, isPremium }: {
   icon: typeof Brain;
   title: string;
   description: string;
   onClick: () => void;
+  isPremium?: boolean;
 }) {
   return (
-    <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={onClick}>
+    <Card className={cn("cursor-pointer transition-colors", isPremium ? "opacity-80" : "hover:bg-accent/50")} onClick={onClick}>
       <CardContent className="p-4 flex items-center gap-4">
-        <div className="p-3 rounded-full bg-primary/10">
-          <Icon className="h-6 w-6 text-primary" />
+        <div className={cn("p-3 rounded-full", isPremium ? "bg-amber-500/20" : "bg-primary/10")}>
+          {isPremium ? <Lock className="h-6 w-6 text-amber-500" /> : <Icon className="h-6 w-6 text-primary" />}
         </div>
-        <div>
-          <h3 className="font-medium">{title}</h3>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium">{title}</h3>
+            {isPremium && (
+              <span className="flex items-center gap-1 text-xs bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full">
+                <Crown className="h-3 w-3" /> Premium
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </CardContent>
