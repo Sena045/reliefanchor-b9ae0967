@@ -54,7 +54,7 @@ export function ToolsPage() {
 
   const stopBreathing = () => setBreathingActive(false);
 
-  const toggleSound = async (type: 'rain' | 'forest' | 'brown') => {
+  const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire') => {
     if (playingSound === type) { audioService.stopNoise(); setPlayingSound(null); }
     else { await audioService.playNoise(type, volume); setPlayingSound(type); }
   };
@@ -115,14 +115,19 @@ export function ToolsPage() {
 
       {activeTab === 'sounds' && (
         <Card><CardContent className="p-6 space-y-4">
-          <div className="flex gap-2">
-            {(['rain', 'forest', 'brown'] as const).map((type) => (
+          <div className="grid grid-cols-2 gap-2">
+            {(['rain', 'forest', 'brown', 'campfire'] as const).map((type) => (
               <Button key={type} variant={playingSound === type ? 'default' : 'outline'} className="flex-1" onClick={() => toggleSound(type)}>
                 {playingSound === type ? <VolumeX className="h-4 w-4 mr-1" /> : <Volume2 className="h-4 w-4 mr-1" />}
-                {t(type === 'brown' ? 'brownNoise' : type)}
+                {type === 'brown' ? t('brownNoise') : type === 'campfire' ? (settings.language === 'hi' ? 'कैम्पफ़ायर' : 'Campfire') : t(type)}
               </Button>
             ))}
           </div>
+          {playingSound === 'campfire' && (
+            <p className="text-xs text-muted-foreground text-center">
+              {settings.language === 'hi' ? 'बारिश • आग • गड़गड़ाहट • उल्लू • हवा • विनाइल' : 'Rain • Fire • Thunder • Owl • Wind • Vinyl'}
+            </p>
+          )}
           {playingSound && <Slider value={[volume]} onValueChange={([v]) => { setVolume(v); audioService.setVolume(v); }} max={1} step={0.1} />}
         </CardContent></Card>
       )}
