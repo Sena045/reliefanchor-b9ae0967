@@ -14,7 +14,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Skeleton } from '@/components/Skeleton';
 
 function AppContent() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isPasswordRecovery } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
 
@@ -30,7 +30,8 @@ function AppContent() {
     );
   }
 
-  if (!user) {
+  // Show AuthPage for password recovery even if user is logged in
+  if (!user || isPasswordRecovery) {
     return <AuthPage />;
   }
 

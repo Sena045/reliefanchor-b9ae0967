@@ -27,11 +27,10 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function AuthPage() {
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, isPasswordRecovery, clearPasswordRecovery } = useAuth();
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,14 +41,6 @@ export function AuthPage() {
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Check if this is a password recovery redirect
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get('type');
-    
-    if (type === 'recovery') {
-      setIsResettingPassword(true);
-    }
-
     // Detect iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(isIOSDevice);
@@ -188,11 +179,9 @@ export function AuthPage() {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Success', description: 'Your password has been updated!' });
-        setIsResettingPassword(false);
+        clearPasswordRecovery();
         setPassword('');
         setConfirmPassword('');
-        // Clear the hash from URL
-        window.history.replaceState(null, '', window.location.pathname);
       }
     } finally {
       setLoading(false);
@@ -210,7 +199,7 @@ export function AuthPage() {
           <div>
             <CardTitle className="text-2xl font-bold">ReliefAnchor</CardTitle>
             <CardDescription className="mt-2">
-              {isResettingPassword
+              {isPasswordRecovery
                 ? 'Enter your new password below.'
                 : isForgotPassword 
                   ? 'Enter your email to reset your password.'
@@ -221,7 +210,7 @@ export function AuthPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isResettingPassword ? (
+          {isPasswordRecovery ? (
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">
