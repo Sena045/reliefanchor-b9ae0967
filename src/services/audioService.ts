@@ -2,400 +2,400 @@ type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire';
 
 interface AudioNodes {
   context: AudioContext;
-  gainNode: GainNode;
-  sourceNodes: AudioBufferSourceNode[];
+  masterGain: GainNode;
+  sources: AudioBufferSourceNode[];
   oscillators: OscillatorNode[];
   intervals: ReturnType<typeof setInterval>[];
+  timeouts: ReturnType<typeof setTimeout>[];
 }
 
 let audioNodes: AudioNodes | null = null;
 let currentNoise: NoiseType | null = null;
 
-function createBrownNoise(context: AudioContext): AudioBuffer {
-  const bufferSize = 2 * context.sampleRate;
-  const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
-  const output = buffer.getChannelData(0);
+// Generate white noise buffer
+function createWhiteNoiseBuffer(context: AudioContext, seconds: number): AudioBuffer {
+  const bufferSize = seconds * context.sampleRate;
+  const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
   
-  let lastOut = 0;
   for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    output[i] = (lastOut + 0.02 * white) / 1.02;
-    lastOut = output[i];
-    output[i] *= 1.5; // Reduced from 3.5
+    left[i] = Math.random() * 2 - 1;
+    right[i] = Math.random() * 2 - 1;
   }
   
   return buffer;
 }
 
-function createRainNoise(context: AudioContext): AudioBuffer {
-  const bufferSize = 2 * context.sampleRate;
-  const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
-  const output = buffer.getChannelData(0);
+// Create a lowpass filtered noise (for brown/pink noise effect)
+function createFilteredNoise(
+  context: AudioContext, 
+  buffer: AudioBuffer, 
+  frequency: number,
+  gain: number
+): { source: AudioBufferSourceNode; filter: BiquadFilterNode } {
+  const source = context.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
   
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    output[i] = white * 0.25; // Reduced from 0.5
-    
-    if (Math.random() < 0.001) {
-      for (let j = 0; j < 100 && i + j < bufferSize; j++) {
-        output[i + j] = (Math.random() * 2 - 1) * (1 - j / 100) * 0.4;
-      }
-    }
-  }
+  const filter = context.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = frequency;
+  filter.Q.value = 0.5;
   
-  return buffer;
+  const gainNode = context.createGain();
+  gainNode.gain.value = gain;
+  
+  source.connect(filter);
+  filter.connect(gainNode);
+  
+  return { source, filter };
 }
 
-function createForestNoise(context: AudioContext, gainNode: GainNode): OscillatorNode[] {
-  const oscillators: OscillatorNode[] = [];
+// Rain sound - filtered noise with occasional droplet variations
+function createRainSound(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode[] {
+  const sources: AudioBufferSourceNode[] = [];
+  const noiseBuffer = createWhiteNoiseBuffer(context, 4);
   
-  const frequencies = [80, 120, 160, 200];
-  frequencies.forEach(freq => {
+  // Base rain layer - low filtered noise
+  const baseSource = context.createBufferSource();
+  baseSource.buffer = noiseBuffer;
+  baseSource.loop = true;
+  
+  const baseFilter = context.createBiquadFilter();
+  baseFilter.type = 'lowpass';
+  baseFilter.frequency.value = 800;
+  baseFilter.Q.value = 0.7;
+  
+  const baseGain = context.createGain();
+  baseGain.gain.value = 0.15;
+  
+  baseSource.connect(baseFilter);
+  baseFilter.connect(baseGain);
+  baseGain.connect(masterGain);
+  baseSource.start();
+  sources.push(baseSource);
+  
+  // High frequency rain texture
+  const highSource = context.createBufferSource();
+  highSource.buffer = noiseBuffer;
+  highSource.loop = true;
+  
+  const highFilter = context.createBiquadFilter();
+  highFilter.type = 'bandpass';
+  highFilter.frequency.value = 3000;
+  highFilter.Q.value = 0.5;
+  
+  const highGain = context.createGain();
+  highGain.gain.value = 0.05;
+  
+  highSource.connect(highFilter);
+  highFilter.connect(highGain);
+  highGain.connect(masterGain);
+  highSource.start();
+  sources.push(highSource);
+  
+  return sources;
+}
+
+// Forest sound - layered oscillators with slow modulation
+function createForestSound(context: AudioContext, masterGain: GainNode): { sources: AudioBufferSourceNode[], oscillators: OscillatorNode[] } {
+  const sources: AudioBufferSourceNode[] = [];
+  const oscillators: OscillatorNode[] = [];
+  const noiseBuffer = createWhiteNoiseBuffer(context, 4);
+  
+  // Soft wind base
+  const windSource = context.createBufferSource();
+  windSource.buffer = noiseBuffer;
+  windSource.loop = true;
+  
+  const windFilter = context.createBiquadFilter();
+  windFilter.type = 'lowpass';
+  windFilter.frequency.value = 400;
+  windFilter.Q.value = 1;
+  
+  const windGain = context.createGain();
+  windGain.gain.value = 0.08;
+  
+  // Modulate the wind
+  const windLFO = context.createOscillator();
+  windLFO.frequency.value = 0.1;
+  const windLFOGain = context.createGain();
+  windLFOGain.gain.value = 150;
+  windLFO.connect(windLFOGain);
+  windLFOGain.connect(windFilter.frequency);
+  windLFO.start();
+  oscillators.push(windLFO);
+  
+  windSource.connect(windFilter);
+  windFilter.connect(windGain);
+  windGain.connect(masterGain);
+  windSource.start();
+  sources.push(windSource);
+  
+  // Bird-like tones (soft sine waves)
+  [520, 660, 880].forEach((freq, i) => {
     const osc = context.createOscillator();
-    const oscGain = context.createGain();
-    
     osc.type = 'sine';
     osc.frequency.value = freq;
     
-    const lfo = context.createOscillator();
-    const lfoGain = context.createGain();
-    lfo.frequency.value = 0.1 + Math.random() * 0.2;
-    lfoGain.gain.value = 5;
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
-    lfo.start();
-    
-    oscGain.gain.value = 0.02; // Reduced from 0.05
-    osc.connect(oscGain);
-    oscGain.connect(gainNode);
-    osc.start();
-    
-    oscillators.push(osc, lfo);
-  });
-  
-  return oscillators;
-}
-
-// Campfire soundscape layers
-function createRainOnTent(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode {
-  const bufferSize = 4 * context.sampleRate;
-  const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
-  const leftChannel = buffer.getChannelData(0);
-  const rightChannel = buffer.getChannelData(1);
-  
-  let lastL = 0, lastR = 0;
-  for (let i = 0; i < bufferSize; i++) {
-    const whiteL = Math.random() * 2 - 1;
-    const whiteR = Math.random() * 2 - 1;
-    lastL = (lastL + 0.1 * whiteL) / 1.1;
-    lastR = (lastR + 0.1 * whiteR) / 1.1;
-    
-    leftChannel[i] = lastL * 0.15; // Reduced from 0.4
-    rightChannel[i] = lastR * 0.15;
-    
-    if (Math.random() < 0.002) {
-      const dropLength = 50 + Math.random() * 100;
-      for (let j = 0; j < dropLength && i + j < bufferSize; j++) {
-        const decay = 1 - j / dropLength;
-        const drop = (Math.random() * 2 - 1) * decay * 0.2; // Reduced from 0.6
-        leftChannel[i + j] += drop * (0.5 + Math.random() * 0.5);
-        rightChannel[i + j] += drop * (0.5 + Math.random() * 0.5);
-      }
-    }
-  }
-  
-  const rainGain = context.createGain();
-  rainGain.gain.value = 0.2; // Reduced from 0.35
-  
-  const noiseNode = context.createBufferSource();
-  noiseNode.buffer = buffer;
-  noiseNode.loop = true;
-  noiseNode.connect(rainGain);
-  rainGain.connect(masterGain);
-  noiseNode.start();
-  
-  return noiseNode;
-}
-
-function createCampfireCrackle(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode {
-  const bufferSize = 6 * context.sampleRate;
-  const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
-  const leftChannel = buffer.getChannelData(0);
-  const rightChannel = buffer.getChannelData(1);
-  
-  let lastOut = 0;
-  for (let i = 0; i < bufferSize; i++) {
-    const white = Math.random() * 2 - 1;
-    lastOut = (lastOut + 0.03 * white) / 1.03;
-    leftChannel[i] = lastOut * 0.08; // Reduced from 0.15
-    rightChannel[i] = lastOut * 0.08;
-    
-    if (Math.random() < 0.0006) {
-      const crackleLength = 20 + Math.random() * 80;
-      const intensity = 0.15 + Math.random() * 0.2; // Reduced from 0.3-0.8
-      for (let j = 0; j < crackleLength && i + j < bufferSize; j++) {
-        const decay = Math.pow(1 - j / crackleLength, 2);
-        const crackle = (Math.random() * 2 - 1) * decay * intensity;
-        leftChannel[i + j] += crackle;
-        rightChannel[i + j] += crackle * 0.8;
-      }
-    }
-    
-    if (Math.random() < 0.0001) {
-      const popLength = 100 + Math.random() * 200;
-      for (let j = 0; j < popLength && i + j < bufferSize; j++) {
-        const decay = Math.pow(1 - j / popLength, 1.5);
-        const pop = (Math.random() * 2 - 1) * decay * 0.3; // Reduced from 0.7
-        leftChannel[i + j] += pop;
-        rightChannel[i + j] += pop;
-      }
-    }
-  }
-  
-  const fireGain = context.createGain();
-  fireGain.gain.value = 0.25; // Reduced from 0.5
-  
-  const noiseNode = context.createBufferSource();
-  noiseNode.buffer = buffer;
-  noiseNode.loop = true;
-  noiseNode.connect(fireGain);
-  fireGain.connect(masterGain);
-  noiseNode.start();
-  
-  return noiseNode;
-}
-
-function createVinylCrackle(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode {
-  const bufferSize = 3 * context.sampleRate;
-  const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
-  const leftChannel = buffer.getChannelData(0);
-  const rightChannel = buffer.getChannelData(1);
-  
-  for (let i = 0; i < bufferSize; i++) {
-    const hiss = (Math.random() * 2 - 1) * 0.01; // Reduced from 0.02
-    leftChannel[i] = hiss;
-    rightChannel[i] = hiss;
-    
-    if (Math.random() < 0.0003) {
-      const clickLength = 5 + Math.random() * 15;
-      for (let j = 0; j < clickLength && i + j < bufferSize; j++) {
-        const decay = 1 - j / clickLength;
-        const click = (Math.random() > 0.5 ? 1 : -1) * decay * 0.08; // Reduced from 0.15
-        leftChannel[i + j] += click;
-        rightChannel[i + j] += click;
-      }
-    }
-  }
-  
-  const vinylGain = context.createGain();
-  vinylGain.gain.value = 0.12; // Reduced from 0.25
-  
-  const noiseNode = context.createBufferSource();
-  noiseNode.buffer = buffer;
-  noiseNode.loop = true;
-  noiseNode.connect(vinylGain);
-  vinylGain.connect(masterGain);
-  noiseNode.start();
-  
-  return noiseNode;
-}
-
-function createWindInTrees(context: AudioContext, masterGain: GainNode): OscillatorNode[] {
-  const oscillators: OscillatorNode[] = [];
-  
-  [40, 60, 90, 130].forEach((freq, idx) => {
-    const osc = context.createOscillator();
     const oscGain = context.createGain();
+    oscGain.gain.value = 0;
     
-    osc.type = 'sine';
-    osc.frequency.value = freq;
+    // Amplitude modulation for chirping effect
+    const ampLFO = context.createOscillator();
+    ampLFO.frequency.value = 0.3 + i * 0.1;
+    const ampLFOGain = context.createGain();
+    ampLFOGain.gain.value = 0.008;
     
-    const lfo = context.createOscillator();
-    const lfoGain = context.createGain();
-    lfo.frequency.value = 0.05 + Math.random() * 0.1;
-    lfoGain.gain.value = freq * 0.3;
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
-    lfo.start();
+    ampLFO.connect(ampLFOGain);
+    ampLFOGain.connect(oscGain.gain);
+    ampLFO.start();
     
-    oscGain.gain.value = 0.008 - idx * 0.001; // Reduced from 0.015
     osc.connect(oscGain);
     oscGain.connect(masterGain);
     osc.start();
     
-    oscillators.push(osc, lfo);
+    oscillators.push(osc, ampLFO);
   });
   
-  return oscillators;
+  return { sources, oscillators };
 }
 
-function playThunder(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode {
-  const duration = 3 + Math.random() * 2;
-  const bufferSize = Math.floor(duration * context.sampleRate);
-  const buffer = context.createBuffer(2, bufferSize, context.sampleRate);
-  const leftChannel = buffer.getChannelData(0);
-  const rightChannel = buffer.getChannelData(1);
+// Brown noise - heavily filtered for deep rumble
+function createBrownSound(context: AudioContext, masterGain: GainNode): AudioBufferSourceNode[] {
+  const sources: AudioBufferSourceNode[] = [];
+  const noiseBuffer = createWhiteNoiseBuffer(context, 4);
   
-  let lastOut = 0;
-  for (let i = 0; i < bufferSize; i++) {
-    const progress = i / bufferSize;
-    const envelope = Math.sin(progress * Math.PI) * Math.pow(1 - progress, 0.5);
-    
-    const white = Math.random() * 2 - 1;
-    lastOut = (lastOut + 0.05 * white) / 1.05;
-    
-    leftChannel[i] = lastOut * envelope * 0.2; // Reduced from 0.4
-    rightChannel[i] = lastOut * envelope * 0.18;
-  }
+  // Deep brown noise
+  const source = context.createBufferSource();
+  source.buffer = noiseBuffer;
+  source.loop = true;
   
-  const thunderGain = context.createGain();
-  thunderGain.gain.value = 0.15; // Reduced from 0.3
+  const filter1 = context.createBiquadFilter();
+  filter1.type = 'lowpass';
+  filter1.frequency.value = 200;
+  filter1.Q.value = 0.5;
   
-  const thunderNode = context.createBufferSource();
-  thunderNode.buffer = buffer;
-  thunderNode.connect(thunderGain);
-  thunderGain.connect(masterGain);
-  thunderNode.start();
+  const filter2 = context.createBiquadFilter();
+  filter2.type = 'lowpass';
+  filter2.frequency.value = 150;
+  filter2.Q.value = 0.5;
   
-  return thunderNode;
+  const gainNode = context.createGain();
+  gainNode.gain.value = 0.4;
+  
+  source.connect(filter1);
+  filter1.connect(filter2);
+  filter2.connect(gainNode);
+  gainNode.connect(masterGain);
+  source.start();
+  sources.push(source);
+  
+  // Subtle mid layer
+  const midSource = context.createBufferSource();
+  midSource.buffer = noiseBuffer;
+  midSource.loop = true;
+  
+  const midFilter = context.createBiquadFilter();
+  midFilter.type = 'bandpass';
+  midFilter.frequency.value = 100;
+  midFilter.Q.value = 1;
+  
+  const midGain = context.createGain();
+  midGain.gain.value = 0.1;
+  
+  midSource.connect(midFilter);
+  midFilter.connect(midGain);
+  midGain.connect(masterGain);
+  midSource.start();
+  sources.push(midSource);
+  
+  return sources;
 }
 
-function playOwl(context: AudioContext, masterGain: GainNode): OscillatorNode[] {
-  const oscillators: OscillatorNode[] = [];
-  
-  [0, 0.6].forEach((delay) => {
-    setTimeout(() => {
-      if (!audioNodes || currentNoise !== 'campfire') return;
-      
-      const osc = context.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = delay === 0 ? 420 : 340;
-      
-      const noteGain = context.createGain();
-      noteGain.gain.setValueAtTime(0, context.currentTime);
-      noteGain.gain.linearRampToValueAtTime(0.04, context.currentTime + 0.05); // Reduced from 0.08
-      noteGain.gain.linearRampToValueAtTime(0.03, context.currentTime + 0.3);
-      noteGain.gain.linearRampToValueAtTime(0, context.currentTime + 0.5);
-      
-      osc.connect(noteGain);
-      noteGain.connect(masterGain);
-      osc.start();
-      osc.stop(context.currentTime + 0.5);
-      
-      oscillators.push(osc);
-    }, delay * 1000);
-  });
-  
-  return oscillators;
-}
-
-function createCampfireSoundscape(context: AudioContext, masterGain: GainNode): { 
-  sourceNodes: AudioBufferSourceNode[], 
-  oscillators: OscillatorNode[], 
-  intervals: ReturnType<typeof setInterval>[] 
+// Campfire - layered crackle and warmth
+function createCampfireSound(context: AudioContext, masterGain: GainNode): { 
+  sources: AudioBufferSourceNode[], 
+  oscillators: OscillatorNode[],
+  intervals: ReturnType<typeof setInterval>[],
+  timeouts: ReturnType<typeof setTimeout>[]
 } {
-  const sourceNodes: AudioBufferSourceNode[] = [];
+  const sources: AudioBufferSourceNode[] = [];
   const oscillators: OscillatorNode[] = [];
   const intervals: ReturnType<typeof setInterval>[] = [];
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
   
-  // Start all layers and track nodes
-  sourceNodes.push(createRainOnTent(context, masterGain));
-  sourceNodes.push(createCampfireCrackle(context, masterGain));
-  sourceNodes.push(createVinylCrackle(context, masterGain));
-  oscillators.push(...createWindInTrees(context, masterGain));
+  const noiseBuffer = createWhiteNoiseBuffer(context, 6);
   
-  // Schedule thunder every 45-70 seconds
-  const thunderInterval = setInterval(() => {
-    if (audioNodes && currentNoise === 'campfire') {
-      const node = playThunder(context, masterGain);
-      audioNodes.sourceNodes.push(node);
-    }
-  }, 45000 + Math.random() * 25000);
-  intervals.push(thunderInterval);
+  // Fire crackle base - filtered noise
+  const crackleSource = context.createBufferSource();
+  crackleSource.buffer = noiseBuffer;
+  crackleSource.loop = true;
   
-  // Initial thunder after 8 seconds
-  setTimeout(() => {
-    if (audioNodes && currentNoise === 'campfire') {
-      const node = playThunder(context, masterGain);
-      audioNodes.sourceNodes.push(node);
-    }
-  }, 8000);
+  const crackleFilter = context.createBiquadFilter();
+  crackleFilter.type = 'bandpass';
+  crackleFilter.frequency.value = 600;
+  crackleFilter.Q.value = 2;
   
-  // Schedule owl hoots every 40-100 seconds
-  const owlInterval = setInterval(() => {
-    if (audioNodes && currentNoise === 'campfire') {
-      playOwl(context, masterGain);
-    }
-  }, 40000 + Math.random() * 60000);
-  intervals.push(owlInterval);
+  // Modulate for crackle effect
+  const crackleLFO = context.createOscillator();
+  crackleLFO.frequency.value = 8;
+  const crackleLFOGain = context.createGain();
+  crackleLFOGain.gain.value = 300;
+  crackleLFO.connect(crackleLFOGain);
+  crackleLFOGain.connect(crackleFilter.frequency);
+  crackleLFO.start();
+  oscillators.push(crackleLFO);
   
-  // Initial owl after 20 seconds
-  setTimeout(() => {
-    if (audioNodes && currentNoise === 'campfire') {
-      playOwl(context, masterGain);
-    }
-  }, 20000);
+  const crackleGain = context.createGain();
+  crackleGain.gain.value = 0.06;
   
-  return { sourceNodes, oscillators, intervals };
+  crackleSource.connect(crackleFilter);
+  crackleFilter.connect(crackleGain);
+  crackleGain.connect(masterGain);
+  crackleSource.start();
+  sources.push(crackleSource);
+  
+  // Deep fire rumble
+  const rumbleSource = context.createBufferSource();
+  rumbleSource.buffer = noiseBuffer;
+  rumbleSource.loop = true;
+  
+  const rumbleFilter = context.createBiquadFilter();
+  rumbleFilter.type = 'lowpass';
+  rumbleFilter.frequency.value = 150;
+  rumbleFilter.Q.value = 1;
+  
+  const rumbleGain = context.createGain();
+  rumbleGain.gain.value = 0.12;
+  
+  // Slow modulation for breathing effect
+  const rumbleLFO = context.createOscillator();
+  rumbleLFO.frequency.value = 0.15;
+  const rumbleLFOGain = context.createGain();
+  rumbleLFOGain.gain.value = 0.04;
+  rumbleLFO.connect(rumbleLFOGain);
+  rumbleLFOGain.connect(rumbleGain.gain);
+  rumbleLFO.start();
+  oscillators.push(rumbleLFO);
+  
+  rumbleSource.connect(rumbleFilter);
+  rumbleFilter.connect(rumbleGain);
+  rumbleGain.connect(masterGain);
+  rumbleSource.start();
+  sources.push(rumbleSource);
+  
+  // Gentle rain in background
+  const rainSource = context.createBufferSource();
+  rainSource.buffer = noiseBuffer;
+  rainSource.loop = true;
+  
+  const rainFilter = context.createBiquadFilter();
+  rainFilter.type = 'highpass';
+  rainFilter.frequency.value = 2000;
+  
+  const rainGain = context.createGain();
+  rainGain.gain.value = 0.02;
+  
+  rainSource.connect(rainFilter);
+  rainFilter.connect(rainGain);
+  rainGain.connect(masterGain);
+  rainSource.start();
+  sources.push(rainSource);
+  
+  // Random pops/crackles
+  const createPop = () => {
+    if (!audioNodes || currentNoise !== 'campfire') return;
+    
+    const popOsc = context.createOscillator();
+    popOsc.frequency.value = 200 + Math.random() * 400;
+    popOsc.type = 'sine';
+    
+    const popGain = context.createGain();
+    const now = context.currentTime;
+    popGain.gain.setValueAtTime(0, now);
+    popGain.gain.linearRampToValueAtTime(0.03 + Math.random() * 0.02, now + 0.01);
+    popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05 + Math.random() * 0.1);
+    
+    popOsc.connect(popGain);
+    popGain.connect(masterGain);
+    popOsc.start(now);
+    popOsc.stop(now + 0.2);
+  };
+  
+  // Schedule random pops
+  const popInterval = setInterval(() => {
+    if (Math.random() < 0.4) createPop();
+  }, 300);
+  intervals.push(popInterval);
+  
+  // Night ambient - subtle wind
+  const windOsc = context.createOscillator();
+  windOsc.type = 'sine';
+  windOsc.frequency.value = 80;
+  
+  const windOscGain = context.createGain();
+  windOscGain.gain.value = 0.015;
+  
+  const windLFO = context.createOscillator();
+  windLFO.frequency.value = 0.08;
+  const windLFOGain = context.createGain();
+  windLFOGain.gain.value = 20;
+  windLFO.connect(windLFOGain);
+  windLFOGain.connect(windOsc.frequency);
+  windLFO.start();
+  
+  windOsc.connect(windOscGain);
+  windOscGain.connect(masterGain);
+  windOsc.start();
+  oscillators.push(windOsc, windLFO);
+  
+  return { sources, oscillators, intervals, timeouts };
 }
 
 export const audioService = {
   async playNoise(type: NoiseType, volume: number = 0.3): Promise<void> {
     // Stop existing audio first
-    if (audioNodes) {
-      this.stopNoise();
-    }
+    this.stopNoise();
     
     try {
       const context = new AudioContext();
       
-      // Resume context if suspended (required for some browsers)
       if (context.state === 'suspended') {
         await context.resume();
       }
       
-      const gainNode = context.createGain();
-      gainNode.gain.value = Math.min(volume, 0.5); // Cap max volume
-      gainNode.connect(context.destination);
+      // Master gain with fade-in
+      const masterGain = context.createGain();
+      masterGain.gain.setValueAtTime(0, context.currentTime);
+      masterGain.gain.linearRampToValueAtTime(Math.min(volume, 0.5), context.currentTime + 0.5);
+      masterGain.connect(context.destination);
       
-      audioNodes = { context, gainNode, sourceNodes: [], oscillators: [], intervals: [] };
+      audioNodes = { 
+        context, 
+        masterGain, 
+        sources: [], 
+        oscillators: [], 
+        intervals: [],
+        timeouts: []
+      };
       currentNoise = type;
       
-      if (type === 'brown') {
-        const buffer = createBrownNoise(context);
-        const noiseNode = context.createBufferSource();
-        noiseNode.buffer = buffer;
-        noiseNode.loop = true;
-        noiseNode.connect(gainNode);
-        noiseNode.start();
-        audioNodes.sourceNodes.push(noiseNode);
-      } else if (type === 'rain') {
-        const buffer = createRainNoise(context);
-        const noiseNode = context.createBufferSource();
-        noiseNode.buffer = buffer;
-        noiseNode.loop = true;
-        noiseNode.connect(gainNode);
-        noiseNode.start();
-        audioNodes.sourceNodes.push(noiseNode);
+      if (type === 'rain') {
+        audioNodes.sources = createRainSound(context, masterGain);
       } else if (type === 'forest') {
-        const oscillators = createForestNoise(context, gainNode);
+        const { sources, oscillators } = createForestSound(context, masterGain);
+        audioNodes.sources = sources;
         audioNodes.oscillators = oscillators;
-        
-        const buffer = createBrownNoise(context);
-        const noiseNode = context.createBufferSource();
-        noiseNode.buffer = buffer;
-        noiseNode.loop = true;
-        const noiseGain = context.createGain();
-        noiseGain.gain.value = 0.05; // Reduced from 0.1
-        noiseNode.connect(noiseGain);
-        noiseGain.connect(gainNode);
-        noiseNode.start();
-        audioNodes.sourceNodes.push(noiseNode);
+      } else if (type === 'brown') {
+        audioNodes.sources = createBrownSound(context, masterGain);
       } else if (type === 'campfire') {
-        const { sourceNodes, oscillators, intervals } = createCampfireSoundscape(context, gainNode);
-        audioNodes.sourceNodes = sourceNodes;
-        audioNodes.oscillators = oscillators;
-        audioNodes.intervals = intervals;
+        const result = createCampfireSound(context, masterGain);
+        audioNodes.sources = result.sources;
+        audioNodes.oscillators = result.oscillators;
+        audioNodes.intervals = result.intervals;
+        audioNodes.timeouts = result.timeouts;
       }
     } catch (e) {
       console.error('Error starting audio:', e);
@@ -406,22 +406,25 @@ export const audioService = {
   stopNoise(): void {
     if (!audioNodes) return;
     
+    const { context, masterGain, sources, oscillators, intervals, timeouts } = audioNodes;
+    
     try {
-      // Clear intervals first
-      audioNodes.intervals.forEach(interval => clearInterval(interval));
+      // Clear timers first
+      intervals.forEach(id => clearInterval(id));
+      timeouts.forEach(id => clearTimeout(id));
       
-      // Stop all source nodes
-      audioNodes.sourceNodes.forEach(node => {
-        try { node.stop(); } catch {}
-      });
+      // Fade out before stopping
+      const now = context.currentTime;
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(0, now + 0.3);
       
-      // Stop all oscillators
-      audioNodes.oscillators.forEach(osc => {
-        try { osc.stop(); } catch {}
-      });
+      // Stop everything after fade
+      setTimeout(() => {
+        sources.forEach(s => { try { s.stop(); } catch {} });
+        oscillators.forEach(o => { try { o.stop(); } catch {} });
+        try { context.close(); } catch {}
+      }, 350);
       
-      // Close context
-      audioNodes.context.close();
     } catch (e) {
       console.error('Error stopping audio:', e);
     }
@@ -432,7 +435,11 @@ export const audioService = {
   
   setVolume(volume: number): void {
     if (audioNodes) {
-      audioNodes.gainNode.gain.value = Math.min(volume, 0.5); // Cap max volume
+      const clampedVolume = Math.min(Math.max(volume, 0), 0.5);
+      audioNodes.masterGain.gain.linearRampToValueAtTime(
+        clampedVolume, 
+        audioNodes.context.currentTime + 0.1
+      );
     }
   },
   
