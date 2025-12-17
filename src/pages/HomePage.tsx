@@ -106,7 +106,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               <div className="flex-1">
                 <h3 className="font-medium">{t('getPremium')}</h3>
                 <p className="text-sm text-muted-foreground">{t('unlockFeatures')}</p>
-                <p className="text-lg font-bold text-primary mt-1">$9.99/year</p>
+                <p className="text-lg font-bold text-primary mt-1">$4.99/month</p>
               </div>
             </div>
             <Button 
