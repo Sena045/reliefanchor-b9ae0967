@@ -12,7 +12,8 @@ interface ChatPageProps {
 
 export function ChatPage({ onShowPremium }: ChatPageProps) {
   const { 
-    settings, 
+    profile, 
+    isPremium,
     chatHistory, 
     sendMessage, 
     clearChat, 
@@ -61,9 +62,9 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div>
           <h1 className="font-semibold">Anya</h1>
-          <p className="text-xs text-muted-foreground">
-            {!settings.isPremium && `${remainingMessages} messages remaining today`}
-          </p>
+        <p className="text-xs text-muted-foreground">
+          {!isPremium && `${remainingMessages} messages remaining today`}
+        </p>
         </div>
         {chatHistory.length > 0 && (
           <Button variant="ghost" size="icon" onClick={clearChat}>
@@ -141,7 +142,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
           </Button>
         </form>
         
-        {!canSendMessage && !settings.isPremium && (
+        {!canSendMessage && !isPremium && (
           <p className="text-xs text-center text-muted-foreground mt-2">
             Free messages used today. Upgrade to Premium!
           </p>

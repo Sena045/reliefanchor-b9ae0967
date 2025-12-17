@@ -18,8 +18,8 @@ const FEATURES = [
 ];
 
 export function PremiumPage({ onClose }: PremiumPageProps) {
-  const { settings, activatePremium, isPremium } = useApp();
-  const { t } = useTranslation(settings.language);
+  const { profile, activatePremium, isPremium, premiumUntil } = useApp();
+  const { t } = useTranslation(profile.language);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
@@ -56,7 +56,12 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         <Card className="text-center p-8">
           <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">You're Premium!</h2>
-          <p className="text-muted-foreground mb-4">Enjoy all features.</p>
+          <p className="text-muted-foreground mb-2">Enjoy all features.</p>
+          {premiumUntil && (
+            <p className="text-sm text-muted-foreground mb-4">
+              Expires: {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          )}
           <Button variant="outline" onClick={onClose}>Back</Button>
         </Card>
       </div>

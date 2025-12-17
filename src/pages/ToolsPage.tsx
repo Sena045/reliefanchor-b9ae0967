@@ -30,9 +30,11 @@ const TAB_LABELS = {
 } as const;
 
 export function ToolsPage() {
-  const { settings, addJournal } = useApp();
-  const { t } = useTranslation(settings.language);
+  const { profile, addJournal } = useApp();
+  const { t } = useTranslation(profile.language);
   const { toast } = useToast();
+  
+  const lang = profile.language === 'hi' ? 'hi' : 'en';
   
   const [activeTab, setActiveTab] = useState<'breathing' | 'grounding' | 'sounds' | 'journal' | 'games'>('breathing');
   const [breathingActive, setBreathingActive] = useState(false);
@@ -41,7 +43,7 @@ export function ToolsPage() {
   const [playingSound, setPlayingSound] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.3);
   const [journalText, setJournalText] = useState('');
-  const [currentPrompt, setCurrentPrompt] = useState(JOURNAL_PROMPTS[settings.language][0]);
+  const [currentPrompt, setCurrentPrompt] = useState(JOURNAL_PROMPTS[lang][0]);
 
   const startBreathing = () => {
     setBreathingActive(true);
@@ -64,9 +66,9 @@ export function ToolsPage() {
   const saveJournal = () => {
     if (!journalText.trim()) return;
     addJournal(currentPrompt, journalText);
-    toast({ title: settings.language === 'hi' ? 'जर्नल सहेजा!' : 'Journal saved!' });
+    toast({ title: lang === 'hi' ? 'जर्नल सहेजा!' : 'Journal saved!' });
     setJournalText('');
-    setCurrentPrompt(JOURNAL_PROMPTS[settings.language][Math.floor(Math.random() * JOURNAL_PROMPTS[settings.language].length)]);
+    setCurrentPrompt(JOURNAL_PROMPTS[lang][Math.floor(Math.random() * JOURNAL_PROMPTS[lang].length)]);
   };
 
   const tabs = [
@@ -95,7 +97,7 @@ export function ToolsPage() {
               )}
             >
               <Icon className="h-5 w-5 shrink-0" />
-              <span className="hidden md:inline">{TAB_LABELS[id][settings.language]}</span>
+              <span className="hidden md:inline">{TAB_LABELS[id][lang]}</span>
             </button>
           ))}
         </nav>
@@ -105,7 +107,7 @@ export function ToolsPage() {
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
         {activeTab === 'breathing' && (
           <Card><CardContent className="p-6 flex flex-col items-center">
-            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.breathing[settings.language]} (4-7-8)</h2>
+            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.breathing[lang]} (4-7-8)</h2>
             <div className={cn('w-32 h-32 rounded-full bg-primary/20 flex items-center justify-center mb-4', breathingActive && 'animate-breathe')}>
               <span className="text-lg font-medium text-primary">{breathingActive ? t(breathPhase) : '4-7-8'}</span>
             </div>
@@ -117,9 +119,9 @@ export function ToolsPage() {
 
         {activeTab === 'grounding' && (
           <Card><CardContent className="p-6">
-            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.grounding[settings.language]} (5-4-3-2-1)</h2>
+            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.grounding[lang]} (5-4-3-2-1)</h2>
             <div className="space-y-4">
-              {GROUNDING_STEPS[settings.language].map((step, i) => (
+              {GROUNDING_STEPS[lang].map((step, i) => (
                 <div key={i} className={cn('p-3 rounded-lg transition-all', i === groundingStep ? 'bg-primary text-primary-foreground' : i < groundingStep ? 'bg-success/20' : 'bg-muted')}>
                   <p className="text-sm font-medium">{step}</p>
                 </div>
@@ -134,18 +136,18 @@ export function ToolsPage() {
 
         {activeTab === 'sounds' && (
           <Card><CardContent className="p-6 space-y-4">
-            <h2 className="text-lg font-medium mb-2">{TAB_LABELS.sounds[settings.language]}</h2>
+            <h2 className="text-lg font-medium mb-2">{TAB_LABELS.sounds[lang]}</h2>
             <div className="grid grid-cols-2 gap-2">
               {(['rain', 'forest', 'brown', 'campfire'] as const).map((type) => (
                 <Button key={type} variant={playingSound === type ? 'default' : 'outline'} className="flex-1" onClick={() => toggleSound(type)}>
                   {playingSound === type ? <VolumeX className="h-4 w-4 mr-1" /> : <Volume2 className="h-4 w-4 mr-1" />}
-                  {type === 'brown' ? t('brownNoise') : type === 'campfire' ? (settings.language === 'hi' ? 'कैम्पफ़ायर' : 'Campfire') : t(type)}
+                  {type === 'brown' ? t('brownNoise') : type === 'campfire' ? (lang === 'hi' ? 'कैम्पफ़ायर' : 'Campfire') : t(type)}
                 </Button>
               ))}
             </div>
             {playingSound === 'campfire' && (
               <p className="text-xs text-muted-foreground text-center">
-                {settings.language === 'hi' ? 'बारिश • आग • गड़गड़ाहट • उल्लू • हवा • विनाइल' : 'Rain • Fire • Thunder • Owl • Wind • Vinyl'}
+                {lang === 'hi' ? 'बारिश • आग • गड़गड़ाहट • उल्लू • हवा • विनाइल' : 'Rain • Fire • Thunder • Owl • Wind • Vinyl'}
               </p>
             )}
             {playingSound && <Slider value={[volume]} onValueChange={([v]) => { setVolume(v); audioService.setVolume(v); }} max={1} step={0.1} />}
@@ -154,7 +156,7 @@ export function ToolsPage() {
 
         {activeTab === 'journal' && (
           <Card><CardContent className="p-6 space-y-4">
-            <h2 className="text-lg font-medium mb-2">{TAB_LABELS.journal[settings.language]}</h2>
+            <h2 className="text-lg font-medium mb-2">{TAB_LABELS.journal[lang]}</h2>
             <div className="p-3 bg-muted rounded-lg"><p className="text-sm italic">"{currentPrompt}"</p></div>
             <Textarea value={journalText} onChange={(e) => setJournalText(e.target.value)} placeholder={t('writeHere')} rows={6} />
             <Button onClick={saveJournal} disabled={!journalText.trim()} className="w-full">{t('save')}</Button>
@@ -163,7 +165,7 @@ export function ToolsPage() {
 
         {activeTab === 'games' && (
           <div>
-            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.games[settings.language]}</h2>
+            <h2 className="text-lg font-medium mb-4">{TAB_LABELS.games[lang]}</h2>
             <MentalWellnessGames />
           </div>
         )}

@@ -9,8 +9,8 @@ interface HomePageProps {
 }
 
 export function HomePage({ onNavigate }: HomePageProps) {
-  const { settings, isPremium, remainingMessages } = useApp();
-  const { t } = useTranslation(settings.language);
+  const { profile, isPremium, premiumUntil, remainingMessages } = useApp();
+  const { t } = useTranslation(profile.language);
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto safe-top">
@@ -77,8 +77,26 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </CardContent>
       </Card>
 
-      {/* Premium CTA */}
-      {!isPremium && (
+      {/* Premium Status or CTA */}
+      {isPremium ? (
+        <Card className="bg-gradient-to-r from-amber-500/10 to-primary/10 border-amber-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <Crown className="h-6 w-6 text-amber-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-amber-600">Premium Active</h3>
+                {premiumUntil && (
+                  <p className="text-sm text-muted-foreground">
+                    Expires: {premiumUntil.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
         <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
