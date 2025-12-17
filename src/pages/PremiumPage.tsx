@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { razorpayService, PRICING } from '@/services/razorpayService';
 
 interface PremiumPageProps { onClose: () => void; }
 
@@ -21,19 +22,32 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const { t } = useTranslation(settings.language);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
+  
+  const pricing = PRICING[currency];
 
   const handlePayment = async () => {
     setLoading(true);
-    // Simulate payment for demo
-    setTimeout(() => {
-      activatePremium();
-      toast({ 
-        title: 'Premium Activated!', 
-        description: 'Your premium account is now active.' 
-      });
-      setLoading(false);
-      onClose();
-    }, 1500);
+    await razorpayService.initiatePayment(
+      currency,
+      () => {
+        activatePremium();
+        toast({ 
+          title: 'Premium Activated!', 
+          description: 'Your premium account is now active.' 
+        });
+        setLoading(false);
+        onClose();
+      },
+      () => {
+        setLoading(false);
+        toast({ title: 'Cancelled', description: 'Payment was cancelled.' });
+      },
+      (error) => {
+        setLoading(false);
+        toast({ title: 'Error', description: error, variant: 'destructive' });
+      }
+    );
   };
 
   if (isPremium) {
@@ -57,10 +71,30 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         <p className="text-muted-foreground">{t('unlockFeatures')}</p>
       </div>
       
+      {/* Currency Toggle */}
+      <div className="flex justify-center gap-2 mb-4">
+        <Button 
+          variant={currency === 'USD' ? 'default' : 'outline'} 
+          size="sm"
+          onClick={() => setCurrency('USD')}
+        >
+          $ USD
+        </Button>
+        <Button 
+          variant={currency === 'INR' ? 'default' : 'outline'} 
+          size="sm"
+          onClick={() => setCurrency('INR')}
+        >
+          ₹ INR
+        </Button>
+      </div>
+      
       <Card className="mb-6">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <span className="text-4xl font-bold text-primary">$9.99</span>
+            <span className="text-4xl font-bold text-primary">
+              {pricing.symbol}{pricing.display}
+            </span>
             <span className="text-muted-foreground">/year</span>
           </div>
           <ul className="space-y-3">
