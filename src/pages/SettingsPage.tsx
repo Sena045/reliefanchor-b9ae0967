@@ -1,10 +1,13 @@
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { LANGUAGES } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { pushNotificationService } from '@/services/pushNotificationService';
 
 interface SettingsPageProps {
   onShowLegal?: (tab: 'privacy' | 'terms') => void;
@@ -14,7 +17,41 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
   const { profile, setLanguage, isPremium, premiumUntil, moods, journals } = useApp();
   const { signOut, user } = useAuth();
   const { toast } = useToast();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsSupported, setNotificationsSupported] = useState(true);
 
+  useEffect(() => {
+    const checkNotifications = async () => {
+      if (!('Notification' in window)) {
+        setNotificationsSupported(false);
+        return;
+      }
+      const isSubscribed = await pushNotificationService.isSubscribed();
+      setNotificationsEnabled(isSubscribed);
+    };
+    checkNotifications();
+  }, []);
+
+  const toggleNotifications = async () => {
+    if (notificationsEnabled) {
+      await pushNotificationService.unsubscribe();
+      setNotificationsEnabled(false);
+      toast({ title: 'Notifications disabled' });
+    } else {
+      const permission = await pushNotificationService.requestPermission();
+      if (permission === 'granted') {
+        const subscription = await pushNotificationService.subscribe();
+        if (subscription) {
+          setNotificationsEnabled(true);
+          toast({ title: 'Notifications enabled!' });
+        } else {
+          toast({ title: 'Push notifications not configured', variant: 'destructive' });
+        }
+      } else {
+        toast({ title: 'Notification permission denied', variant: 'destructive' });
+      }
+    }
+  };
   const exportData = () => {
     const data = {
       exportDate: new Date().toISOString(),
@@ -48,6 +85,27 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Notifications */}
+      {notificationsSupported && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Daily Reminders</p>
+                <p className="text-xs text-muted-foreground">Get mood check-in reminders</p>
+              </div>
+              <Switch checked={notificationsEnabled} onCheckedChange={toggleNotifications} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader className="pb-2">
