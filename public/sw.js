@@ -3,7 +3,7 @@
 // IMPORTANT: Navigation requests ("/") must be network-first to avoid serving a stale
 // cached index.html after a new deploy (otherwise production can appear "not updated").
 
-const CACHE_NAME = 'reliefanchor-runtime-v2';
+const CACHE_NAME = 'reliefanchor-runtime-v3';
 
 const PRECACHE_URLS = [
   '/',
@@ -102,13 +102,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
-  if (
-    request.destination === 'script' ||
-    request.destination === 'style' ||
-    request.destination === 'image' ||
-    request.destination === 'font'
-  ) {
+  // IMPORTANT: Network-first for JS/CSS to avoid mixing cached assets across deploys
+  // (prevents React "Invalid hook call" / useState null issues).
+  if (request.destination === 'script' || request.destination === 'style') {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Cache-first for static assets that are safe to keep stale longer
+  if (request.destination === 'image' || request.destination === 'font') {
     event.respondWith(cacheFirst(request));
     return;
   }
