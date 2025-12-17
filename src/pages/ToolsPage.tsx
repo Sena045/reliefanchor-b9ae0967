@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
@@ -19,6 +19,13 @@ const GROUNDING_STEPS = {
   en: ['5 things you can SEE', '4 things you can TOUCH', '3 things you can HEAR', '2 things you can SMELL', '1 thing you can TASTE'],
   hi: ['5 चीज़ें जो आप देख सकते हैं', '4 चीज़ें जो आप छू सकते हैं', '3 चीज़ें जो आप सुन सकते हैं', '2 चीज़ें जो आप सूंघ सकते हैं', '1 चीज़ जो आप चख सकते हैं'],
 };
+
+const TAB_LABELS = {
+  breathing: { en: 'Breathing', hi: 'सांस' },
+  grounding: { en: 'Grounding', hi: 'ग्राउंडिंग' },
+  sounds: { en: 'Sounds', hi: 'ध्वनि' },
+  journal: { en: 'Journal', hi: 'जर्नल' },
+} as const;
 
 export function ToolsPage() {
   const { settings, addJournal } = useApp();
@@ -60,14 +67,21 @@ export function ToolsPage() {
     setCurrentPrompt(JOURNAL_PROMPTS[settings.language][Math.floor(Math.random() * JOURNAL_PROMPTS[settings.language].length)]);
   };
 
+  const tabs = [
+    { id: 'breathing' as const, icon: Wind },
+    { id: 'grounding' as const, icon: Eye },
+    { id: 'sounds' as const, icon: Volume2 },
+    { id: 'journal' as const, icon: BookOpen },
+  ];
+
   return (
     <div className="p-4 space-y-4 max-w-lg mx-auto safe-top">
       <div className="pt-4"><h1 className="text-xl font-semibold">{t('wellnessTools')}</h1></div>
       
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {[{ id: 'breathing', icon: Wind }, { id: 'grounding', icon: Eye }, { id: 'sounds', icon: Volume2 }, { id: 'journal', icon: BookOpen }].map(({ id, icon: Icon }) => (
-          <Button key={id} variant={activeTab === id ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab(id as typeof activeTab)}>
-            <Icon className="h-4 w-4 mr-1" />{t(id as keyof ReturnType<typeof useTranslation>['t'] extends (k: infer K) => string ? K : never)}
+        {tabs.map(({ id, icon: Icon }) => (
+          <Button key={id} variant={activeTab === id ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab(id)}>
+            <Icon className="h-4 w-4 mr-1" />{TAB_LABELS[id][settings.language]}
           </Button>
         ))}
       </div>
@@ -77,7 +91,9 @@ export function ToolsPage() {
           <div className={cn('w-32 h-32 rounded-full bg-primary/20 flex items-center justify-center mb-4', breathingActive && 'animate-breathe')}>
             <span className="text-lg font-medium text-primary">{breathingActive ? t(breathPhase) : '4-7-8'}</span>
           </div>
-          <Button onClick={breathingActive ? stopBreathing : startBreathing}>{breathingActive ? <><Pause className="h-4 w-4 mr-2" />{t('stopBreathing')}</> : <><Play className="h-4 w-4 mr-2" />{t('startBreathing')}</>}</Button>
+          <Button onClick={breathingActive ? stopBreathing : startBreathing}>
+            {breathingActive ? <><Pause className="h-4 w-4 mr-2" />{t('stopBreathing')}</> : <><Play className="h-4 w-4 mr-2" />{t('startBreathing')}</>}
+          </Button>
         </CardContent></Card>
       )}
 
