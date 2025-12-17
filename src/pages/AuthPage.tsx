@@ -27,7 +27,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function AuthPage() {
-  const { signIn, signUp, resetPassword, isPasswordRecovery, clearPasswordRecovery } = useAuth();
+  const { signIn, signUp, resetPassword, signOut, isPasswordRecovery, clearPasswordRecovery } = useAuth();
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -178,10 +178,13 @@ export function AuthPage() {
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
-        toast({ title: 'Success', description: 'Your password has been updated!' });
+        toast({ title: 'Success', description: 'Your password has been updated! Please sign in again.' });
         clearPasswordRecovery();
         setPassword('');
         setConfirmPassword('');
+        setIsLogin(true);
+        setIsForgotPassword(false);
+        await signOut();
       }
     } finally {
       setLoading(false);
