@@ -121,7 +121,7 @@ export function ToolsPage() {
 
   const stopBreathing = () => setBreathingActive(false);
 
-  const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire') => {
+  const toggleSound = async (type: 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep') => {
     if (playingSound === type) { audioService.stopNoise(); setPlayingSound(null); }
     else { await audioService.playNoise(type, volume); setPlayingSound(type); }
   };
@@ -320,6 +320,20 @@ export function ToolsPage() {
         {activeTab === 'sounds' && (
           <Card><CardContent className="p-6 space-y-4">
             <h2 className="text-lg font-medium mb-2">{t('sounds')}</h2>
+            
+            {/* Featured: Sleep Mix */}
+            <Button 
+              variant={playingSound === 'sleep' ? 'default' : 'secondary'} 
+              className="w-full h-16 text-base"
+              onClick={() => toggleSound('sleep')}
+            >
+              {playingSound === 'sleep' ? <VolumeX className="h-5 w-5 mr-2" /> : <Volume2 className="h-5 w-5 mr-2" />}
+              <div className="text-left">
+                <div className="font-medium">{t('sleepMix')}</div>
+                <div className="text-xs opacity-80">Binaural beats + Rain + Thunder</div>
+              </div>
+            </Button>
+            
             <div className="grid grid-cols-2 gap-2">
               {(['rain', 'forest', 'brown', 'campfire'] as const).map((type) => (
                 <Button key={type} variant={playingSound === type ? 'default' : 'outline'} className="flex-1" onClick={() => toggleSound(type)}>
@@ -328,7 +342,17 @@ export function ToolsPage() {
                 </Button>
               ))}
             </div>
-            {playingSound && <Slider value={[volume]} onValueChange={([v]) => { setVolume(v); audioService.setVolume(v); }} max={1} step={0.1} />}
+            
+            {playingSound && (
+              <div className="space-y-2">
+                <Slider value={[volume]} onValueChange={([v]) => { setVolume(v); audioService.setVolume(v); }} max={1} step={0.1} />
+                {playingSound === 'sleep' && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    🎧 Use headphones for binaural beats effect
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent></Card>
         )}
 

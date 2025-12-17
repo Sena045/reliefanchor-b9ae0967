@@ -8,7 +8,7 @@ type TranslationKey =
   | 'breathingExercise' | 'groundingExercise' | 'ambientSounds' | 'journalPrompt' | 'writeHere' | 'save'
   | 'language' | 'happy' | 'calm' | 'sad' | 'anxious' | 'angry' | 'rain' | 'forest' | 'brownNoise'
   | 'inhale' | 'hold' | 'exhale' | 'startBreathing' | 'stopBreathing' | 'games' | 'campfire'
-  | 'back' | 'next' | 'complete' | 'restart' | 'enterItems';
+  | 'back' | 'next' | 'complete' | 'restart' | 'enterItems' | 'sleepMix';
 
 const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -67,6 +67,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: 'Complete!',
     restart: 'Restart',
     enterItems: 'Enter items...',
+    sleepMix: 'Sleep Mix',
   },
   hi: {
     appName: 'रिलीफ़ एंकर',
@@ -124,6 +125,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: 'पूर्ण!',
     restart: 'पुनः आरंभ',
     enterItems: 'आइटम दर्ज करें...',
+    sleepMix: 'स्लीप मिक्स',
   },
   es: {
     appName: 'ReliefAnchor',
@@ -181,6 +183,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: '¡Completo!',
     restart: 'Reiniciar',
     enterItems: 'Ingresa elementos...',
+    sleepMix: 'Mezcla Sueño',
   },
   fr: {
     appName: 'ReliefAnchor',
@@ -238,6 +241,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: 'Terminé!',
     restart: 'Recommencer',
     enterItems: 'Entrez des éléments...',
+    sleepMix: 'Mix Sommeil',
   },
   de: {
     appName: 'ReliefAnchor',
@@ -295,6 +299,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: 'Fertig!',
     restart: 'Neustart',
     enterItems: 'Elemente eingeben...',
+    sleepMix: 'Schlaf-Mix',
   },
   pt: {
     appName: 'ReliefAnchor',
@@ -352,6 +357,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: 'Completo!',
     restart: 'Reiniciar',
     enterItems: 'Digite itens...',
+    sleepMix: 'Mix Sono',
   },
   zh: {
     appName: 'ReliefAnchor',
@@ -409,6 +415,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: '完成！',
     restart: '重新开始',
     enterItems: '输入项目...',
+    sleepMix: '睡眠混音',
   },
   ja: {
     appName: 'ReliefAnchor',
@@ -466,6 +473,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     complete: '完了！',
     restart: 'やり直す',
     enterItems: '項目を入力...',
+    sleepMix: 'スリープミックス',
   },
 };
 
