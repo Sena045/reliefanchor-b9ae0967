@@ -45,7 +45,7 @@ export interface AppState {
 // - All wellness games unlocked
 // - Export journal entries
 
-export const FREE_MESSAGES_PER_DAY = 5;
+export const FREE_MESSAGES_PER_DAY = 10;
 
 export const LANGUAGES: { code: Language; name: string; native: string }[] = [
   { code: 'en', name: 'English', native: 'English' },
