@@ -26,7 +26,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const detectPasswordRecoveryFromUrl = () => {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const searchParams = new URLSearchParams(window.location.search);
-      return hashParams.get('type') === 'recovery' || searchParams.get('type') === 'recovery';
+
+      // Primary: GoTrue adds type=recovery
+      if (hashParams.get('type') === 'recovery' || searchParams.get('type') === 'recovery') return true;
+
+      // Secondary: our own marker to make the flow robust across providers/configs
+      if (searchParams.get('recovery') === '1' || searchParams.get('mode') === 'recovery') return true;
+
+      return false;
     };
 
     // Detect recovery on initial load (hash-based or query-param based)
@@ -91,7 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Add a marker so the app reliably shows the reset form after the email link redirect
+    const redirectUrl = `${window.location.origin}/?recovery=1`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
