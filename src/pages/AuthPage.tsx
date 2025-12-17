@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Heart, Loader2, Mail, Lock, ArrowRight, Download } from 'lucide-react';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 export function AuthPage() {
   const { signIn, signUp } = useAuth();
@@ -20,6 +25,27 @@ export function AuthPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      toast({ title: 'App installed!', description: 'ReliefAnchor has been added to your home screen.' });
+      setInstallPrompt(null);
+    }
+  };
 
   const validateForm = () => {
     try {
@@ -148,6 +174,17 @@ export function AuthPage() {
               Press <kbd className="px-1.5 py-0.5 mx-1 rounded bg-muted text-[10px] font-mono">Ctrl+D</kbd> (or <kbd className="px-1.5 py-0.5 mx-1 rounded bg-muted text-[10px] font-mono">⌘+D</kbd> on Mac) to save ReliefAnchor for quick access.
             </p>
           </div>
+
+          {installPrompt && (
+            <Button
+              variant="outline"
+              className="w-full mt-4"
+              onClick={handleInstallClick}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Install App
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>
