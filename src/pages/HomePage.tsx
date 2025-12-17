@@ -3,7 +3,6 @@ import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PRICING } from '@/types';
 
 interface HomePageProps {
   onNavigate: (tab: string) => void;
@@ -12,7 +11,6 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const { settings, isPremium, remainingMessages } = useApp();
   const { t } = useTranslation(settings.language);
-  const pricing = PRICING[settings.region];
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto safe-top">
@@ -90,9 +88,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               <div className="flex-1">
                 <h3 className="font-medium">{t('getPremium')}</h3>
                 <p className="text-sm text-muted-foreground">{t('unlockFeatures')}</p>
-                <p className="text-lg font-bold text-primary mt-1">
-                  {pricing.symbol}{pricing.amount}/{settings.region === 'india' ? 'year' : 'year'}
-                </p>
+                <p className="text-lg font-bold text-primary mt-1">$9.99/year</p>
               </div>
             </div>
             <Button 

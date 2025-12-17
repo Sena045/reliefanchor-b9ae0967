@@ -1,5 +1,4 @@
-export type Region = 'india' | 'global';
-export type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'es' | 'fr' | 'de' | 'pt' | 'zh' | 'ja';
 
 export type MoodType = 'happy' | 'calm' | 'sad' | 'anxious' | 'angry';
 
@@ -25,7 +24,6 @@ export interface JournalEntry {
 }
 
 export interface UserSettings {
-  region: Region;
   language: Language;
   isPremium: boolean;
   premiumUntil: number | null;
@@ -40,22 +38,22 @@ export interface AppState {
   journals: JournalEntry[];
 }
 
-export const CRISIS_HELPLINES = {
-  india: [
-    { name: 'iCall', phone: '9152987821', description: 'Professional counseling' },
-    { name: 'Vandrevala Foundation', phone: '18602662345', description: '24/7 helpline' },
-    { name: 'NIMHANS', phone: '08046110007', description: 'Mental health support' },
-  ],
-  global: [
-    { name: 'National Suicide Prevention (US)', phone: '988', description: '24/7 crisis support' },
-    { name: 'Crisis Text Line', phone: 'Text HOME to 741741', description: 'Text-based support' },
-    { name: 'Samaritans (UK)', phone: '116123', description: '24/7 emotional support' },
-  ],
-};
-
-export const PRICING = {
-  india: { amount: 499, currency: 'INR', symbol: '₹', display: '499' },
-  global: { amount: 9.99, currency: 'USD', symbol: '$', display: '9.99' },
-};
+// Premium Features:
+// - Unlimited AI chat messages (Free: 5/day)
+// - Weekly mood insights & analytics
+// - Priority AI responses
+// - All wellness games unlocked
+// - Export journal entries
 
 export const FREE_MESSAGES_PER_DAY = 5;
+
+export const LANGUAGES: { code: Language; name: string; native: string }[] = [
+  { code: 'en', name: 'English', native: 'English' },
+  { code: 'hi', name: 'Hindi', native: 'हिंदी' },
+  { code: 'es', name: 'Spanish', native: 'Español' },
+  { code: 'fr', name: 'French', native: 'Français' },
+  { code: 'de', name: 'German', native: 'Deutsch' },
+  { code: 'pt', name: 'Portuguese', native: 'Português' },
+  { code: 'zh', name: 'Chinese', native: '中文' },
+  { code: 'ja', name: 'Japanese', native: '日本語' },
+];

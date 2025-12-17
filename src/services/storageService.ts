@@ -3,7 +3,6 @@ import { AppState, MoodEntry, ChatMessage, JournalEntry, UserSettings } from '@/
 const STORAGE_KEY = 'reliefanchor_data';
 
 const defaultSettings: UserSettings = {
-  region: 'global',
   language: 'en',
   isPremium: false,
   premiumUntil: null,
