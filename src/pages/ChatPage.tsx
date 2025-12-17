@@ -1,11 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Trash2, AlertTriangle, Phone, Loader2 } from 'lucide-react';
+import { Send, Trash2, Loader2 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { useTranslation } from '@/lib/translations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { CRISIS_HELPLINES } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,16 +19,12 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
     canSendMessage, 
     remainingMessages,
   } = useApp();
-  const { t } = useTranslation(settings.language);
   const { toast } = useToast();
   
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showCrisis, setShowCrisis] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  
-  const helplines = CRISIS_HELPLINES[settings.region];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,12 +38,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
     setIsLoading(true);
     
     try {
-      const response = await sendMessage(message);
-      
-      // Check for crisis detection
-      if (response.includes('[CRISIS_DETECTED]')) {
-        setShowCrisis(true);
-      }
+      await sendMessage(message);
     } catch (error) {
       if (error instanceof Error && error.message === 'PAYWALL') {
         onShowPremium();
@@ -74,7 +62,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
         <div>
           <h1 className="font-semibold">Anya</h1>
           <p className="text-xs text-muted-foreground">
-            {!settings.isPremium && `${remainingMessages} ${t('messagesRemaining')}`}
+            {!settings.isPremium && `${remainingMessages} messages remaining today`}
           </p>
         </div>
         {chatHistory.length > 0 && (
@@ -84,50 +72,13 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
         )}
       </div>
 
-      {/* Crisis Banner */}
-      {showCrisis && (
-        <Card className="mx-4 mt-4 border-destructive bg-destructive/10">
-          <CardContent className="p-3">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-destructive">{t('needHelp')}</p>
-                <div className="mt-2 space-y-1">
-                  {helplines.map((line) => (
-                    <a
-                      key={line.phone}
-                      href={`tel:${line.phone.replace(/\D/g, '')}`}
-                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary"
-                    >
-                      <Phone className="h-3 w-3" />
-                      <span className="font-medium">{line.name}:</span>
-                      <span>{line.phone}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => setShowCrisis(false)}
-              >
-                ×
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
         {chatHistory.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
-            <p className="text-lg mb-2">👋 {settings.language === 'hi' ? 'नमस्ते!' : 'Hello!'}</p>
+            <p className="text-lg mb-2">👋 Hello!</p>
             <p className="text-sm">
-              {settings.language === 'hi' 
-                ? 'मैं अन्या हूं, आपकी मानसिक स्वास्थ्य साथी। आज आप कैसा महसूस कर रहे हैं?'
-                : "I'm Anya, your mental wellness companion. How are you feeling today?"}
+              I'm Anya, your mental wellness companion. How are you feeling today?
             </p>
           </div>
         )}
@@ -148,7 +99,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
                   : 'bg-secondary text-secondary-foreground rounded-bl-md'
               )}
             >
-              {msg.content.replace('[CRISIS_DETECTED]', '').trim()}
+              {msg.content}
             </div>
           </div>
         ))}
@@ -177,7 +128,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t('typeMessage')}
+            placeholder="Type a message..."
             disabled={isLoading || !canSendMessage}
             className="flex-1"
           />
@@ -192,9 +143,7 @@ export function ChatPage({ onShowPremium }: ChatPageProps) {
         
         {!canSendMessage && !settings.isPremium && (
           <p className="text-xs text-center text-muted-foreground mt-2">
-            {settings.language === 'hi' 
-              ? 'आज के मुफ्त संदेश समाप्त। प्रीमियम में अपग्रेड करें!'
-              : 'Free messages used today. Upgrade to Premium!'}
+            Free messages used today. Upgrade to Premium!
           </p>
         )}
       </div>

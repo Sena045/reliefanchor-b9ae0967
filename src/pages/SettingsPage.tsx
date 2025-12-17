@@ -1,45 +1,110 @@
-import { Globe, Languages, Phone } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { useTranslation } from '@/lib/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CRISIS_HELPLINES, Region, Language } from '@/types';
+import { LANGUAGES, Language } from '@/types';
 
 export function SettingsPage() {
-  const { settings, setRegion, setLanguage } = useApp();
-  const { t } = useTranslation(settings.language);
-  const helplines = CRISIS_HELPLINES[settings.region];
+  const { settings, setLanguage, isPremium } = useApp();
 
   return (
     <div className="p-4 space-y-4 max-w-lg mx-auto safe-top">
-      <div className="pt-4"><h1 className="text-xl font-semibold">{t('settings')}</h1></div>
+      <div className="pt-4"><h1 className="text-xl font-semibold">Settings</h1></div>
 
-      <Card><CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4" />{t('region')}</CardTitle></CardHeader>
-        <CardContent className="flex gap-2">
-          {(['india', 'global'] as Region[]).map((r) => (
-            <Button key={r} variant={settings.region === r ? 'default' : 'outline'} className="flex-1" onClick={() => setRegion(r)}>{t(r)}</Button>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Languages className="h-4 w-4" />
+            Language
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-2">
+          {LANGUAGES.map((lang) => (
+            <Button 
+              key={lang.code} 
+              variant={settings.language === lang.code ? 'default' : 'outline'} 
+              className="justify-start"
+              onClick={() => setLanguage(lang.code)}
+            >
+              {lang.native}
+            </Button>
           ))}
         </CardContent>
       </Card>
 
-      <Card><CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Languages className="h-4 w-4" />{t('language')}</CardTitle></CardHeader>
-        <CardContent className="flex gap-2">
-          {(['en', 'hi'] as Language[]).map((l) => (
-            <Button key={l} variant={settings.language === l ? 'default' : 'outline'} className="flex-1" onClick={() => setLanguage(l)}>{l === 'en' ? 'English' : 'हिंदी'}</Button>
-          ))}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Crown className="h-4 w-4 text-amber-500" />
+            Premium Features
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {isPremium ? (
+            <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+              <p className="text-sm font-medium text-amber-600">✓ You have Premium access</p>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Upgrade to unlock all features
+            </p>
+          )}
+          
+          <div className="space-y-2">
+            <FeatureItem 
+              icon={MessageCircle} 
+              title="Unlimited AI Chat" 
+              description="Free: 5 messages/day" 
+              isPremium={!isPremium}
+            />
+            <FeatureItem 
+              icon={BarChart3} 
+              title="Weekly Mood Insights" 
+              description="Detailed analytics & trends" 
+              isPremium={!isPremium}
+            />
+            <FeatureItem 
+              icon={Gamepad2} 
+              title="All Wellness Games" 
+              description="Full access to all activities" 
+              isPremium={!isPremium}
+            />
+            <FeatureItem 
+              icon={FileText} 
+              title="Export Journals" 
+              description="Download your entries" 
+              isPremium={!isPremium}
+            />
+          </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
 
-      <Card><CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Phone className="h-4 w-4" />{t('crisisHelp')}</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          {helplines.map((line) => (
-            <a key={line.phone} href={`tel:${line.phone.replace(/\D/g, '')}`} className="flex items-center justify-between p-2 rounded-lg bg-muted hover:bg-muted/80">
-              <div><p className="text-sm font-medium">{line.name}</p><p className="text-xs text-muted-foreground">{line.description}</p></div>
-              <span className="text-sm text-primary font-medium">{line.phone}</span>
-            </a>
-          ))}
-        </CardContent>
-      </Card>
+function FeatureItem({ 
+  icon: Icon, 
+  title, 
+  description, 
+  isPremium 
+}: { 
+  icon: typeof MessageCircle; 
+  title: string; 
+  description: string;
+  isPremium: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+      <Icon className="h-4 w-4 text-primary shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      {isPremium && (
+        <span className="text-xs bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded">
+          Premium
+        </span>
+      )}
     </div>
   );
 }
