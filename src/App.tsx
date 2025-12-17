@@ -58,7 +58,7 @@ function AppContent() {
         {activeTab === 'home' && <HomePage onNavigate={handleNavigate} />}
         {activeTab === 'chat' && <ChatPage onShowPremium={() => setShowPremium(true)} />}
         {activeTab === 'mood' && <MoodPage />}
-        {activeTab === 'tools' && <ToolsPage />}
+        {activeTab === 'tools' && <ToolsPage onShowPremium={() => setShowPremium(true)} />}
         {activeTab === 'settings' && <SettingsPage />}
       </ErrorBoundary>
     </Layout>

@@ -83,7 +83,11 @@ const GROUNDING_STEPS: Record<Language, { prompt: string; count: number; icon: s
   ],
 };
 
-export function ToolsPage() {
+interface ToolsPageProps {
+  onShowPremium?: () => void;
+}
+
+export function ToolsPage({ onShowPremium }: ToolsPageProps) {
   const { profile, addJournal } = useApp();
   const { t } = useTranslation(profile.language);
   const { toast } = useToast();
@@ -417,7 +421,7 @@ export function ToolsPage() {
         {activeTab === 'games' && (
           <div>
             <h2 className="text-lg font-medium mb-4">{t('games')}</h2>
-            <MentalWellnessGames />
+            <MentalWellnessGames onShowPremium={onShowPremium} />
           </div>
         )}
       </main>
