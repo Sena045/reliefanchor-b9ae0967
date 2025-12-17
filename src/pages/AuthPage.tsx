@@ -8,18 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Globe } from 'lucide-react';
-import { Language } from '@/types';
+import { Language, LANGUAGES } from '@/types';
 
-const languages: { code: Language; name: string; native: string }[] = [
-  { code: 'en', name: 'English', native: 'English' },
-  { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
-  { code: 'es', name: 'Spanish', native: 'Español' },
-  { code: 'fr', name: 'French', native: 'Français' },
-  { code: 'de', name: 'German', native: 'Deutsch' },
-  { code: 'pt', name: 'Portuguese', native: 'Português' },
-  { code: 'zh', name: 'Chinese', native: '中文' },
-  { code: 'ja', name: 'Japanese', native: '日本語' },
-];
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -229,7 +219,7 @@ export function AuthPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {languages.map((lang) => (
+              {LANGUAGES.map((lang) => (
                 <SelectItem key={lang.code} value={lang.code} className="text-sm">
                   {lang.native}
                 </SelectItem>
