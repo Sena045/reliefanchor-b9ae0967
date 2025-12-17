@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,6 +17,10 @@ const emailSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
 });
 
+const passwordSchema = z.object({
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
@@ -26,15 +31,25 @@ export function AuthPage() {
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
+    // Check if this is a password recovery redirect
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    
+    if (type === 'recovery') {
+      setIsResettingPassword(true);
+    }
+
     // Detect iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(isIOSDevice);
@@ -142,6 +157,48 @@ export function AuthPage() {
     }
   };
 
+  const validateNewPassword = () => {
+    const errs: { password?: string; confirmPassword?: string } = {};
+    
+    try {
+      passwordSchema.parse({ password });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        errs.password = err.errors[0]?.message;
+      }
+    }
+    
+    if (password !== confirmPassword) {
+      errs.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateNewPassword()) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Success', description: 'Your password has been updated!' });
+        setIsResettingPassword(false);
+        setPassword('');
+        setConfirmPassword('');
+        // Clear the hash from URL
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
@@ -153,16 +210,61 @@ export function AuthPage() {
           <div>
             <CardTitle className="text-2xl font-bold">ReliefAnchor</CardTitle>
             <CardDescription className="mt-2">
-              {isForgotPassword 
-                ? 'Enter your email to reset your password.'
-                : isLogin 
-                  ? 'Welcome back! Sign in to continue.' 
-                  : 'Create an account to get started.'}
+              {isResettingPassword
+                ? 'Enter your new password below.'
+                : isForgotPassword 
+                  ? 'Enter your email to reset your password.'
+                  : isLogin 
+                    ? 'Welcome back! Sign in to continue.' 
+                    : 'Create an account to get started.'}
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          {isForgotPassword ? (
+          {isResettingPassword ? (
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    placeholder="New Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    disabled={loading}
+                  />
+                </div>
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    placeholder="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="pl-10"
+                    disabled={loading}
+                  />
+                </div>
+                {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    Update Password
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+          ) : isForgotPassword ? (
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">
