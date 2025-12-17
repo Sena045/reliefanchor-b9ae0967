@@ -1,4 +1,4 @@
-type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire';
+type NoiseType = 'rain' | 'forest' | 'brown' | 'campfire' | 'sleep';
 
 interface AudioNodes {
   context: AudioContext;
@@ -12,6 +12,11 @@ interface AudioNodes {
 
 let audioNodes: AudioNodes | null = null;
 let currentNoise: NoiseType | null = null;
+
+// Therapeutic frequencies (Hz) - scientifically backed
+const THETA_FREQUENCY = 6; // Deep relaxation, meditation (4-8 Hz range)
+const ALPHA_FREQUENCY = 10; // Calm alertness, stress relief (8-12 Hz range)
+const DELTA_FREQUENCY = 2; // Deep sleep (0.5-4 Hz range)
 
 // Generate high-quality noise buffer with stereo variance
 function createNoiseBuffer(context: AudioContext, seconds: number, type: 'white' | 'pink' | 'brown' = 'white'): AudioBuffer {
@@ -555,6 +560,226 @@ function createCampfireSound(context: AudioContext, masterGain: GainNode): {
   return { sources, oscillators, intervals, timeouts };
 }
 
+// Therapeutic Sleep Mix with binaural beats - designed for mental wellness
+function createSleepSound(context: AudioContext, masterGain: GainNode): { 
+  sources: AudioBufferSourceNode[], 
+  oscillators: OscillatorNode[],
+  intervals: ReturnType<typeof setInterval>[],
+  timeouts: ReturnType<typeof setTimeout>[]
+} {
+  const sources: AudioBufferSourceNode[] = [];
+  const oscillators: OscillatorNode[] = [];
+  const intervals: ReturnType<typeof setInterval>[] = [];
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
+  
+  // === BINAURAL BEATS FOR THETA WAVES (Deep relaxation) ===
+  // Left ear: 200 Hz, Right ear: 206 Hz = 6 Hz theta difference
+  const binauralBase = 200;
+  
+  const leftOsc = context.createOscillator();
+  leftOsc.type = 'sine';
+  leftOsc.frequency.value = binauralBase;
+  
+  const rightOsc = context.createOscillator();
+  rightOsc.type = 'sine';
+  rightOsc.frequency.value = binauralBase + THETA_FREQUENCY;
+  
+  // Create stereo panning for binaural effect
+  const leftPanner = context.createStereoPanner();
+  leftPanner.pan.value = -1;
+  
+  const rightPanner = context.createStereoPanner();
+  rightPanner.pan.value = 1;
+  
+  const binauralGain = context.createGain();
+  binauralGain.gain.value = 0.08; // Subtle but effective
+  
+  leftOsc.connect(leftPanner);
+  leftPanner.connect(binauralGain);
+  
+  rightOsc.connect(rightPanner);
+  rightPanner.connect(binauralGain);
+  
+  binauralGain.connect(masterGain);
+  
+  leftOsc.start();
+  rightOsc.start();
+  oscillators.push(leftOsc, rightOsc);
+  
+  // === DEEP BROWN NOISE - Womb-like comfort ===
+  const brownNoise = createNoiseBuffer(context, 10, 'brown');
+  
+  const brownSource = context.createBufferSource();
+  brownSource.buffer = brownNoise;
+  brownSource.loop = true;
+  
+  const brownFilter = context.createBiquadFilter();
+  brownFilter.type = 'lowpass';
+  brownFilter.frequency.value = 150;
+  brownFilter.Q.value = 0.3;
+  
+  const brownGain = context.createGain();
+  brownGain.gain.value = 0.25;
+  
+  // Slow breathing modulation (4 seconds in, 6 seconds out pattern)
+  const breathLFO = context.createOscillator();
+  breathLFO.frequency.value = 0.1; // ~10 second cycle
+  const breathLFOGain = context.createGain();
+  breathLFOGain.gain.value = 0.05;
+  breathLFO.connect(breathLFOGain);
+  breathLFOGain.connect(brownGain.gain);
+  breathLFO.start();
+  oscillators.push(breathLFO);
+  
+  brownSource.connect(brownFilter);
+  brownFilter.connect(brownGain);
+  brownGain.connect(masterGain);
+  brownSource.start();
+  sources.push(brownSource);
+  
+  // === GENTLE RAIN - Masking and comfort ===
+  const pinkNoise = createNoiseBuffer(context, 6, 'pink');
+  
+  const rainSource = context.createBufferSource();
+  rainSource.buffer = pinkNoise;
+  rainSource.loop = true;
+  
+  const rainFilter = context.createBiquadFilter();
+  rainFilter.type = 'bandpass';
+  rainFilter.frequency.value = 800;
+  rainFilter.Q.value = 0.5;
+  
+  const rainGain = context.createGain();
+  rainGain.gain.value = 0.06;
+  
+  rainSource.connect(rainFilter);
+  rainFilter.connect(rainGain);
+  rainGain.connect(masterGain);
+  rainSource.start();
+  sources.push(rainSource);
+  
+  // === SOFT CAMPFIRE CRACKLE - Primal comfort ===
+  const crackleSource = context.createBufferSource();
+  crackleSource.buffer = createNoiseBuffer(context, 5, 'white');
+  crackleSource.loop = true;
+  
+  const crackleFilter = context.createBiquadFilter();
+  crackleFilter.type = 'bandpass';
+  crackleFilter.frequency.value = 600;
+  crackleFilter.Q.value = 2;
+  
+  const crackleGain = context.createGain();
+  crackleGain.gain.value = 0.02;
+  
+  const crackleLFO = context.createOscillator();
+  crackleLFO.frequency.value = 8;
+  const crackleLFOGain = context.createGain();
+  crackleLFOGain.gain.value = 200;
+  crackleLFO.connect(crackleLFOGain);
+  crackleLFOGain.connect(crackleFilter.frequency);
+  crackleLFO.start();
+  oscillators.push(crackleLFO);
+  
+  crackleSource.connect(crackleFilter);
+  crackleFilter.connect(crackleGain);
+  crackleGain.connect(masterGain);
+  crackleSource.start();
+  sources.push(crackleSource);
+  
+  // === DISTANT THUNDER every 45-60 seconds ===
+  const createThunder = () => {
+    if (!audioNodes || currentNoise !== 'sleep') return;
+    
+    const now = context.currentTime;
+    const thunderDuration = 3 + Math.random() * 2;
+    
+    const thunderSource = context.createBufferSource();
+    thunderSource.buffer = createNoiseBuffer(context, 5, 'brown');
+    
+    const thunderFilter = context.createBiquadFilter();
+    thunderFilter.type = 'lowpass';
+    thunderFilter.frequency.value = 60;
+    thunderFilter.Q.value = 0.5;
+    
+    const thunderGain = context.createGain();
+    thunderGain.gain.setValueAtTime(0, now);
+    thunderGain.gain.linearRampToValueAtTime(0.15, now + 0.5);
+    thunderGain.gain.setValueAtTime(0.15, now + 0.8);
+    thunderGain.gain.exponentialRampToValueAtTime(0.001, now + thunderDuration);
+    
+    thunderSource.connect(thunderFilter);
+    thunderFilter.connect(thunderGain);
+    thunderGain.connect(masterGain);
+    thunderSource.start(now);
+    thunderSource.stop(now + thunderDuration + 0.1);
+  };
+  
+  // Thunder every 45-60 seconds
+  const scheduleThunder = () => {
+    const delay = 45000 + Math.random() * 15000;
+    const timeout = setTimeout(() => {
+      createThunder();
+      scheduleThunder();
+    }, delay);
+    timeouts.push(timeout);
+  };
+  
+  // First thunder after 30-45 seconds
+  const initialTimeout = setTimeout(() => {
+    createThunder();
+    scheduleThunder();
+  }, 30000 + Math.random() * 15000);
+  timeouts.push(initialTimeout);
+  
+  // === VINYL CRACKLE - Warmth and nostalgia ===
+  const vinylSource = context.createBufferSource();
+  vinylSource.buffer = createNoiseBuffer(context, 3, 'white');
+  vinylSource.loop = true;
+  
+  const vinylFilter = context.createBiquadFilter();
+  vinylFilter.type = 'highpass';
+  vinylFilter.frequency.value = 5000;
+  
+  const vinylFilter2 = context.createBiquadFilter();
+  vinylFilter2.type = 'lowpass';
+  vinylFilter2.frequency.value = 8000;
+  
+  const vinylGain = context.createGain();
+  vinylGain.gain.value = 0.008;
+  
+  vinylSource.connect(vinylFilter);
+  vinylFilter.connect(vinylFilter2);
+  vinylFilter2.connect(vinylGain);
+  vinylGain.connect(masterGain);
+  vinylSource.start();
+  sources.push(vinylSource);
+  
+  // === ALPHA WAVE CARRIER - Gentle calming frequency ===
+  const alphaOsc = context.createOscillator();
+  alphaOsc.type = 'sine';
+  alphaOsc.frequency.value = 136.1; // Om frequency - deeply calming
+  
+  const alphaGain = context.createGain();
+  alphaGain.gain.value = 0;
+  
+  // Pulse at alpha rhythm
+  const alphaLFO = context.createOscillator();
+  alphaLFO.frequency.value = ALPHA_FREQUENCY;
+  const alphaLFOGain = context.createGain();
+  alphaLFOGain.gain.value = 0.015;
+  alphaLFO.connect(alphaLFOGain);
+  alphaLFOGain.connect(alphaGain.gain);
+  alphaLFO.start();
+  oscillators.push(alphaLFO);
+  
+  alphaOsc.connect(alphaGain);
+  alphaGain.connect(masterGain);
+  alphaOsc.start();
+  oscillators.push(alphaOsc);
+  
+  return { sources, oscillators, intervals, timeouts };
+}
+
 export const audioService = {
   async playNoise(type: NoiseType, volume: number = 0.3): Promise<void> {
     this.stopNoise();
@@ -568,7 +793,7 @@ export const audioService = {
       
       const masterGain = context.createGain();
       masterGain.gain.setValueAtTime(0, context.currentTime);
-      masterGain.gain.linearRampToValueAtTime(Math.min(volume, 0.5), context.currentTime + 0.8);
+      masterGain.gain.linearRampToValueAtTime(Math.min(volume, 0.5), context.currentTime + 1.5); // Slower fade in for sleep
       masterGain.connect(context.destination);
       
       audioNodes = { 
@@ -592,6 +817,12 @@ export const audioService = {
         audioNodes.sources = createBrownSound(context, masterGain);
       } else if (type === 'campfire') {
         const result = createCampfireSound(context, masterGain);
+        audioNodes.sources = result.sources;
+        audioNodes.oscillators = result.oscillators;
+        audioNodes.intervals = result.intervals;
+        audioNodes.timeouts = result.timeouts;
+      } else if (type === 'sleep') {
+        const result = createSleepSound(context, masterGain);
         audioNodes.sources = result.sources;
         audioNodes.oscillators = result.oscillators;
         audioNodes.intervals = result.intervals;
