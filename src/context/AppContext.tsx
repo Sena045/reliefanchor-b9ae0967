@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { UserSettings, Region, Language, MoodEntry, ChatMessage, JournalEntry } from '@/types';
 import { storageService } from '@/services/storageService';
-import { geminiService } from '@/services/geminiService';
+import { chatService } from '@/services/chatService';
 
 interface AppContextType {
   settings: UserSettings;
@@ -27,34 +27,14 @@ interface AppContextType {
   // Journal
   addJournal: (prompt: string, content: string) => void;
   journals: JournalEntry[];
-  
-  // Gemini
-  initializeGemini: (apiKey: string) => Promise<void>;
-  isGeminiReady: boolean;
-  geminiApiKey: string;
-  setGeminiApiKey: (key: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-
-const GEMINI_KEY_STORAGE = 'reliefanchor_gemini_key';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(() => storageService.getState().settings);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>(() => storageService.getChats());
   const [journals, setJournals] = useState<JournalEntry[]>(() => storageService.getJournals());
-  const [isGeminiReady, setIsGeminiReady] = useState(false);
-  const [geminiApiKey, setGeminiApiKeyState] = useState(() => localStorage.getItem(GEMINI_KEY_STORAGE) || '');
-  
-  // Initialize Gemini on mount if key exists
-  useEffect(() => {
-    const storedKey = localStorage.getItem(GEMINI_KEY_STORAGE);
-    if (storedKey && !isGeminiReady) {
-      geminiService.initialize(storedKey)
-        .then(() => setIsGeminiReady(true))
-        .catch(console.error);
-    }
-  }, []);
   
   const updateSettings = useCallback((updates: Partial<UserSettings>) => {
     const newSettings = storageService.updateSettings(updates);
@@ -74,28 +54,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSettings(prev => ({ ...prev, isPremium: true, premiumUntil: Date.now() + 365 * 24 * 60 * 60 * 1000 }));
   }, []);
   
-  const initializeGemini = useCallback(async (apiKey: string) => {
-    await geminiService.initialize(apiKey);
-    localStorage.setItem(GEMINI_KEY_STORAGE, apiKey);
-    setGeminiApiKeyState(apiKey);
-    setIsGeminiReady(true);
-  }, []);
-  
-  const setGeminiApiKey = useCallback((key: string) => {
-    localStorage.setItem(GEMINI_KEY_STORAGE, key);
-    setGeminiApiKeyState(key);
-    if (key) {
-      geminiService.initialize(key)
-        .then(() => setIsGeminiReady(true))
-        .catch(console.error);
-    }
-  }, []);
-  
   const sendMessage = useCallback(async (content: string): Promise<string> => {
-    if (!isGeminiReady) {
-      throw new Error('Please set your Gemini API key in Settings first.');
-    }
-    
     if (!storageService.canSendMessage()) {
       throw new Error('PAYWALL');
     }
@@ -108,16 +67,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     storageService.incrementMessageCount();
     setSettings(storageService.getState().settings);
     
-    // Get AI response
+    // Get AI response via backend
     const allMessages = [...chatHistory, userMessage].map(m => ({ role: m.role, content: m.content }));
-    const response = await geminiService.chat(allMessages);
+    const response = await chatService.sendMessage(allMessages);
     
     // Add assistant message
     const assistantMessage = storageService.addChat({ role: 'assistant', content: response, timestamp: Date.now() });
     setChatHistory(prev => [...prev, assistantMessage]);
     
     return response;
-  }, [chatHistory, isGeminiReady]);
+  }, [chatHistory]);
   
   const clearChat = useCallback(() => {
     storageService.clearChats();
@@ -153,10 +112,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     getMoods,
     addJournal,
     journals,
-    initializeGemini,
-    isGeminiReady,
-    geminiApiKey,
-    setGeminiApiKey,
   };
   
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
