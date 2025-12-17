@@ -109,7 +109,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+    // Explicitly clear local state in case the listener doesn't fire
+    setUser(null);
+    setSession(null);
+    setIsPasswordRecovery(false);
   };
 
   const resetPassword = async (email: string) => {
