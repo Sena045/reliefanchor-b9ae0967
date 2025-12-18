@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Anchor, MessageCircle, Smile, Sparkles, Crown } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
@@ -11,6 +12,19 @@ interface HomePageProps {
 export function HomePage({ onNavigate }: HomePageProps) {
   const { profile, isPremium, premiumUntil, remainingMessages } = useApp();
   const { t } = useTranslation(profile.language);
+  const [isIndia, setIsIndia] = useState(false);
+
+  // Detect user's country on mount
+  useEffect(() => {
+    fetch('https://ipapi.co/country/')
+      .then(res => res.text())
+      .then(countryCode => {
+        setIsIndia(countryCode.trim() === 'IN');
+      })
+      .catch(() => setIsIndia(false));
+  }, []);
+
+  const priceDisplay = isIndia ? '₹249/month' : '$7.99/month';
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto safe-top">
@@ -106,7 +120,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
               <div className="flex-1">
                 <h3 className="font-medium">{t('getPremium')}</h3>
                 <p className="text-sm text-muted-foreground">{t('unlockFeatures')}</p>
-                <p className="text-lg font-bold text-primary mt-1">$7.99/month</p>
+                <p className="text-lg font-bold text-primary mt-1">{priceDisplay}</p>
               </div>
             </div>
             <Button 
