@@ -46,10 +46,21 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
   const [email, setEmail] = useState('');
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
+  const [isFirefox, setIsFirefox] = useState(false);
 
   useEffect(() => {
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    const ua = navigator.userAgent;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    const isAndroidDevice = /Android/.test(ua);
+    const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(ua);
+    const isFirefoxBrowser = /Firefox/.test(ua);
+    
     setIsIOS(isIOSDevice);
+    setIsAndroid(isAndroidDevice);
+    setIsSafari(isSafariBrowser && !isIOSDevice);
+    setIsFirefox(isFirefoxBrowser);
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -143,9 +154,17 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           </Button>
         </div>
 
-        {isIOS && (
+        {!installPrompt && (
           <p className="text-sm text-muted-foreground">
-            <Share className="inline h-4 w-4 mx-1" /> Tap Share → Add to Home Screen to install
+            {isIOS ? (
+              <><Share className="inline h-4 w-4 mx-1" /> Tap Share → Add to Home Screen to install</>
+            ) : isFirefox ? (
+              <><Download className="inline h-4 w-4 mx-1" /> Firefox: Use Chrome or Edge for best install experience</>
+            ) : isSafari ? (
+              <><Download className="inline h-4 w-4 mx-1" /> Use Chrome or Edge for one-tap install</>
+            ) : isAndroid && !installPrompt ? (
+              <><Download className="inline h-4 w-4 mx-1" /> Tap Menu (⋮) → Install app</>
+            ) : null}
           </p>
         )}
 
@@ -243,6 +262,10 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               <p className="text-sm text-left">
                 {isIOS 
                   ? <span>Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></span>
+                  : isFirefox
+                  ? <span>Firefox doesn't support install. Use <strong>Chrome</strong> or <strong>Edge</strong></span>
+                  : isSafari
+                  ? <span>Use <strong>Chrome</strong> or <strong>Edge</strong> for one-tap install</span>
                   : <span>Tap <strong>Menu (⋮)</strong> → <strong>Install app</strong></span>
                 }
               </p>
