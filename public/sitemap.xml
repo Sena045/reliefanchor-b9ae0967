@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://reliefanchor.com/</loc>
+    <loc>https://reliefanchor.lovable.app/</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://reliefanchor.com/auth</loc>
+    <loc>https://reliefanchor.lovable.app/auth</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://reliefanchor.com/premium</loc>
+    <loc>https://reliefanchor.lovable.app/premium</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://reliefanchor.com/legal/privacy</loc>
+    <loc>https://reliefanchor.lovable.app/legal/privacy</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://reliefanchor.com/legal/terms</loc>
+    <loc>https://reliefanchor.lovable.app/legal/terms</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
