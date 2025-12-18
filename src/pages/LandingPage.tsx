@@ -117,7 +117,7 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
         </h1>
         
         <p className="text-xl text-muted-foreground mb-2">
-          Your AI Mental Wellness Companion
+          Calm your mind in 60 seconds.
         </p>
         
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
