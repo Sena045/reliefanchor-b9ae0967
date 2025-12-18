@@ -14,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onShowPressKit?: () => void;
 }
 
 const FEATURES = [
@@ -40,7 +41,7 @@ const FEATURES = [
 ];
 
 
-export function LandingPage({ onGetStarted }: LandingPageProps) {
+export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -223,9 +224,18 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       {/* Footer */}
       <footer className="px-4 py-8 border-t text-center text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} ReliefAnchor. All rights reserved.</p>
-        <p className="mt-2">
-          Made with ❤️ for your mental wellness
-        </p>
+        <div className="mt-3 flex items-center justify-center gap-4">
+          {onShowPressKit && (
+            <button 
+              onClick={onShowPressKit}
+              className="hover:text-primary transition-colors"
+            >
+              Press Kit
+            </button>
+          )}
+          <span>•</span>
+          <span>Made with ❤️ for your mental wellness</span>
+        </div>
       </footer>
     </div>
   );

@@ -16,12 +16,14 @@ const MoodPage = lazy(() => import('@/pages/MoodPage').then(m => ({ default: m.M
 const ToolsPage = lazy(() => import('@/pages/ToolsPage').then(m => ({ default: m.ToolsPage })));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
+const PressKitPage = lazy(() => import('@/pages/PressKitPage').then(m => ({ default: m.PressKitPage })));
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [showPressKit, setShowPressKit] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -43,12 +45,25 @@ function AppContent() {
 
   // Not logged in
   if (!user) {
+    // Show press kit page
+    if (showPressKit) {
+      return (
+        <Suspense fallback={<SplashLoader />}>
+          <PressKitPage onClose={() => setShowPressKit(false)} />
+        </Suspense>
+      );
+    }
     // Show auth page if explicitly requested or has referral code
     if (showAuth || hasReferralCode) {
       return <AuthPage />;
     }
     // Show landing page by default
-    return <LandingPage onGetStarted={() => setShowAuth(true)} />;
+    return (
+      <LandingPage 
+        onGetStarted={() => setShowAuth(true)} 
+        onShowPressKit={() => setShowPressKit(true)}
+      />
+    );
   }
 
   if (showPremium) {

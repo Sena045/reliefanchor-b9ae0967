@@ -19,6 +19,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://reliefanchor.lovable.app/press</loc>
+    <lastmod>2024-12-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://reliefanchor.lovable.app/legal/privacy</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>yearly</changefreq>
