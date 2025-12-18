@@ -1,5 +1,5 @@
 import { Crown, Check, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,8 +23,24 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const { t } = useTranslation(profile.language);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isIndia, setIsIndia] = useState<boolean | null>(null);
   const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
   const [plan, setPlan] = useState<PlanType>('yearly');
+  
+  // Detect user's country on mount
+  useEffect(() => {
+    fetch('https://ip-api.com/json/?fields=countryCode')
+      .then(res => res.json())
+      .then(data => {
+        const inIndia = data.countryCode === 'IN';
+        setIsIndia(inIndia);
+        setCurrency(inIndia ? 'INR' : 'USD');
+      })
+      .catch(() => {
+        setIsIndia(false);
+        setCurrency('USD');
+      });
+  }, []);
   
   const monthlyPricing = PRICING.monthly[currency];
   const yearlyPricing = PRICING.yearly[currency];
@@ -86,23 +102,25 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         <p className="text-muted-foreground">{t('unlockFeatures')}</p>
       </div>
       
-      {/* Currency Toggle */}
-      <div className="flex justify-center gap-2 mb-6">
-        <Button 
-          variant={currency === 'USD' ? 'default' : 'outline'} 
-          size="sm"
-          onClick={() => setCurrency('USD')}
-        >
-          $ USD
-        </Button>
-        <Button 
-          variant={currency === 'INR' ? 'default' : 'outline'} 
-          size="sm"
-          onClick={() => setCurrency('INR')}
-        >
-          ₹ INR
-        </Button>
-      </div>
+      {/* Currency Toggle - Only show if in India */}
+      {isIndia && (
+        <div className="flex justify-center gap-2 mb-6">
+          <Button 
+            variant={currency === 'USD' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setCurrency('USD')}
+          >
+            $ USD
+          </Button>
+          <Button 
+            variant={currency === 'INR' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setCurrency('INR')}
+          >
+            ₹ INR
+          </Button>
+        </div>
+      )}
       
       {/* Plan Selection */}
       <div className="grid grid-cols-2 gap-3 mb-6">
