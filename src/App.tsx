@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
+import { ThemeProvider } from 'next-themes';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AppProvider } from '@/context/AppContext';
 import { Layout } from '@/components/layout/Layout';
@@ -107,10 +108,12 @@ function AuthenticatedApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AuthenticatedApp />
-      <Toaster />
-      <UpdatePrompt />
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AuthProvider>
+        <AuthenticatedApp />
+        <Toaster />
+        <UpdatePrompt />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

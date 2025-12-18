@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell, Trash2, Send } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell, Trash2, Send, Sun, Moon, Monitor } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,10 +20,17 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
   const { profile, setLanguage, isPremium, premiumUntil, moods, journals } = useApp();
   const { signOut, user } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationsSupported, setNotificationsSupported] = useState(true);
   const [feedback, setFeedback] = useState('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const checkNotifications = async () => {
@@ -127,6 +135,47 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
 
       {/* Referral Program */}
       <ReferralCard />
+
+      {/* Theme */}
+      {mounted && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Sun className="h-4 w-4" />
+              Appearance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-3 gap-2">
+            <Button
+              variant={theme === 'light' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTheme('light')}
+              className="flex items-center gap-2"
+            >
+              <Sun className="h-4 w-4" />
+              Light
+            </Button>
+            <Button
+              variant={theme === 'dark' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTheme('dark')}
+              className="flex items-center gap-2"
+            >
+              <Moon className="h-4 w-4" />
+              Dark
+            </Button>
+            <Button
+              variant={theme === 'system' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTheme('system')}
+              className="flex items-center gap-2"
+            >
+              <Monitor className="h-4 w-4" />
+              System
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Notifications */}
       {notificationsSupported && (
