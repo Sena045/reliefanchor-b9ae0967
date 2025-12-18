@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,15 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
     }
   };
 
+  const handleBookmark = () => {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const shortcut = isMac ? '⌘+D' : 'Ctrl+D';
+    toast({ 
+      title: 'Bookmark this page', 
+      description: `Press ${shortcut} to add ReliefAnchor to your bookmarks.` 
+    });
+  };
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
@@ -127,6 +136,11 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
               Install App
             </Button>
           )}
+
+          <Button size="lg" variant="outline" onClick={handleBookmark}>
+            <Bookmark className="mr-2 h-5 w-5" />
+            Bookmark
+          </Button>
         </div>
 
         {isIOS && (
