@@ -226,57 +226,28 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
           </div>
           
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Install ReliefAnchor
+            Tap & Install
           </h2>
           <p className="text-muted-foreground mb-6">
-            Add to your home screen for the best experience. Works offline!
+            Add to your home screen for instant access. Works offline!
           </p>
 
-          <div className="space-y-4">
-            {installPrompt && (
-              <Button size="lg" onClick={handleInstall} className="w-full sm:w-auto">
-                <Download className="mr-2 h-5 w-5" />
-                Install App Now
-              </Button>
-            )}
-
-            <Card className="text-left">
-              <CardContent className="p-4 space-y-3">
-                {isIOS ? (
-                  <div className="flex items-start gap-3">
-                    <Share className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <div>
-                      <p className="font-medium text-sm">iPhone / iPad</p>
-                      <p className="text-sm text-muted-foreground">
-                        Tap <span className="font-medium">Share</span> → <span className="font-medium">Add to Home Screen</span>
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-start gap-3">
-                      <Download className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                      <div>
-                        <p className="font-medium text-sm">Android / Chrome</p>
-                        <p className="text-sm text-muted-foreground">
-                          {installPrompt ? 'Click "Install App Now" above' : 'Tap menu (⋮) → Install app'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Share className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                      <div>
-                        <p className="font-medium text-sm">iPhone / iPad</p>
-                        <p className="text-sm text-muted-foreground">
-                          Tap <span className="font-medium">Share</span> → <span className="font-medium">Add to Home Screen</span>
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          {installPrompt ? (
+            <Button size="lg" onClick={handleInstall} className="text-lg px-8">
+              <Download className="mr-2 h-5 w-5" />
+              Install Now
+            </Button>
+          ) : (
+            <div className="bg-muted/50 rounded-lg p-4 inline-flex items-center gap-3">
+              <Share className="h-5 w-5 text-primary shrink-0" />
+              <p className="text-sm text-left">
+                {isIOS 
+                  ? <span>Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></span>
+                  : <span>Tap <strong>Menu (⋮)</strong> → <strong>Install app</strong></span>
+                }
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
