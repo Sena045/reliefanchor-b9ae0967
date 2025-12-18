@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -41,7 +41,7 @@ const FEATURES = [
 ];
 
 
-export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) {
+export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit }, ref) {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -105,7 +105,7 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Hero Section */}
       <section className="px-4 pt-12 pb-16 text-center max-w-4xl mx-auto">
         <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
@@ -286,4 +286,4 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
       </footer>
     </div>
   );
-}
+});
