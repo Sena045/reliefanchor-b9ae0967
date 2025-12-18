@@ -281,6 +281,25 @@ export function AuthPage() {
                   </>
                 )}
               </Button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  clearPasswordRecovery();
+                  // Clear recovery URL parameter
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('recovery');
+                  window.history.replaceState({}, '', url.toString());
+                  setPassword('');
+                  setConfirmPassword('');
+                  setErrors({});
+                }}
+                className="w-full flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+                disabled={loading}
+              >
+                <ArrowLeft className="w-3 h-3" />
+                Back to Sign In
+              </button>
             </form>
           ) : isForgotPassword ? (
             <form onSubmit={handleForgotPassword} className="space-y-4">
