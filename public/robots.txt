@@ -1,5 +1,5 @@
 # ReliefAnchor - Mental Health & Wellness App
-# https://reliefanchor.com
+# https://reliefanchor.lovable.app
 
 User-agent: Googlebot
 Allow: /
@@ -21,4 +21,4 @@ Disallow: /api/
 Disallow: /auth/
 
 # Sitemap
-Sitemap: https://reliefanchor.com/sitemap.xml
+Sitemap: https://reliefanchor.lovable.app/sitemap.xml
