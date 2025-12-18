@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -215,6 +215,68 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
           <p className="text-xs text-muted-foreground mt-3">
             No spam, ever. Unsubscribe anytime.
           </p>
+        </div>
+      </section>
+
+      {/* Install App Section */}
+      <section className="px-4 py-16">
+        <div className="max-w-lg mx-auto text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+            <Smartphone className="w-8 h-8 text-primary" />
+          </div>
+          
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Install ReliefAnchor
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Add to your home screen for the best experience. Works offline!
+          </p>
+
+          <div className="space-y-4">
+            {installPrompt && (
+              <Button size="lg" onClick={handleInstall} className="w-full sm:w-auto">
+                <Download className="mr-2 h-5 w-5" />
+                Install App Now
+              </Button>
+            )}
+
+            <Card className="text-left">
+              <CardContent className="p-4 space-y-3">
+                {isIOS ? (
+                  <div className="flex items-start gap-3">
+                    <Share className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-sm">iPhone / iPad</p>
+                      <p className="text-sm text-muted-foreground">
+                        Tap <span className="font-medium">Share</span> → <span className="font-medium">Add to Home Screen</span>
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-3">
+                      <Download className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-medium text-sm">Android / Chrome</p>
+                        <p className="text-sm text-muted-foreground">
+                          {installPrompt ? 'Click "Install App Now" above' : 'Tap menu (⋮) → Install app'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Share className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-medium text-sm">iPhone / iPad</p>
+                        <p className="text-sm text-muted-foreground">
+                          Tap <span className="font-medium">Share</span> → <span className="font-medium">Add to Home Screen</span>
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
