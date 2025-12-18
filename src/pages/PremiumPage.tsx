@@ -27,12 +27,12 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
   const [plan, setPlan] = useState<PlanType>('yearly');
   
-  // Detect user's country on mount
+  // Detect user's country on mount using ipapi.co (supports HTTPS)
   useEffect(() => {
-    fetch('https://ip-api.com/json/?fields=countryCode')
-      .then(res => res.json())
-      .then(data => {
-        const inIndia = data.countryCode === 'IN';
+    fetch('https://ipapi.co/country/')
+      .then(res => res.text())
+      .then(countryCode => {
+        const inIndia = countryCode.trim() === 'IN';
         setIsIndia(inIndia);
         setCurrency(inIndia ? 'INR' : 'USD');
       })
