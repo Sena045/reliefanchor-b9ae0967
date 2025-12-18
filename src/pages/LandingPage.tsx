@@ -121,7 +121,7 @@ export function LandingPage({ onGetStarted, onShowPressKit }: LandingPageProps) 
         </p>
         
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Find calm, track your moods, and chat with an empathetic AI companion. Available in 8 languages.
+          Find calm, track your moods, and chat with an empathetic AI companion. Available in 8 languages, change from settings.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
