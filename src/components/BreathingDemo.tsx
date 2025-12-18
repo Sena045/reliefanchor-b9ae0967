@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, forwardRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -12,7 +12,7 @@ const TOTAL_CYCLES = 6;
 
 type BreathingPhase = 'idle' | 'inhale' | 'exhale' | 'complete';
 
-export function BreathingDemo({ onGetStarted }: BreathingDemoProps) {
+export const BreathingDemo = forwardRef<HTMLElement, BreathingDemoProps>(function BreathingDemo({ onGetStarted }, ref) {
   const [phase, setPhase] = useState<BreathingPhase>('idle');
   const [cycle, setCycle] = useState(0);
 
@@ -55,7 +55,7 @@ export function BreathingDemo({ onGetStarted }: BreathingDemoProps) {
   };
 
   return (
-    <section className="px-4 py-16">
+    <section ref={ref} className="px-4 py-16">
       <div className="max-w-lg mx-auto text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-4">
           Experience Calm in 60 Seconds
@@ -153,4 +153,4 @@ export function BreathingDemo({ onGetStarted }: BreathingDemoProps) {
       </div>
     </section>
   );
-}
+});
