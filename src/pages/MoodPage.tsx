@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { MoodType } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { SocialShare } from '@/components/SocialShare';
 
 const moodConfig: Record<MoodType, { icon: typeof Smile; color: string; value: number }> = {
   happy: { icon: Smile, color: 'text-mood-happy', value: 5 },
@@ -122,21 +123,30 @@ export function MoodPage() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">{t('moodHistory')}</CardTitle>
-            <div className="flex gap-1">
-              <Button
-                variant={viewDays === 7 ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewDays(7)}
-              >
-                {t('last7Days')}
-              </Button>
-              <Button
-                variant={viewDays === 30 ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewDays(30)}
-              >
-                {t('last30Days')}
-              </Button>
+            <div className="flex items-center gap-2">
+              {moods.length > 0 && (
+                <SocialShare
+                  title="My Mood Journey on ReliefAnchor"
+                  text={`I've been tracking my mental wellness! ${moods.length} mood entries in the last ${viewDays} days. Join me on this journey!`}
+                  hashtags={['MentalHealth', 'MoodTracking', 'Wellness']}
+                />
+              )}
+              <div className="flex gap-1">
+                <Button
+                  variant={viewDays === 7 ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewDays(7)}
+                >
+                  {t('last7Days')}
+                </Button>
+                <Button
+                  variant={viewDays === 30 ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewDays(30)}
+                >
+                  {t('last30Days')}
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
