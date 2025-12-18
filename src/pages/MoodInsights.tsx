@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { SocialShare } from '@/components/SocialShare';
 
 interface MoodInsightsProps {
   onClose: () => void;
@@ -102,6 +103,17 @@ export function MoodInsights({ onClose, onUpgrade }: MoodInsightsProps) {
             </div>
             <h1 className="text-xl font-semibold">Weekly Mood Insights</h1>
             <p className="text-sm text-muted-foreground">AI-powered analysis of your emotional patterns</p>
+            
+            {/* Share mood streak */}
+            {totalMoods > 0 && (
+              <div className="mt-3">
+                <SocialShare
+                  title="My Mood Streak on ReliefAnchor"
+                  text={`I've tracked ${totalMoods} mood${totalMoods > 1 ? 's' : ''} this week on ReliefAnchor! ${dominantMood ? `My dominant mood: ${MOOD_EMOJIS[dominantMood]}` : ''} Track your mental wellness journey too!`}
+                  hashtags={['MentalHealth', 'MoodTracking', 'Wellness', 'SelfCare']}
+                />
+              </div>
+            )}
           </div>
 
           {/* Weekly Summary */}
