@@ -45,22 +45,49 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [isSafari, setIsSafari] = useState(false);
-  const [isFirefox, setIsFirefox] = useState(false);
+  const [browserInfo, setBrowserInfo] = useState({
+    isIOS: false,
+    isAndroid: false,
+    isChrome: false,
+    isSafari: false,
+    isFirefox: false,
+    isEdge: false,
+    isSamsung: false,
+    isOpera: false,
+    isMobile: false,
+    isStandalone: false
+  });
 
   useEffect(() => {
     const ua = navigator.userAgent;
     const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
     const isAndroidDevice = /Android/.test(ua);
-    const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(ua);
-    const isFirefoxBrowser = /Firefox/.test(ua);
+    const isMobileDevice = isIOSDevice || isAndroidDevice || /webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     
-    setIsIOS(isIOSDevice);
-    setIsAndroid(isAndroidDevice);
-    setIsSafari(isSafariBrowser && !isIOSDevice);
-    setIsFirefox(isFirefoxBrowser);
+    // Check if already installed as PWA
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
+                             (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    
+    // Browser detection
+    const isChromeBrowser = /Chrome/.test(ua) && !/Edge|Edg|OPR|Samsung/.test(ua);
+    const isEdgeBrowser = /Edg/.test(ua);
+    const isSafariBrowser = /Safari/.test(ua) && !/Chrome|Chromium|Android/.test(ua);
+    const isFirefoxBrowser = /Firefox/.test(ua);
+    const isSamsungBrowser = /SamsungBrowser/.test(ua);
+    const isOperaBrowser = /OPR|Opera/.test(ua);
+    
+    setBrowserInfo({
+      isIOS: isIOSDevice,
+      isAndroid: isAndroidDevice,
+      isChrome: isChromeBrowser,
+      isSafari: isSafariBrowser,
+      isFirefox: isFirefoxBrowser,
+      isEdge: isEdgeBrowser,
+      isSamsung: isSamsungBrowser,
+      isOpera: isOperaBrowser,
+      isMobile: isMobileDevice,
+      isStandalone: isStandaloneMode
+    });
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -70,6 +97,89 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   }, []);
+
+  const getInstallInstructions = () => {
+    const { isIOS, isAndroid, isSafari, isFirefox, isChrome, isEdge, isSamsung, isOpera, isMobile } = browserInfo;
+    
+    // iOS devices (all browsers on iOS use Safari engine)
+    if (isIOS) {
+      return {
+        icon: Share,
+        text: 'Tap Share → Add to Home Screen',
+        shortText: 'Share → Add to Home Screen'
+      };
+    }
+    
+    // Android with Samsung Internet
+    if (isAndroid && isSamsung) {
+      return {
+        icon: Download,
+        text: 'Tap Menu (☰) → Add page to → Home screen',
+        shortText: 'Menu → Add to Home screen'
+      };
+    }
+    
+    // Android with Firefox
+    if (isAndroid && isFirefox) {
+      return {
+        icon: Download,
+        text: 'Tap Menu (⋮) → Install',
+        shortText: 'Menu → Install'
+      };
+    }
+    
+    // Android with Opera
+    if (isAndroid && isOpera) {
+      return {
+        icon: Download,
+        text: 'Tap Menu (⋮) → Home screen',
+        shortText: 'Menu → Home screen'
+      };
+    }
+    
+    // Android Chrome/Edge (supports beforeinstallprompt)
+    if (isAndroid && (isChrome || isEdge)) {
+      return {
+        icon: Download,
+        text: 'Tap Menu (⋮) → Install app',
+        shortText: 'Menu → Install app'
+      };
+    }
+    
+    // Desktop Safari
+    if (isSafari && !isMobile) {
+      return {
+        icon: Share,
+        text: 'Click Share → Add to Dock',
+        shortText: 'Share → Add to Dock'
+      };
+    }
+    
+    // Desktop Firefox
+    if (isFirefox && !isMobile) {
+      return {
+        icon: Bookmark,
+        text: 'Press Ctrl+D to bookmark, or use Chrome/Edge for install',
+        shortText: 'Bookmark (Ctrl+D) or use Chrome/Edge'
+      };
+    }
+    
+    // Desktop Chrome/Edge (supports beforeinstallprompt)
+    if ((isChrome || isEdge) && !isMobile) {
+      return {
+        icon: Download,
+        text: 'Click the install icon in address bar, or Menu → Install',
+        shortText: 'Install from address bar'
+      };
+    }
+    
+    // Fallback for other browsers
+    return {
+      icon: Download,
+      text: 'Look for "Add to Home Screen" or "Install" in your browser menu',
+      shortText: 'Check browser menu to install'
+    };
+  };
 
   const handleInstall = async () => {
     if (installPrompt) {
@@ -154,19 +264,15 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           </Button>
         </div>
 
-        {!installPrompt && (
-          <p className="text-sm text-muted-foreground">
-            {isIOS ? (
-              <><Share className="inline h-4 w-4 mx-1" /> Tap Share → Add to Home Screen to install</>
-            ) : isFirefox ? (
-              <><Download className="inline h-4 w-4 mx-1" /> Firefox: Use Chrome or Edge for best install experience</>
-            ) : isSafari ? (
-              <><Download className="inline h-4 w-4 mx-1" /> Use Chrome or Edge for one-tap install</>
-            ) : isAndroid && !installPrompt ? (
-              <><Download className="inline h-4 w-4 mx-1" /> Tap Menu (⋮) → Install app</>
-            ) : null}
-          </p>
-        )}
+        {!installPrompt && !browserInfo.isStandalone && (() => {
+          const instructions = getInstallInstructions();
+          const IconComponent = instructions.icon;
+          return (
+            <p className="text-sm text-muted-foreground">
+              <IconComponent className="inline h-4 w-4 mx-1" /> {instructions.shortText}
+            </p>
+          );
+        })()}
 
         <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
@@ -256,21 +362,18 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               <Download className="mr-2 h-5 w-5" />
               Install Now
             </Button>
-          ) : (
-            <div className="bg-muted/50 rounded-lg p-4 inline-flex items-center gap-3">
-              <Share className="h-5 w-5 text-primary shrink-0" />
-              <p className="text-sm text-left">
-                {isIOS 
-                  ? <span>Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></span>
-                  : isFirefox
-                  ? <span>Firefox doesn't support install. Use <strong>Chrome</strong> or <strong>Edge</strong></span>
-                  : isSafari
-                  ? <span>Use <strong>Chrome</strong> or <strong>Edge</strong> for one-tap install</span>
-                  : <span>Tap <strong>Menu (⋮)</strong> → <strong>Install app</strong></span>
-                }
-              </p>
-            </div>
-          )}
+          ) : (() => {
+            const instructions = getInstallInstructions();
+            const IconComponent = instructions.icon;
+            return (
+              <div className="bg-muted/50 rounded-lg p-4 inline-flex items-center gap-3">
+                <IconComponent className="h-5 w-5 text-primary shrink-0" />
+                <p className="text-sm text-left">
+                  <span>{instructions.text}</span>
+                </p>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
