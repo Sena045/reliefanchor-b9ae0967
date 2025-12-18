@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell, Trash2 } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Bell, Trash2, Send } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { LANGUAGES } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { pushNotificationService } from '@/services/pushNotificationService';
@@ -20,6 +21,8 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
   const { toast } = useToast();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationsSupported, setNotificationsSupported] = useState(true);
+  const [feedback, setFeedback] = useState('');
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   useEffect(() => {
     const checkNotifications = async () => {
@@ -85,6 +88,23 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
     } else {
       toast({ title: 'Chat history cleared!' });
     }
+  };
+
+  const submitFeedback = async () => {
+    if (!user || !feedback.trim()) return;
+    
+    setSubmittingFeedback(true);
+    const { error } = await supabase
+      .from('feedback')
+      .insert({ user_id: user.id, message: feedback.trim() });
+
+    if (error) {
+      toast({ title: 'Failed to submit feedback', variant: 'destructive' });
+    } else {
+      toast({ title: 'Thank you for your feedback!' });
+      setFeedback('');
+    }
+    setSubmittingFeedback(false);
   };
 
   return (
@@ -229,6 +249,35 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
               </Button>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Feedback */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Send className="h-4 w-4" />
+            Send Feedback
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Textarea
+            placeholder="Share your thoughts, suggestions, or report issues..."
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            className="min-h-[100px] resize-none"
+            maxLength={1000}
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{feedback.length}/1000</span>
+            <Button 
+              size="sm" 
+              onClick={submitFeedback} 
+              disabled={!feedback.trim() || submittingFeedback}
+            >
+              {submittingFeedback ? 'Sending...' : 'Submit Feedback'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
