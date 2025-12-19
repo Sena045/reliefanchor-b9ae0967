@@ -19,71 +19,18 @@ export const referralService = {
   },
 
   async applyReferralCode(referralCode: string, newUserId: string): Promise<boolean> {
-    // Find the referrer by code
-    const { data: referrer } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('referral_code', referralCode.toUpperCase())
-      .single();
+    // Use the secure database function to apply the referral
+    const { data, error } = await supabase.rpc('apply_referral_reward', {
+      p_referral_code: referralCode.toUpperCase(),
+      p_new_user_id: newUserId,
+    });
 
-    if (!referrer || referrer.id === newUserId) {
+    if (error) {
+      console.error('Error applying referral:', error);
       return false;
     }
 
-    // Create referral record
-    const { error: refError } = await supabase
-      .from('referrals')
-      .insert({
-        referrer_id: referrer.id,
-        referred_id: newUserId,
-      });
-
-    if (refError) {
-      console.error('Error creating referral:', refError);
-      return false;
-    }
-
-    // Update referred user's profile
-    await supabase
-      .from('profiles')
-      .update({ referred_by: referrer.id })
-      .eq('id', newUserId);
-
-    // Award 7 days premium to referrer
-    const { data: referrerProfile } = await supabase
-      .from('profiles')
-      .select('is_premium, premium_until')
-      .eq('id', referrer.id)
-      .single();
-
-    const now = new Date();
-    let newPremiumUntil: Date;
-
-    if (referrerProfile?.is_premium && referrerProfile.premium_until) {
-      // Extend existing premium
-      newPremiumUntil = new Date(referrerProfile.premium_until);
-      newPremiumUntil.setDate(newPremiumUntil.getDate() + 7);
-    } else {
-      // Start new premium period
-      newPremiumUntil = new Date(now);
-      newPremiumUntil.setDate(newPremiumUntil.getDate() + 7);
-    }
-
-    await supabase
-      .from('profiles')
-      .update({
-        is_premium: true,
-        premium_until: newPremiumUntil.toISOString(),
-      })
-      .eq('id', referrer.id);
-
-    // Mark referral as rewarded
-    await supabase
-      .from('referrals')
-      .update({ rewarded: true })
-      .eq('referred_id', newUserId);
-
-    return true;
+    return data === true;
   },
 
   getShareUrl(referralCode: string): string {
