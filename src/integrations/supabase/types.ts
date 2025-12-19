@@ -131,6 +131,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          first_exercise_at: string | null
           id: string
           is_premium: boolean
           language: string
@@ -143,6 +144,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          first_exercise_at?: string | null
           id: string
           is_premium?: boolean
           language?: string
@@ -155,6 +157,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          first_exercise_at?: string | null
           id?: string
           is_premium?: boolean
           language?: string
@@ -179,6 +182,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          ip_address: string | null
           referred_id: string
           referrer_id: string
           rewarded: boolean
@@ -186,6 +190,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          ip_address?: string | null
           referred_id: string
           referrer_id: string
           rewarded?: boolean
@@ -193,6 +198,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          ip_address?: string | null
           referred_id?: string
           referrer_id?: string
           rewarded?: boolean
@@ -219,10 +225,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      apply_referral_reward: {
-        Args: { p_new_user_id: string; p_referral_code: string }
+      apply_referral_reward:
+        | {
+            Args: { p_new_user_id: string; p_referral_code: string }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_ip_address?: string
+              p_new_user_id: string
+              p_referral_code: string
+            }
+            Returns: boolean
+          }
+      complete_referral_after_exercise: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
+      get_remaining_referrals: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never

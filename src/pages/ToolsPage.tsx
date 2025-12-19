@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Wind, Eye, Volume2, BookOpen, Play, Pause, VolumeX, Gamepad2, Check, RotateCcw, Timer, Waves, Lock } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { audioService } from '@/services/audioService';
+import { referralService } from '@/services/referralService';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { MentalWellnessGames } from '@/components/games/MentalWellnessGames';
@@ -89,8 +91,11 @@ interface ToolsPageProps {
 
 export function ToolsPage({ onShowPremium }: ToolsPageProps) {
   const { profile, addJournal, isPremium } = useApp();
+  const { user } = useAuth();
   const { t } = useTranslation(profile.language);
   const { toast } = useToast();
+  const breathingCycleRef = useRef<number>(0);
+  const exerciseCompletedRef = useRef<boolean>(false);
   
   const lang = profile.language;
   
@@ -113,13 +118,40 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
     setCurrentPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
   }, [lang]);
 
+  // Track and reward first exercise completion
+  const handleExerciseComplete = async () => {
+    if (exerciseCompletedRef.current || !user) return;
+    exerciseCompletedRef.current = true;
+    
+    try {
+      await referralService.completeReferralAfterExercise(user.id);
+    } catch (error) {
+      console.error('Error completing referral:', error);
+    }
+  };
+
   const startBreathing = () => {
     setBreathingActive(true);
+    breathingCycleRef.current = 0;
     let phase: 'inhale' | 'hold' | 'exhale' = 'inhale';
     const cycle = () => {
-      if (phase === 'inhale') { setBreathPhase('inhale'); setTimeout(() => { phase = 'hold'; cycle(); }, 4000); }
-      else if (phase === 'hold') { setBreathPhase('hold'); setTimeout(() => { phase = 'exhale'; cycle(); }, 7000); }
-      else { setBreathPhase('exhale'); setTimeout(() => { phase = 'inhale'; cycle(); }, 8000); }
+      if (phase === 'inhale') { 
+        setBreathPhase('inhale'); 
+        setTimeout(() => { phase = 'hold'; cycle(); }, 4000); 
+      }
+      else if (phase === 'hold') { 
+        setBreathPhase('hold'); 
+        setTimeout(() => { phase = 'exhale'; cycle(); }, 7000); 
+      }
+      else { 
+        setBreathPhase('exhale');
+        breathingCycleRef.current++;
+        // After 3 full cycles (about 1 minute), count as exercise completed
+        if (breathingCycleRef.current >= 3) {
+          handleExerciseComplete();
+        }
+        setTimeout(() => { phase = 'inhale'; cycle(); }, 8000); 
+      }
     };
     cycle();
   };
