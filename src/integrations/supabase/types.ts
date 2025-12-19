@@ -222,7 +222,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_referrals: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          referred_id: string | null
+          referrer_id: string | null
+          rewarded: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          referred_id?: string | null
+          referrer_id?: string | null
+          rewarded?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          referred_id?: string | null
+          referrer_id?: string | null
+          rewarded?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       apply_referral_reward:
