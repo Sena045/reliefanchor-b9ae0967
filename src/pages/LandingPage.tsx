@@ -294,7 +294,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       <section className="px-4 py-16 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            Everything You Need for Mental Wellness
+            Simple tools to calm your mind.
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6">
