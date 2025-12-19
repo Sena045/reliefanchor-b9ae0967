@@ -242,6 +242,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      get_pending_referrals_count: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       get_remaining_referrals: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
