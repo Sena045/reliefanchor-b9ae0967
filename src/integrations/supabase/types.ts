@@ -219,7 +219,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_referral_reward: {
+        Args: { p_new_user_id: string; p_referral_code: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
