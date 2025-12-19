@@ -88,7 +88,7 @@ export function ReferralCard() {
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
               <Info className="h-4 w-4 text-muted-foreground shrink-0" />
               <span className="text-sm">
-                You have <span className="font-semibold text-primary">{remainingReferrals}</span> referral{remainingReferrals !== 1 ? 's' : ''} left out of {MAX_REFERRALS}
+                <span className="font-semibold text-primary">{remainingReferrals}</span> of {MAX_REFERRALS} referrals remaining
               </span>
             </div>
 
