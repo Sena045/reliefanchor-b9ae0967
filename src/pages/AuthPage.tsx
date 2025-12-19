@@ -126,7 +126,20 @@ export function AuthPage() {
     try {
       // Store referral code before signup so AppContext can apply it
       if (!isLogin && referralCode) {
-        localStorage.setItem('pendingReferralCode', referralCode);
+        const normalized = referralCode.trim().toUpperCase();
+        const isValid = /^[A-Z0-9]{8}$/.test(normalized);
+
+        if (!isValid) {
+          toast({
+            title: 'Invalid referral code',
+            description: 'Referral codes are 8 letters/numbers (example: A1B2C3D4).',
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+
+        localStorage.setItem('pendingReferralCode', normalized);
       }
 
       const { error } = isLogin
@@ -397,9 +410,12 @@ export function AuthPage() {
                       <Gift className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="text"
-                        placeholder="Referral Code (optional)"
+                        placeholder="Referral Code (8 characters, optional)"
                         value={referralCode}
-                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                        onChange={(e) => {
+                          const next = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                          setReferralCode(next);
+                        }}
                         className="pl-10 uppercase"
                         disabled={loading}
                         maxLength={8}

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { chatService } from '@/services/chatService';
 import { useAuth } from '@/hooks/useAuth';
 import { referralService } from '@/services/referralService';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
   language: Language;
@@ -50,6 +51,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [moods, setMoods] = useState<MoodEntry[]>([]);
@@ -114,7 +116,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
           // Check for pending referral code
           const pendingReferral = localStorage.getItem('pendingReferralCode');
           if (pendingReferral) {
-            await referralService.applyReferralCode(pendingReferral, user.id);
+            const ok = await referralService.applyReferralCode(pendingReferral, user.id);
+
+            if (ok) {
+              toast({
+                title: 'Referral applied!',
+                description: 'Complete your first breathing exercise to reward your friend with 7 days Premium.',
+              });
+            } else {
+              toast({
+                title: 'Referral not applied',
+                description: 'Invalid code, already used, or blocked by our anti-abuse checks (same network/IP).',
+                variant: 'destructive',
+              });
+            }
+
             localStorage.removeItem('pendingReferralCode');
           }
         }
