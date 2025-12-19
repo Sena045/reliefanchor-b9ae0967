@@ -43,18 +43,21 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          ip_address: string | null
           source: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id?: string
+          ip_address?: string | null
           source?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          ip_address?: string | null
           source?: string | null
         }
         Relationships: []
@@ -238,6 +241,10 @@ export type Database = {
             }
             Returns: boolean
           }
+      check_email_subscription_rate_limit: {
+        Args: { p_ip_address: string }
+        Returns: boolean
+      }
       complete_referral_after_exercise: {
         Args: { p_user_id: string }
         Returns: boolean
