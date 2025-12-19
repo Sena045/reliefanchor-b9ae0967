@@ -13,7 +13,6 @@ import { referralService } from '@/services/referralService';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { MentalWellnessGames } from '@/components/games/MentalWellnessGames';
-import { ReferralCard } from '@/components/ReferralCard';
 import { Language } from '@/types';
 
 const JOURNAL_PROMPTS: Record<Language, string[]> = {
@@ -467,11 +466,6 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
             <MentalWellnessGames onShowPremium={onShowPremium} />
           </div>
         )}
-
-        {/* Referral Card */}
-        <div className="mt-6">
-          <ReferralCard />
-        </div>
       </main>
     </div>
   );
