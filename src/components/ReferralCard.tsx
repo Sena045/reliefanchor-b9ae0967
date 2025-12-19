@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Copy, Share2, Users, Gift, Check, Info } from 'lucide-react';
+import { Copy, Share2, Users, Gift, Check, Info, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { referralService } from '@/services/referralService';
 
-const MAX_REFERRALS = 10;
+const MAX_REFERRALS = 5;
 
 export function ReferralCard() {
   const { user } = useAuth();
@@ -14,20 +14,23 @@ export function ReferralCard() {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [remainingReferrals, setRemainingReferrals] = useState(MAX_REFERRALS);
+  const [pendingReferrals, setPendingReferrals] = useState(0);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const loadReferralData = async () => {
-      const [code, count, remaining] = await Promise.all([
+      const [code, count, remaining, pending] = await Promise.all([
         referralService.getReferralCode(user.id),
         referralService.getReferralCount(user.id),
         referralService.getRemainingReferrals(user.id),
+        referralService.getPendingReferralsCount(user.id),
       ]);
       setReferralCode(code);
       setReferralCount(count);
       setRemainingReferrals(remaining);
+      setPendingReferrals(pending);
     };
 
     loadReferralData();
@@ -116,11 +119,21 @@ export function ReferralCard() {
           </div>
         )}
 
+        {/* Pending referrals */}
+        {pendingReferrals > 0 && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <Clock className="h-4 w-4 text-amber-500 shrink-0" />
+            <span className="text-sm">
+              <span className="font-semibold text-amber-600 dark:text-amber-400">{pendingReferrals}</span> friend{pendingReferrals !== 1 ? 's' : ''} waiting to complete their first exercise
+            </span>
+          </div>
+        )}
+
         {referralCount > 0 && (
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-2 border-t">
             <Users className="h-4 w-4" />
             <span>
-              <span className="font-semibold text-foreground">{referralCount}</span> friend{referralCount !== 1 ? 's' : ''} joined
+              <span className="font-semibold text-foreground">{referralCount}</span> friend{referralCount !== 1 ? 's' : ''} joined and completed
             </span>
           </div>
         )}

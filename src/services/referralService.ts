@@ -36,9 +36,20 @@ export const referralService = {
     });
     if (error) {
       console.error('Error getting remaining referrals:', error);
-      return 10;
+      return 5;
     }
-    return data ?? 10;
+    return data ?? 5;
+  },
+
+  async getPendingReferralsCount(userId: string): Promise<number> {
+    const { data, error } = await supabase.rpc('get_pending_referrals_count', {
+      p_user_id: userId,
+    });
+    if (error) {
+      console.error('Error getting pending referrals:', error);
+      return 0;
+    }
+    return data ?? 0;
   },
 
   async applyReferralCode(referralCode: string, newUserId: string): Promise<boolean> {
