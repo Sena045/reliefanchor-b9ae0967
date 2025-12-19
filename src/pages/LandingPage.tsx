@@ -206,13 +206,28 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
     if (!email) return;
     
     try {
+      // Get client IP for rate limiting
+      let ipAddress: string | null = null;
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        ipAddress = ipData.ip || null;
+      } catch {
+        // Continue without IP if fetch fails
+      }
+
       const { error } = await supabase
         .from('email_subscribers')
-        .insert({ email: email.trim().toLowerCase() });
+        .insert({ 
+          email: email.trim().toLowerCase(),
+          ip_address: ipAddress
+        });
       
       if (error) {
         if (error.code === '23505') {
           toast({ title: 'Already subscribed!', description: "You're already on our list." });
+        } else if (error.code === '23514' || error.message?.includes('rate limit')) {
+          toast({ title: 'Too many requests', description: 'Please try again later.', variant: 'destructive' });
         } else {
           throw error;
         }
