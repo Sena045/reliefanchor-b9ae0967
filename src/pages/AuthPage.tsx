@@ -423,6 +423,8 @@ export function AuthPage() {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Have a friend's code? Enter it to give them free Premium days!
+                      <br />
+                      <span className="text-amber-600 dark:text-amber-400">Note: Referrals from the same network/Wi-Fi may be blocked to prevent abuse.</span>
                     </p>
                   </div>
                 )}
