@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-const RAZORPAY_KEY = 'rzp_live_RsboxtV3DUXMha';
+const RAZORPAY_KEY = 'rzp_live_RttA4Sjyxmu0lV';
 
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
