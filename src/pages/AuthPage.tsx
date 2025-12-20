@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { referralService } from '@/services/referralService';
 
 const authSchema = z.object({
@@ -232,7 +233,24 @@ export function AuthPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4 relative">
+      {/* Share QR Code - Top Right */}
+      <div className="absolute top-4 right-4 flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-primary/10">
+        <div className="p-1.5 bg-white rounded-lg shadow-sm">
+          <QRCodeSVG 
+            value="https://reliefanchor.lovable.app"
+            size={48}
+            level="M"
+            includeMargin={false}
+            bgColor="#FFFFFF"
+            fgColor="#1a1a2e"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground max-w-[120px] leading-tight">
+          Scan to share ReliefAnchor with a friend ❤️
+        </p>
+      </div>
+      
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
