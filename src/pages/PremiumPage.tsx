@@ -76,17 +76,56 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
     );
   };
 
-  if (isPremium) {
+  // Calculate trial countdown
+  const getTrialCountdown = () => {
+    if (!premiumUntil) return null;
+    const now = new Date();
+    const diff = premiumUntil.getTime() - now.getTime();
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return { days, hours, isTrial: days <= 7 };
+  };
+
+  const trialInfo = getTrialCountdown();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  if (isPremium && !showUpgrade) {
     return (
       <div className="p-4 max-w-lg mx-auto safe-top">
         <Card className="text-center p-8">
           <Crown className="h-16 w-16 text-primary mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">You're Premium!</h2>
           <p className="text-muted-foreground mb-2">Enjoy all features.</p>
-          {premiumUntil && (
+          
+          {/* Trial Countdown Banner */}
+          {trialInfo?.isTrial && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-4">
+              <p className="text-amber-600 dark:text-amber-400 font-semibold text-lg">
+                Free Trial Ending Soon
+              </p>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                {trialInfo.days > 0 ? `${trialInfo.days} day${trialInfo.days !== 1 ? 's' : ''}` : ''} 
+                {trialInfo.days > 0 && trialInfo.hours > 0 ? ', ' : ''}
+                {trialInfo.hours > 0 ? `${trialInfo.hours} hour${trialInfo.hours !== 1 ? 's' : ''}` : ''}
+                {trialInfo.days === 0 && trialInfo.hours === 0 ? 'Less than an hour' : ''} left
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Subscribe now to keep your premium features
+              </p>
+            </div>
+          )}
+          
+          {premiumUntil && !trialInfo?.isTrial && (
             <p className="text-sm text-muted-foreground mb-4">
               Expires: {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
+          )}
+          
+          {trialInfo?.isTrial && (
+            <Button className="w-full mb-3" onClick={() => setShowUpgrade(true)}>
+              Upgrade Now
+            </Button>
           )}
           <Button variant="outline" onClick={onClose}>Back</Button>
         </Card>
