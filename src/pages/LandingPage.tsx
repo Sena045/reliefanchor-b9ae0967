@@ -1,5 +1,6 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Camera } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -332,6 +333,37 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
       {/* Breathing Demo Section */}
       <BreathingDemo onGetStarted={onGetStarted} />
+
+      {/* QR Code Section */}
+      <section className="px-4 py-16 bg-muted/30">
+        <div className="max-w-md mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <Camera className="w-6 h-6 text-primary" />
+            <h2 className="text-xl md:text-2xl font-bold">
+              Open camera → scan → instant calm
+            </h2>
+          </div>
+          <p className="text-muted-foreground mb-6 text-sm">
+            (no typing needed)
+          </p>
+          
+          {/* QR Code Container */}
+          <div className="inline-block p-4 bg-white rounded-2xl border-4 border-primary shadow-lg shadow-primary/20">
+            <QRCodeSVG 
+              value="https://reliefanchor.lovable.app"
+              size={200}
+              level="H"
+              includeMargin={false}
+              bgColor="#FFFFFF"
+              fgColor="#1a1a2e"
+            />
+          </div>
+          
+          <p className="text-xs text-muted-foreground mt-6 max-w-xs mx-auto">
+            Works with Google Lens, phone camera, WhatsApp, Instagram
+          </p>
+        </div>
+      </section>
 
       {/* Email Capture Section */}
       <section className="px-4 py-16 bg-primary/5">
