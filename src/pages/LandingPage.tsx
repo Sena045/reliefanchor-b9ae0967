@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BreathingDemo } from '@/components/BreathingDemo';
+import { PromoBanner } from '@/components/PromoBanner';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -243,12 +244,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
   return (
     <div ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Promo Banner */}
-      <div className="w-full bg-gradient-to-r from-purple-600 via-purple-500 to-emerald-500 py-3 px-4 text-center">
-        <p className="text-white text-lg md:text-2xl font-bold tracking-wide">
-          🎉 7 DAYS FREE PREMIUM
-        </p>
-      </div>
+      <PromoBanner />
 
       {/* Hero Section */}
       <section className="px-4 pt-12 pb-16 text-center max-w-4xl mx-auto">
