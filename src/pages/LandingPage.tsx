@@ -280,7 +280,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           Find calm, track your moods, and chat with an empathetic AI companion. Available in 8 languages, change from settings.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3">
           <Button size="lg" onClick={onGetStarted} className="text-lg px-8">
             Sign Up Now
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -298,6 +298,11 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             Bookmark
           </Button>
         </div>
+        
+        <p className="text-sm text-muted-foreground mb-6 flex items-center justify-center gap-1">
+          <Shield className="h-4 w-4" />
+          Your data is encrypted and securely protected.
+        </p>
 
         {!installPrompt && !browserInfo.isStandalone && (() => {
           const instructions = getInstallInstructions();
