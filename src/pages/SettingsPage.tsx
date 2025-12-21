@@ -229,10 +229,10 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
         <CardContent className="space-y-3">
           {isPremium ? (
             <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-              <p className="text-sm font-medium text-amber-600">✓ You have Premium access</p>
+              <p className="text-sm font-medium text-amber-600">👑 Premium access active</p>
               {premiumUntil && (
                 <p className="text-xs text-amber-600/80 mt-1">
-                  Expires: {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                  Enjoy all features until {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               )}
             </div>
