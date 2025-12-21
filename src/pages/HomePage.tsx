@@ -100,10 +100,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 <Crown className="h-6 w-6 text-amber-500" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-amber-600">Premium Active</h3>
+                <h3 className="font-medium text-amber-600">👑 Premium access active</h3>
                 {premiumUntil && (
                   <p className="text-sm text-muted-foreground">
-                    Expires: {premiumUntil.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    Enjoy all features until {premiumUntil.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 )}
               </div>
