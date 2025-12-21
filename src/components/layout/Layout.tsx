@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { BottomNav } from './BottomNav';
-import { PromoBanner } from '../PromoBanner';
+import { HomePremiumBanner } from '../HomePremiumBanner';
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface LayoutProps {
 export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      <PromoBanner />
+      <HomePremiumBanner />
       
       <main className="pb-20 min-h-screen">
         {children}
