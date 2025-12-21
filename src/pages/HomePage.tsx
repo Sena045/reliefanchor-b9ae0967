@@ -106,6 +106,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     Enjoy all features until {premiumUntil.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground/70 mt-1">
+                  You won't be charged automatically. You're always in control.
+                </p>
               </div>
             </div>
           </CardContent>

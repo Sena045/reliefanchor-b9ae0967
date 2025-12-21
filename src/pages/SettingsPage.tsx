@@ -235,6 +235,9 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
                   Enjoy all features until {premiumUntil.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               )}
+              <p className="text-xs text-amber-600/60 mt-1">
+                You won't be charged automatically. You're always in control.
+              </p>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
