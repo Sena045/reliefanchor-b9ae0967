@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const BANNER_FIRST_SEEN_KEY = 'promo_banner_first_seen';
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-const PROMO_END_DATE = new Date('2024-12-28T23:59:59').getTime();
+const PROMO_END_DATE = new Date('2025-12-28T23:59:59').getTime();
 
 export function PromoBanner() {
   const [isVisible, setIsVisible] = useState(false);
