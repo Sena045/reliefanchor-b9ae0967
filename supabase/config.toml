@@ -4,4 +4,7 @@ project_id = "urbllfogetzvckloyrld"
 verify_jwt = false
 
 [functions.mood-insights]
-verify_jwt = true
+verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false

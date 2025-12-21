@@ -1,6 +1,7 @@
 import { Crown, Check, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ const FEATURES = [
 
 export function PremiumPage({ onClose }: PremiumPageProps) {
   const { profile, activatePremium, isPremium, premiumUntil } = useApp();
+  const { user } = useAuth();
   const { t } = useTranslation(profile.language);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -52,15 +54,23 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
     : `Save ₹${(149 * 12 - 1499)}`;
 
   const handlePayment = async (selectedPlan: PlanType) => {
+    if (!user) {
+      toast({ title: 'Error', description: 'Please sign in first', variant: 'destructive' });
+      return;
+    }
+    
     setLoading(true);
     await razorpayService.initiatePayment(
       selectedPlan,
       currency,
+      user.id,
+      user.email || '',
       () => {
+        // Optimistic update - webhook will confirm
         activatePremium(selectedPlan);
         toast({ 
-          title: 'Premium Activated!', 
-          description: `Your ${selectedPlan} subscription is now active.`
+          title: 'Payment Successful!', 
+          description: `Your ${selectedPlan} subscription is being activated.`
         });
         setLoading(false);
         onClose();

@@ -1,9 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const FREE_MESSAGES_PER_DAY = 5;
 
 const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English',
@@ -48,6 +51,71 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate user
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    );
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Get user profile to check premium status and rate limits
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('is_premium, premium_until, messages_used_today, last_message_date')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      console.error('Profile error:', profileError);
+      return new Response(JSON.stringify({ error: 'Profile not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check if premium has expired
+    const premiumExpired = profile.premium_until && new Date(profile.premium_until) < new Date();
+    const isPremium = profile.is_premium && !premiumExpired;
+
+    // Check rate limits for non-premium users
+    const today = new Date().toISOString().split('T')[0];
+    const isNewDay = profile.last_message_date !== today;
+    const messagesUsedToday = isNewDay ? 0 : profile.messages_used_today;
+
+    if (!isPremium && messagesUsedToday >= FREE_MESSAGES_PER_DAY) {
+      return new Response(JSON.stringify({ error: 'Daily message limit reached. Upgrade to Premium for unlimited messages.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Update message count
+    await supabaseClient
+      .from('profiles')
+      .update({
+        messages_used_today: messagesUsedToday + 1,
+        last_message_date: today,
+      })
+      .eq('id', user.id);
+
     const { messages, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -55,7 +123,37 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log(`Chat request with language: ${language}`);
+    // Validate messages input
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 100) {
+      return new Response(JSON.stringify({ error: 'Invalid messages format' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validate each message
+    for (const msg of messages) {
+      if (!msg.role || !msg.content) {
+        return new Response(JSON.stringify({ error: 'Invalid message structure' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (typeof msg.content !== 'string' || msg.content.length > 4000) {
+        return new Response(JSON.stringify({ error: 'Message too long (max 4000 characters)' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (msg.role !== 'user' && msg.role !== 'assistant') {
+        return new Response(JSON.stringify({ error: 'Invalid message role' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    console.log(`Chat request from user ${user.id} with language: ${language}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

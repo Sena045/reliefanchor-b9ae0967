@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-const RAZORPAY_KEY = 'rzp_live_RttA4Sjyxmu0lV';
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY || 'rzp_live_RttA4Sjyxmu0lV';
 
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -37,6 +37,8 @@ export const razorpayService = {
   async initiatePayment(
     plan: PlanType,
     currency: 'USD' | 'INR',
+    userId: string,
+    userEmail: string,
     onSuccess: () => void,
     onCancel: () => void,
     onError: (error: string) => void
@@ -55,9 +57,17 @@ export const razorpayService = {
         currency: pricing.currency,
         name: 'ReliefAnchor',
         description,
-        handler: () => onSuccess(),
+        notes: {
+          user_id: userId,
+          plan: plan,
+        },
+        handler: () => {
+          // Payment captured - webhook will update database
+          // Show optimistic success, real update happens via webhook
+          onSuccess();
+        },
         modal: { ondismiss: () => onCancel() },
-        prefill: { email: '' },
+        prefill: { email: userEmail },
         theme: { color: '#0d9488' },
       };
       
