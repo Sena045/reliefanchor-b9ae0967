@@ -1,7 +1,7 @@
 import { AppState, MoodEntry, ChatMessage, JournalEntry, UserSettings } from '@/types';
 
 const STORAGE_KEY = 'reliefanchor_data';
-const PROMO_END_DATE = new Date('2024-12-28T23:59:59').getTime();
+const PROMO_END_DATE = new Date('2025-12-28T23:59:59').getTime();
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 const defaultSettings: UserSettings = {
