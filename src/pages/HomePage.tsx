@@ -5,9 +5,6 @@ import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-const TRIAL_START_KEY = 'trial_start_date';
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
 interface HomePageProps {
   onNavigate: (tab: string) => void;
 }
@@ -16,7 +13,6 @@ export function HomePage({ onNavigate }: HomePageProps) {
   const { profile, isPremium, premiumUntil, remainingMessages } = useApp();
   const { t } = useTranslation(profile.language);
   const [isIndia, setIsIndia] = useState(false);
-  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
 
   // Detect user's country on mount
   useEffect(() => {
@@ -28,40 +24,10 @@ export function HomePage({ onNavigate }: HomePageProps) {
       .catch(() => setIsIndia(false));
   }, []);
 
-  // Calculate trial days remaining
-  useEffect(() => {
-    const now = Date.now();
-    const trialStart = localStorage.getItem(TRIAL_START_KEY);
-
-    if (!trialStart) {
-      localStorage.setItem(TRIAL_START_KEY, now.toString());
-      setTrialDaysLeft(7);
-    } else {
-      const elapsed = now - parseInt(trialStart, 10);
-      if (elapsed < SEVEN_DAYS_MS) {
-        const remaining = Math.ceil((SEVEN_DAYS_MS - elapsed) / (24 * 60 * 60 * 1000));
-        setTrialDaysLeft(remaining);
-      } else {
-        setTrialDaysLeft(0);
-      }
-    }
-  }, []);
-
   const priceDisplay = isIndia ? '₹249/month' : '$7.99/month';
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto safe-top">
-      {/* Trial Banner - only show for new users on trial (never had premium) */}
-      {!isPremium && !premiumUntil && trialDaysLeft > 0 && (
-        <div className="text-center pt-4">
-          <p className="text-base font-medium text-primary">
-            🎁 You have {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'} of full access
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Explore everything, no payment required
-          </p>
-        </div>
-      )}
       {/* Header */}
       <div className="pt-8 pb-4 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
