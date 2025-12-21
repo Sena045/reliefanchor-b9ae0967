@@ -5,7 +5,7 @@ export function PromoBanner() {
         🌱 Free to try • No payment • No spam
       </p>
       <p className="text-emerald-600 dark:text-emerald-300/80 text-xs md:text-sm mt-1">
-        60-second calm tool • No login needed • Premium coming soon
+        60-second calm tool • Premium coming soon
       </p>
     </div>
   );
