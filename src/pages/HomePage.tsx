@@ -51,8 +51,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
   return (
     <div className="p-4 space-y-6 max-w-lg mx-auto safe-top">
-      {/* Trial Banner - only show if not premium and trial still active */}
-      {!isPremium && trialDaysLeft > 0 && (
+      {/* Trial Banner - only show for new users on trial (never had premium) */}
+      {!isPremium && !premiumUntil && trialDaysLeft > 0 && (
         <div className="text-center pt-4">
           <p className="text-base font-medium text-primary">
             🎁 You have {trialDaysLeft} {trialDaysLeft === 1 ? 'day' : 'days'} of full access
