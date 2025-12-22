@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 
 interface BreathingDemoProps {
   onGetStarted: () => void;
@@ -26,7 +25,6 @@ export const BreathingDemo = forwardRef<HTMLElement, BreathingDemoProps>(functio
   const [cycle, setCycle] = useState(0);
   const [showPulse, setShowPulse] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
-  const navigate = useNavigate();
 
   const startBreathing = useCallback(() => {
     setPhase('inhale');
