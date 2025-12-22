@@ -223,6 +223,33 @@ export type Database = {
           },
         ]
       }
+      registration_surveys: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          other_reason: string | null
+          reason: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          other_reason?: string | null
+          reason: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          other_reason?: string | null
+          reason?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
