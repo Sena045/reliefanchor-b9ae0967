@@ -305,8 +305,52 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </p>
       </section>
 
-      {/* Interactive Demo - Immediately After Hero */}
+      {/* Interactive Demo */}
       <BreathingDemo onGetStarted={onGetStarted} />
+
+      {/* How It Works Section */}
+      <section className="px-4 py-12 bg-muted/30">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+            How It Works
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+                1
+              </div>
+              <h3 className="font-semibold mb-2">Sign Up Free</h3>
+              <p className="text-sm text-muted-foreground">
+                One tap with Google. No credit card, no commitment.
+              </p>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+                2
+              </div>
+              <h3 className="font-semibold mb-2">Choose Your Tool</h3>
+              <p className="text-sm text-muted-foreground">
+                Chat with AI, try breathing exercises, or track your mood.
+              </p>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+                3
+              </div>
+              <h3 className="font-semibold mb-2">Feel Better</h3>
+              <p className="text-sm text-muted-foreground">
+                Use anytime you need support. Your progress is saved privately.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="px-4 py-16 bg-muted/30">
