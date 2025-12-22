@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Camera } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Camera, Zap } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BreathingDemo } from '@/components/BreathingDemo';
 import { PromoBanner } from '@/components/PromoBanner';
+import { StickySignupBar } from '@/components/StickySignupBar';
+import { ExitIntentPopup } from '@/components/ExitIntentPopup';
+import { SocialProof } from '@/components/SocialProof';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -263,71 +266,57 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       <PromoBanner />
 
       {/* Hero Section */}
-      <section className="px-4 pt-12 pb-16 text-center max-w-4xl mx-auto">
-        <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-          <Heart className="w-10 h-10 text-primary" />
+      <section className="px-4 pt-8 pb-12 text-center max-w-4xl mx-auto">
+        <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse">
+          <Heart className="w-8 h-8 text-primary" />
         </div>
         
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          ReliefAnchor
+        <h1 className="text-3xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Feeling Anxious?
         </h1>
         
-        <p className="text-xl text-muted-foreground mb-2">
+        <p className="text-xl md:text-2xl text-foreground font-medium mb-2">
           Calm your mind in 60 seconds.
         </p>
         
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Find calm, track your moods, and chat with an empathetic AI companion. Available in 8 languages, change from settings.
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm md:text-base">
+          Free AI companion • Mood tracking • Breathing exercises
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3">
-          <Button size="lg" onClick={onGetStarted} className="text-lg px-8">
-            Sign Up Now
-            <ArrowRight className="ml-2 h-5 w-5" />
+        {/* Social Proof */}
+        <SocialProof />
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6 mb-4">
+          <Button size="lg" onClick={onGetStarted} className="text-lg px-8 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
+            <Zap className="mr-2 h-5 w-5" />
+            Start Free Now
           </Button>
           
-          {installPrompt && (
-            <Button size="lg" variant="outline" onClick={handleInstall}>
-              <Download className="mr-2 h-5 w-5" />
-              Install App
-            </Button>
-          )}
-
-          <Button size="lg" variant="outline" onClick={handleBookmark}>
-            <Bookmark className="mr-2 h-5 w-5" />
-            Bookmark
+          <Button size="lg" variant="outline" onClick={handleGoogleSignIn} className="gap-2">
+            <svg className="h-5 w-5" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
           </Button>
         </div>
         
-        <p className="text-sm text-muted-foreground mb-6 flex items-center justify-center gap-1">
-          <Shield className="h-4 w-4" />
-          Your data is encrypted and securely protected.
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+          <Shield className="h-3 w-3" />
+          Free forever • No credit card • Cancel anytime
         </p>
 
         {!installPrompt && !browserInfo.isStandalone && (() => {
           const instructions = getInstallInstructions();
           const IconComponent = instructions.icon;
           return (
-            <p className="text-sm text-muted-foreground">
-              <IconComponent className="inline h-4 w-4 mx-1" /> {instructions.shortText}
+            <p className="text-xs text-muted-foreground mt-4">
+              <IconComponent className="inline h-3 w-3 mx-1" /> {instructions.shortText}
             </p>
           );
         })()}
-
-        <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Globe className="h-4 w-4" />
-            <span>8 Languages</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Shield className="h-4 w-4" />
-            <span>Private & Secure</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Check className="h-4 w-4" />
-            <span>Works Offline</span>
-          </div>
-        </div>
       </section>
 
       {/* Interactive Demo - Immediately After Hero */}
@@ -481,6 +470,10 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           <span>Made with ❤️ for your mental wellness</span>
         </div>
       </footer>
+
+      {/* Conversion Components */}
+      <StickySignupBar onSignUp={onGetStarted} />
+      <ExitIntentPopup onSignUp={onGetStarted} />
     </div>
   );
 });
