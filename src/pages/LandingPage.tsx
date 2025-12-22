@@ -262,11 +262,11 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
   };
 
   return (
-    <div ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <main ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5" role="main">
       <PromoBanner />
 
       {/* Hero Section */}
-      <section className="px-4 pt-8 pb-8 text-center max-w-4xl mx-auto">
+      <header className="px-4 pt-8 pb-8 text-center max-w-4xl mx-auto" aria-label="Welcome to ReliefAnchor">
         <h1 className="text-2xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           When your mind feels full, this is your quiet corner
         </h1>
@@ -276,28 +276,29 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </p>
 
         {/* Value bullets */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8 text-sm">
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
+        <ul className="flex flex-wrap justify-center gap-3 mb-8 text-sm" aria-label="Key benefits">
+          <li className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
             <span>Your progress saved privately</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
+          </li>
+          <li className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
             <span>Return whenever you need</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
+          </li>
+          <li className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
             <span>See patterns in how you feel</span>
-          </div>
-        </div>
+          </li>
+        </ul>
 
         {/* Primary CTA */}
         <Button 
           size="lg" 
           onClick={handleGoogleSignIn} 
           className="w-full max-w-sm mb-4 text-base bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 shadow-md"
+          aria-label="Sign up with Google for free"
         >
-          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -307,7 +308,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </Button>
         
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
-          <Shield className="h-3 w-3 text-green-600" />
+          <Shield className="h-3 w-3 text-green-600" aria-hidden="true" />
           <span>Free to use. No credit card needed. Your data stays private.</span>
         </p>
 
@@ -315,72 +316,74 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         <p className="text-xs text-muted-foreground mt-4">
           Premium is optional and adds deeper insights and extended tools.
         </p>
-      </section>
+      </header>
 
       {/* How It Works Section */}
-      <section className="px-4 py-12 bg-muted/30">
+      <section className="px-4 py-12 bg-muted/30" aria-labelledby="how-it-works-heading">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+          <h2 id="how-it-works-heading" className="text-2xl md:text-3xl font-bold mb-8">
             How It Works
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          <ol className="grid md:grid-cols-3 gap-6 md:gap-8 list-none">
             {/* Step 1 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+            <li className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary" aria-hidden="true">
                 1
               </div>
               <h3 className="font-semibold mb-2">Create Your Space</h3>
               <p className="text-sm text-muted-foreground">
                 Sign up with Google. It takes a few seconds. Nothing to install.
               </p>
-            </div>
+            </li>
             
             {/* Step 2 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+            <li className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary" aria-hidden="true">
                 2
               </div>
               <h3 className="font-semibold mb-2">Use It Your Way</h3>
               <p className="text-sm text-muted-foreground">
                 Write, reflect, or try a calming exercise. Whatever feels right today.
               </p>
-            </div>
+            </li>
             
             {/* Step 3 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
+            <li className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary" aria-hidden="true">
                 3
               </div>
               <h3 className="font-semibold mb-2">Come Back Anytime</h3>
               <p className="text-sm text-muted-foreground">
                 Your reflections are saved. Over time, you may start to notice what helps.
               </p>
-            </div>
-          </div>
+            </li>
+          </ol>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="px-4 py-16 bg-muted/30">
+      <section className="px-4 py-16 bg-muted/30" aria-labelledby="features-heading">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
+          <h2 id="features-heading" className="text-2xl md:text-3xl font-bold text-center mb-12">
             What you will find here
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6" role="list">
             {FEATURES.map((feature) => (
-              <Card key={feature.title} className="border-primary/10">
-                <CardContent className="p-6 flex gap-4">
-                  <div className="shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <article key={feature.title} role="listitem">
+                <Card className="border-primary/10 h-full">
+                  <CardContent className="p-6 flex gap-4">
+                    <div className="shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" aria-hidden="true">
+                      <feature.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1">{feature.title}</h3>
+                      <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </article>
             ))}
           </div>
         </div>
@@ -388,20 +391,22 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
 
       {/* Email Capture Section */}
-      <section className="px-4 py-16 bg-primary/5">
+      <section className="px-4 py-16 bg-primary/5" aria-labelledby="newsletter-heading">
         <div className="max-w-md mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">Stay in the loop</h2>
+          <h2 id="newsletter-heading" className="text-2xl font-bold mb-4">Stay in the loop</h2>
           <p className="text-muted-foreground mb-6">
             Occasional updates on new features and gentle reminders to check in with yourself.
           </p>
           
-          <form onSubmit={handleEmailSubmit} className="flex gap-2">
+          <form onSubmit={handleEmailSubmit} className="flex gap-2" aria-label="Newsletter signup">
             <Input
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1"
+              aria-label="Email address"
+              autoComplete="email"
             />
             <Button type="submit">Subscribe</Button>
           </form>
@@ -414,42 +419,43 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
 
       {/* CTA Section */}
-      <section className="px-4 py-16">
+      <section className="px-4 py-16" aria-labelledby="cta-heading">
         <div className="max-w-lg mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          <h2 id="cta-heading" className="text-2xl md:text-3xl font-bold mb-4">
             Start Your Wellness Journey Today
           </h2>
           <p className="text-muted-foreground mb-8">
             Join thousands finding peace with ReliefAnchor. Free to start, always private.
           </p>
           
-          <Button size="lg" onClick={onGetStarted} className="text-lg px-8">
+          <Button size="lg" onClick={onGetStarted} className="text-lg px-8" aria-label="Sign up now for free">
             Sign Up Now
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="px-4 py-8 border-t text-center text-sm text-muted-foreground">
+      <footer className="px-4 py-8 border-t text-center text-sm text-muted-foreground" role="contentinfo">
         <p>© {new Date().getFullYear()} ReliefAnchor. All rights reserved.</p>
-        <div className="mt-3 flex items-center justify-center gap-4">
+        <nav className="mt-3 flex items-center justify-center gap-4" aria-label="Footer navigation">
           {onShowPressKit && (
             <button 
               onClick={onShowPressKit}
               className="hover:text-primary transition-colors"
+              aria-label="View press kit"
             >
               Press Kit
             </button>
           )}
-          <span>•</span>
+          <span aria-hidden="true">•</span>
           <span>Made with ❤️ for your mental wellness</span>
-        </div>
+        </nav>
       </footer>
 
       {/* Conversion Components */}
       <StickySignupBar onSignUp={onGetStarted} />
       
-    </div>
+    </main>
   );
 });
