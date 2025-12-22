@@ -25,23 +25,23 @@ interface LandingPageProps {
 const FEATURES = [
   {
     icon: MessageCircle,
-    title: 'AI Companion',
-    description: 'Chat with Anya, your empathetic AI friend available 24/7 for emotional support.',
+    title: 'A Calm Space to Talk',
+    description: 'Write out what you are feeling. Anya listens without judgment, anytime you need.',
   },
   {
     icon: Brain,
-    title: 'Mood Tracking',
-    description: 'Track your emotional patterns and get AI-powered weekly insights.',
+    title: 'See Your Patterns Over Time',
+    description: 'Track how you feel day to day. Small insights can make a big difference.',
   },
   {
     icon: Gamepad2,
-    title: 'Wellness Games',
-    description: 'Relaxing activities including breathing exercises, grounding, and mindfulness games.',
+    title: 'Gentle Tools for Tough Moments',
+    description: 'Simple exercises to help you slow down when things feel overwhelming.',
   },
   {
     icon: Shield,
-    title: 'Private & Secure',
-    description: 'Your data is encrypted and never shared. Your mental health journey stays private.',
+    title: 'Private by Design',
+    description: 'Your reflections stay yours. Encrypted, never shared, never sold.',
   },
 ];
 
@@ -265,9 +265,33 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
     <div ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <PromoBanner />
 
-      {/* Hero Section - ULTRA COMPACT for mobile */}
-      <section className="px-4 pt-4 pb-6 text-center max-w-4xl mx-auto">
-        {/* One-tap Google Sign-in - THE FASTEST PATH */}
+      {/* Hero Section */}
+      <section className="px-4 pt-8 pb-8 text-center max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          When your mind feels full, this is your quiet corner
+        </h1>
+        
+        <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
+          Create a free account to save your reflections, return when you need to, and notice what helps over time.
+        </p>
+
+        {/* Value bullets */}
+        <div className="flex flex-wrap justify-center gap-3 mb-8 text-sm">
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>Your progress saved privately</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>Return whenever you need</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>See patterns in how you feel</span>
+          </div>
+        </div>
+
+        {/* Primary CTA */}
         <Button 
           size="lg" 
           onClick={handleGoogleSignIn} 
@@ -279,46 +303,18 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          Continue with Google — It's Free
+          Create Your Free Account
         </Button>
         
-        <p className="text-xs text-muted-foreground mb-4 flex items-center justify-center gap-2">
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
           <Shield className="h-3 w-3 text-green-600" />
-          <span>100% free • No credit card • Your data stays private</span>
+          <span>Free to use. No credit card needed. Your data stays private.</span>
         </p>
 
-        <div className="relative mb-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-muted" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-background px-2 text-muted-foreground">or try first</span>
-          </div>
-        </div>
-        
-        <h1 className="text-2xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Your Mental Wellness Companion
-        </h1>
-        
-        <p className="text-base md:text-lg text-muted-foreground mb-6">
-          AI chat support • Breathing exercises • Mood tracking — all in one free app
+        {/* Premium transparency */}
+        <p className="text-xs text-muted-foreground mt-4">
+          Premium is optional and adds deeper insights and extended tools.
         </p>
-
-        {/* What you get - quick benefits */}
-        <div className="flex flex-wrap justify-center gap-3 mb-6 text-sm">
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
-            <span>24/7 AI Support</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
-            <span>Breathing Exercises</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
-            <Check className="h-4 w-4 text-primary" />
-            <span>Mood Insights</span>
-          </div>
-        </div>
       </section>
 
       {/* How It Works Section */}
@@ -334,9 +330,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
                 1
               </div>
-              <h3 className="font-semibold mb-2">Sign Up Free</h3>
+              <h3 className="font-semibold mb-2">Create Your Space</h3>
               <p className="text-sm text-muted-foreground">
-                One tap with Google. No credit card, no commitment.
+                Sign up with Google. It takes a few seconds. Nothing to install.
               </p>
             </div>
             
@@ -345,9 +341,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
                 2
               </div>
-              <h3 className="font-semibold mb-2">Choose Your Tool</h3>
+              <h3 className="font-semibold mb-2">Use It Your Way</h3>
               <p className="text-sm text-muted-foreground">
-                Chat with AI, try breathing exercises, or track your mood.
+                Write, reflect, or try a calming exercise. Whatever feels right today.
               </p>
             </div>
             
@@ -356,9 +352,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-xl font-bold text-primary">
                 3
               </div>
-              <h3 className="font-semibold mb-2">Feel Better</h3>
+              <h3 className="font-semibold mb-2">Come Back Anytime</h3>
               <p className="text-sm text-muted-foreground">
-                Use anytime you need support. Your progress is saved privately.
+                Your reflections are saved. Over time, you may start to notice what helps.
               </p>
             </div>
           </div>
@@ -369,7 +365,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       <section className="px-4 py-16 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-            Simple tools to calm your mind.
+            What you will find here
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6">
@@ -424,9 +420,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       {/* Email Capture Section */}
       <section className="px-4 py-16 bg-primary/5">
         <div className="max-w-md mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">Stay Updated</h2>
+          <h2 className="text-2xl font-bold mb-4">Stay in the loop</h2>
           <p className="text-muted-foreground mb-6">
-            Get tips on mental wellness and be the first to know about new features.
+            Occasional updates on new features and gentle reminders to check in with yourself.
           </p>
           
           <form onSubmit={handleEmailSubmit} className="flex gap-2">
