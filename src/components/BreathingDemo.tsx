@@ -172,21 +172,21 @@ export const BreathingDemo = forwardRef<HTMLElement, BreathingDemoProps>(functio
             </div>
           </div>
 
-          {/* CTA after completion - AGGRESSIVE */}
+          {/* CTA after completion - Honest & Trust-building */}
           {phase === 'complete' && (
             <div className="animate-fade-in flex flex-col items-center gap-2">
               <p className="text-base font-semibold text-foreground">
-                🎉 You just reduced your anxiety!
+                ✨ Well done! Feeling calmer?
               </p>
               <p className="text-sm text-muted-foreground">
-                Get <span className="text-primary font-medium">unlimited exercises + AI support</span>
+                Get <span className="text-primary font-medium">more exercises + AI companion</span>
               </p>
-              <Button size="lg" onClick={onGetStarted} className="text-lg px-8 mt-2 shadow-lg shadow-primary/25 animate-pulse">
-                Unlock Free Access
+              <Button size="lg" onClick={onGetStarted} className="text-lg px-8 mt-2 shadow-lg shadow-primary/25">
+                Get Free Access
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <p className="text-xs text-green-600 font-medium">
-                ✓ 2,847 people signed up today
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span className="text-green-600">✓</span> Free forever • Your data stays private
               </p>
               <button
                 onClick={resetDemo}

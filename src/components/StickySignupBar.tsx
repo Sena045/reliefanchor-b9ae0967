@@ -69,8 +69,8 @@ export function StickySignupBar({ onSignUp }: StickySignupBarProps) {
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
-      <p className="text-center text-xs text-green-600 font-medium mt-1">
-        ✓ 2,847 signed up today
+      <p className="text-center text-xs text-muted-foreground mt-1">
+        Free forever • Your data stays private
       </p>
     </div>
   );
