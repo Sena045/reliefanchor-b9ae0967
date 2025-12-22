@@ -42,7 +42,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         triggerSurvey();
-      }, 5000); // 5 seconds for testing (change to 45000 for production)
+      }, 45000); // 45 seconds
     };
 
     const handleMouseLeaveWithCheck = (e: MouseEvent) => {
