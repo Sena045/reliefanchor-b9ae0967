@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 import { PromoBanner } from '@/components/PromoBanner';
 import { StickySignupBar } from '@/components/StickySignupBar';
-import { ExitIntentPopup } from '@/components/ExitIntentPopup';
+
 import { SocialProof } from '@/components/SocialProof';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -516,7 +516,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
       {/* Conversion Components */}
       <StickySignupBar onSignUp={onGetStarted} />
-      <ExitIntentPopup onSignUp={onGetStarted} />
+      
     </div>
   );
 });
