@@ -23,8 +23,8 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     if (user) return;
     
     const shownBefore = sessionStorage.getItem('exit_popup_shown');
-    const breathingPopupShown = sessionStorage.getItem('breathing_popup_shown');
-    if (!shownBefore && !hasTriggered && !breathingPopupShown) {
+    // Don't block survey if breathing popup was shown - they can still give feedback
+    if (!shownBefore && !hasTriggered) {
       setIsOpen(true);
       setHasTriggered(true);
       sessionStorage.setItem('exit_popup_shown', 'true');
@@ -67,10 +67,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     };
 
     const handleMouseLeaveWithCheck = (e: MouseEvent) => {
-      const breathingPopupShown = sessionStorage.getItem('breathing_popup_shown');
-      if (!breathingPopupShown) {
-        handleMouseLeave(e);
-      }
+      handleMouseLeave(e);
     };
 
     // Mobile: trigger when user switches tabs/apps
