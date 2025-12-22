@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { BreathingDemo } from '@/components/BreathingDemo';
+
 import { PromoBanner } from '@/components/PromoBanner';
 import { StickySignupBar } from '@/components/StickySignupBar';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
@@ -296,17 +296,30 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           </div>
         </div>
         
-        <h1 className="text-2xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Feeling Anxious Right Now?
+        <h1 className="text-2xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Your Mental Wellness Companion
         </h1>
         
-        <p className="text-base md:text-lg text-muted-foreground mb-2">
-          👇 Tap the circle below — feel calmer in 30 seconds
+        <p className="text-base md:text-lg text-muted-foreground mb-6">
+          AI chat support • Breathing exercises • Mood tracking — all in one free app
         </p>
-      </section>
 
-      {/* Interactive Demo */}
-      <BreathingDemo onGetStarted={onGetStarted} />
+        {/* What you get - quick benefits */}
+        <div className="flex flex-wrap justify-center gap-3 mb-6 text-sm">
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>24/7 AI Support</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>Breathing Exercises</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-full">
+            <Check className="h-4 w-4 text-primary" />
+            <span>Mood Insights</span>
+          </div>
+        </div>
+      </section>
 
       {/* How It Works Section */}
       <section className="px-4 py-12 bg-muted/30">
