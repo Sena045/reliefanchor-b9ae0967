@@ -69,6 +69,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Store sign-in method for future reference (helps with forgot password UX)
+    const storeSignInMethod = () => {
+      if (user.email && user.app_metadata?.provider === 'google') {
+        localStorage.setItem(`signInMethod_${user.email}`, 'google');
+      } else if (user.email && user.app_metadata?.provider === 'email') {
+        localStorage.setItem(`signInMethod_${user.email}`, 'email');
+      }
+    };
+    storeSignInMethod();
+
     const loadUserData = async () => {
       setLoading(true);
       try {

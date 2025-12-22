@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift, AlertCircle } from 'lucide-react';
 import { referralService } from '@/services/referralService';
 
 const authSchema = z.object({
@@ -43,6 +42,8 @@ export function AuthPage() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [checkingProvider, setCheckingProvider] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -165,9 +166,49 @@ export function AuthPage() {
     }
   };
 
+  // Check if email is associated with Google sign-in
+  const checkIfGoogleUser = async (emailToCheck: string) => {
+    if (!emailToCheck || !emailSchema.safeParse({ email: emailToCheck }).success) {
+      setIsGoogleUser(false);
+      return;
+    }
+    
+    setCheckingProvider(true);
+    try {
+      // Check localStorage for previously used sign-in method
+      const lastSignInMethod = localStorage.getItem(`signInMethod_${emailToCheck}`);
+      if (lastSignInMethod === 'google') {
+        setIsGoogleUser(true);
+      } else {
+        setIsGoogleUser(false);
+      }
+    } finally {
+      setCheckingProvider(false);
+    }
+  };
+
+  // Update email handler to check for Google users in forgot password mode
+  const handleEmailChange = (newEmail: string) => {
+    setEmail(newEmail);
+    if (isForgotPassword) {
+      checkIfGoogleUser(newEmail);
+    }
+  };
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateEmail()) return;
+
+    // If this is a known Google user, show helpful message instead
+    if (isGoogleUser) {
+      toast({ 
+        title: 'Google Account Detected', 
+        description: 'This email uses Google sign-in. Please use "Continue with Google" to access your account.',
+      });
+      setIsForgotPassword(false);
+      setIsGoogleUser(false);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -232,25 +273,8 @@ export function AuthPage() {
   };
 
 
-  return (
+    return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4 relative">
-      {/* Share QR Code - Top Right */}
-      <div className="absolute top-4 right-4 flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-primary/10">
-        <div className="p-1.5 bg-white rounded-lg shadow-sm">
-          <QRCodeSVG 
-            value="https://reliefanchor.lovable.app"
-            size={48}
-            level="M"
-            includeMargin={false}
-            bgColor="#FFFFFF"
-            fgColor="#1a1a2e"
-          />
-        </div>
-        <p className="text-xs text-muted-foreground max-w-[120px] leading-tight">
-          Scan to share ReliefAnchor with a friend ❤️
-        </p>
-      </div>
-      
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -341,12 +365,20 @@ export function AuthPage() {
                     type="email"
                     placeholder="Email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
                 {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                {isGoogleUser && (
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700 dark:text-amber-300">
+                      This email previously signed in with Google. Password reset won't work—please use "Continue with Google" instead.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
@@ -402,6 +434,7 @@ export function AuthPage() {
                       toast({ title: 'Error', description: error.message, variant: 'destructive' });
                       localStorage.removeItem('pendingReferralCode');
                     }
+                    // Note: We'll store the sign-in method after successful OAuth redirect in AppContext
                   } finally {
                     setLoading(false);
                   }
