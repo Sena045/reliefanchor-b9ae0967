@@ -20,6 +20,7 @@ interface BeforeInstallPromptEvent extends Event {
 interface LandingPageProps {
   onGetStarted: () => void;
   onShowPressKit?: () => void;
+  onShowAbout?: () => void;
 }
 
 const FEATURES = [
@@ -46,7 +47,7 @@ const FEATURES = [
 ];
 
 
-export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit }, ref) {
+export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit, onShowAbout }, ref) {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
 
@@ -439,14 +440,26 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       <footer className="px-4 py-8 border-t text-center text-sm text-muted-foreground" role="contentinfo">
         <p>© {new Date().getFullYear()} ReliefAnchor. All rights reserved.</p>
         <nav className="mt-3 flex items-center justify-center gap-4" aria-label="Footer navigation">
-          {onShowPressKit && (
+          {onShowAbout && (
             <button 
-              onClick={onShowPressKit}
+              onClick={onShowAbout}
               className="hover:text-primary transition-colors"
-              aria-label="View press kit"
+              aria-label="Learn about ReliefAnchor"
             >
-              Press Kit
+              About
             </button>
+          )}
+          {onShowPressKit && (
+            <>
+              <span aria-hidden="true">•</span>
+              <button 
+                onClick={onShowPressKit}
+                className="hover:text-primary transition-colors"
+                aria-label="View press kit"
+              >
+                Press Kit
+              </button>
+            </>
           )}
           <span aria-hidden="true">•</span>
           <span>Made with ❤️ for your mental wellness</span>

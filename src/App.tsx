@@ -18,6 +18,7 @@ const ToolsPage = lazy(() => import('@/pages/ToolsPage').then(m => ({ default: m
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
 const PressKitPage = lazy(() => import('@/pages/PressKitPage').then(m => ({ default: m.PressKitPage })));
+const AboutPage = lazy(() => import('@/pages/AboutPage').then(m => ({ default: m.AboutPage })));
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -25,6 +26,7 @@ function AppContent() {
   const [showPremium, setShowPremium] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showPressKit, setShowPressKit] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -46,6 +48,14 @@ function AppContent() {
 
   // Not logged in
   if (!user) {
+    // Show about page
+    if (showAbout) {
+      return (
+        <Suspense fallback={<SplashLoader />}>
+          <AboutPage onClose={() => setShowAbout(false)} />
+        </Suspense>
+      );
+    }
     // Show press kit page
     if (showPressKit) {
       return (
@@ -63,6 +73,7 @@ function AppContent() {
       <LandingPage 
         onGetStarted={() => setShowAuth(true)} 
         onShowPressKit={() => setShowPressKit(true)}
+        onShowAbout={() => setShowAbout(true)}
       />
     );
   }
