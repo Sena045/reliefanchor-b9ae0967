@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { RegistrationSurvey } from '@/components/RegistrationSurvey';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ExitIntentPopupProps {
   onSignUp: () => void;
 }
 
 export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [timeOnPage, setTimeOnPage] = useState(0);
@@ -17,6 +19,9 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   const triggerSurvey = useCallback(() => {
+    // Only show survey to visitors (non-authenticated users)
+    if (user) return;
+    
     const shownBefore = sessionStorage.getItem('exit_popup_shown');
     const breathingPopupShown = sessionStorage.getItem('breathing_popup_shown');
     if (!shownBefore && !hasTriggered && !breathingPopupShown) {
@@ -24,7 +29,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       setHasTriggered(true);
       sessionStorage.setItem('exit_popup_shown', 'true');
     }
-  }, [hasTriggered]);
+  }, [hasTriggered, user]);
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (e.clientY <= 10) {
