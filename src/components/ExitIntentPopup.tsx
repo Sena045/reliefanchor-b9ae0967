@@ -33,7 +33,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
           setHasTriggered(true);
           sessionStorage.setItem('exit_popup_shown', 'true');
         }
-      }, 45000);
+      }, 5000); // 5 seconds for testing (change to 45000 for production)
     };
 
     const handleMouseLeaveWithCheck = (e: MouseEvent) => {
