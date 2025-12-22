@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { RegistrationSurvey } from '@/components/RegistrationSurvey';
 
 interface ExitIntentPopupProps {
@@ -9,6 +9,12 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [timeOnPage, setTimeOnPage] = useState(0);
+  const lastScrollY = useRef(0);
+  const scrollUpCount = useRef(0);
+
+  // Detect if mobile device
+  const isMobile = typeof window !== 'undefined' && 
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   const triggerSurvey = useCallback(() => {
     const shownBefore = sessionStorage.getItem('exit_popup_shown');
@@ -35,14 +41,24 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     return () => clearInterval(timeTracker);
   }, []);
 
+  // Mobile: Auto-trigger after 20 seconds on page (more aggressive for mobile)
+  useEffect(() => {
+    if (isMobile && timeOnPage >= 20 && !hasTriggered) {
+      triggerSurvey();
+    }
+  }, [isMobile, timeOnPage, hasTriggered, triggerSurvey]);
+
   useEffect(() => {
     let inactivityTimer: NodeJS.Timeout;
     
+    // Shorter inactivity time for mobile (15s vs 45s desktop)
+    const inactivityDelay = isMobile ? 15000 : 45000;
+
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         triggerSurvey();
-      }, 45000); // 45 seconds
+      }, inactivityDelay);
     };
 
     const handleMouseLeaveWithCheck = (e: MouseEvent) => {
@@ -52,16 +68,32 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       }
     };
 
-    // Mobile: trigger when user switches tabs/apps (after spending some time on page)
+    // Mobile: trigger when user switches tabs/apps
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && timeOnPage >= 3) {
+      if (document.visibilityState === 'hidden' && timeOnPage >= 2) {
         triggerSurvey();
       }
     };
 
+    // Mobile: detect scroll up (user looking to leave)
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (isMobile && currentScrollY < lastScrollY.current && currentScrollY < 100) {
+        scrollUpCount.current += 1;
+        // If user scrolls up to top 3 times, likely looking to exit
+        if (scrollUpCount.current >= 3 && timeOnPage >= 5) {
+          triggerSurvey();
+        }
+      }
+      
+      lastScrollY.current = currentScrollY;
+      resetTimer();
+    };
+
     // Mobile: trigger on back button / page unload attempt
     const handleBeforeUnload = () => {
-      if (timeOnPage >= 3) {
+      if (timeOnPage >= 2) {
         triggerSurvey();
       }
     };
@@ -69,7 +101,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     document.addEventListener('mouseleave', handleMouseLeaveWithCheck);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handleBeforeUnload);
-    window.addEventListener('scroll', resetTimer, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('touchstart', resetTimer, { passive: true });
     resetTimer();
 
@@ -77,11 +109,11 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       document.removeEventListener('mouseleave', handleMouseLeaveWithCheck);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handleBeforeUnload);
-      window.removeEventListener('scroll', resetTimer);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('touchstart', resetTimer);
       clearTimeout(inactivityTimer);
     };
-  }, [handleMouseLeave, triggerSurvey, timeOnPage]);
+  }, [handleMouseLeave, triggerSurvey, timeOnPage, isMobile]);
 
   const handleClose = () => {
     setIsOpen(false);
