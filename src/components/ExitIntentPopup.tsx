@@ -37,21 +37,29 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         const shownBefore = sessionStorage.getItem('exit_popup_shown');
-        if (!shownBefore && !hasTriggered) {
+        const breathingPopupShown = sessionStorage.getItem('breathing_popup_shown');
+        if (!shownBefore && !hasTriggered && !breathingPopupShown) {
           setIsOpen(true);
           setHasTriggered(true);
           sessionStorage.setItem('exit_popup_shown', 'true');
         }
-      }, 20000); // Reduced to 20 seconds - faster trigger
+      }, 45000); // Increased to 45 seconds to avoid conflict with breathing exercise
     };
 
-    document.addEventListener('mouseleave', handleMouseLeave);
+    const handleMouseLeaveWithCheck = (e: MouseEvent) => {
+      const breathingPopupShown = sessionStorage.getItem('breathing_popup_shown');
+      if (!breathingPopupShown) {
+        handleMouseLeave(e);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeaveWithCheck);
     window.addEventListener('scroll', resetTimer, { passive: true });
     window.addEventListener('touchstart', resetTimer, { passive: true });
     resetTimer();
 
     return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseleave', handleMouseLeaveWithCheck);
       window.removeEventListener('scroll', resetTimer);
       window.removeEventListener('touchstart', resetTimer);
       clearTimeout(inactivityTimer);

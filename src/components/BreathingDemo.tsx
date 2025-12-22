@@ -51,6 +51,8 @@ export const BreathingDemo = forwardRef<HTMLElement, BreathingDemoProps>(functio
         if (cycle >= TOTAL_CYCLES) {
           setPhase('complete');
           setShowPopup(true);
+          // Mark that breathing popup was shown to prevent exit popup conflict
+          sessionStorage.setItem('breathing_popup_shown', 'true');
         } else {
           setCycle((c) => c + 1);
           setPhase('inhale');
