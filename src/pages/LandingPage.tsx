@@ -282,8 +282,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           Continue with Google — It's Free
         </Button>
         
-        <p className="text-xs text-muted-foreground mb-4">
-          <span className="text-green-600 font-medium">✓ 2,847 signed up today</span> • No credit card
+        <p className="text-xs text-muted-foreground mb-4 flex items-center justify-center gap-2">
+          <Shield className="h-3 w-3 text-green-600" />
+          <span>100% free • No credit card • Your data stays private</span>
         </p>
 
         <div className="relative mb-4">
@@ -300,7 +301,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </h1>
         
         <p className="text-base md:text-lg text-muted-foreground mb-2">
-          👇 Tap the circle below — calm down in 30 seconds
+          👇 Tap the circle below — feel calmer in 30 seconds
         </p>
       </section>
 

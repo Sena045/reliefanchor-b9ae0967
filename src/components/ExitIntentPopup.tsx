@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Gift } from 'lucide-react';
+import { Gift, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -89,7 +89,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
         
         <div className="text-center space-y-4 py-2">
           <p className="text-muted-foreground">
-            <span className="font-semibold text-green-600">2,847 people</span> signed up today. Join them!
+            Try our <span className="font-semibold text-foreground">free breathing exercise</span> — it only takes 30 seconds.
           </p>
           
           <Button 
@@ -108,14 +108,17 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
           
           <div className="text-xs text-muted-foreground space-y-1">
             <p>✓ 24/7 AI companion • ✓ Breathing exercises • ✓ Mood tracking</p>
-            <p className="text-green-600 font-medium">100% Free • No credit card</p>
+            <p className="flex items-center justify-center gap-1">
+              <Shield className="h-3 w-3 text-green-600" />
+              100% Free • Your data stays private
+            </p>
           </div>
           
           <button
             onClick={() => setIsOpen(false)}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            No thanks, I'll stay anxious
+            Maybe later
           </button>
         </div>
       </DialogContent>
