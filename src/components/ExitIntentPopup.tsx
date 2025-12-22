@@ -13,6 +13,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
   const [timeOnPage, setTimeOnPage] = useState(0);
   const lastScrollY = useRef(0);
   const scrollUpCount = useRef(0);
+  const hasInteracted = useRef(false);
 
   // Detect if mobile device
   const isMobile = typeof window !== 'undefined' && 
@@ -23,7 +24,6 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     if (user) return;
     
     const shownBefore = sessionStorage.getItem('exit_popup_shown');
-    // Don't block survey if breathing popup was shown - they can still give feedback
     if (!shownBefore && !hasTriggered) {
       setIsOpen(true);
       setHasTriggered(true);
@@ -37,8 +37,8 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     }
   }, [triggerSurvey]);
 
+  // Track time on page
   useEffect(() => {
-    // Track time on page
     const timeTracker = setInterval(() => {
       setTimeOnPage(prev => prev + 1);
     }, 1000);
@@ -46,9 +46,29 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
     return () => clearInterval(timeTracker);
   }, []);
 
-  // Mobile: Auto-trigger after 20 seconds on page (more aggressive for mobile)
+  // Track user interaction
   useEffect(() => {
-    if (isMobile && timeOnPage >= 20 && !hasTriggered) {
+    const markInteraction = () => {
+      hasInteracted.current = true;
+    };
+
+    window.addEventListener('touchstart', markInteraction, { passive: true, once: true });
+    window.addEventListener('scroll', markInteraction, { passive: true, once: true });
+    window.addEventListener('click', markInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener('touchstart', markInteraction);
+      window.removeEventListener('scroll', markInteraction);
+      window.removeEventListener('click', markInteraction);
+    };
+  }, []);
+
+  // Mobile: Auto-trigger after 15 seconds if user has interacted, or 25 seconds regardless
+  useEffect(() => {
+    if (!isMobile || hasTriggered) return;
+
+    const triggerTime = hasInteracted.current ? 15 : 25;
+    if (timeOnPage >= triggerTime) {
       triggerSurvey();
     }
   }, [isMobile, timeOnPage, hasTriggered, triggerSurvey]);
@@ -56,8 +76,8 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
   useEffect(() => {
     let inactivityTimer: NodeJS.Timeout;
     
-    // Shorter inactivity time for mobile (15s vs 45s desktop)
-    const inactivityDelay = isMobile ? 15000 : 45000;
+    // Shorter inactivity time for mobile (12s vs 45s desktop)
+    const inactivityDelay = isMobile ? 12000 : 45000;
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
@@ -70,14 +90,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       handleMouseLeave(e);
     };
 
-    // Mobile: trigger when user switches tabs/apps
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && timeOnPage >= 2) {
-        triggerSurvey();
-      }
-    };
-
-    // Mobile: detect scroll up (user looking to leave)
+    // Mobile: detect scroll up to top (user looking to leave)
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
@@ -93,26 +106,17 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       resetTimer();
     };
 
-    // Mobile: trigger on back button / page unload attempt
-    const handleBeforeUnload = () => {
-      if (timeOnPage >= 2) {
-        triggerSurvey();
-      }
-    };
-
     document.addEventListener('mouseleave', handleMouseLeaveWithCheck);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pagehide', handleBeforeUnload);
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('touchstart', resetTimer, { passive: true });
+    window.addEventListener('touchmove', resetTimer, { passive: true });
     resetTimer();
 
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeaveWithCheck);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pagehide', handleBeforeUnload);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('touchstart', resetTimer);
+      window.removeEventListener('touchmove', resetTimer);
       clearTimeout(inactivityTimer);
     };
   }, [handleMouseLeave, triggerSurvey, timeOnPage, isMobile]);
