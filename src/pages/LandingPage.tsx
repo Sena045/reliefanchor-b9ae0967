@@ -330,6 +330,9 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </div>
       </section>
 
+      {/* Interactive Demo - Immediately After Hero */}
+      <BreathingDemo onGetStarted={onGetStarted} />
+
       {/* Features Section */}
       <section className="px-4 py-16 bg-muted/30">
         <div className="max-w-5xl mx-auto">
@@ -354,9 +357,6 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           </div>
         </div>
       </section>
-
-      {/* Breathing Demo Section */}
-      <BreathingDemo onGetStarted={onGetStarted} />
 
       {/* QR Code Section */}
       <section className="px-4 py-16 bg-muted/30">
