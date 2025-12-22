@@ -412,39 +412,6 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </div>
       </section>
 
-      {/* Install App Section */}
-      <section className="px-4 py-16">
-        <div className="max-w-lg mx-auto text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-            <Smartphone className="w-8 h-8 text-primary" />
-          </div>
-          
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Tap & Install
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Add to your home screen for instant access. Works offline!
-          </p>
-
-          {installPrompt ? (
-            <Button size="lg" onClick={handleInstall} className="text-lg px-8">
-              <Download className="mr-2 h-5 w-5" />
-              Install Now
-            </Button>
-          ) : (() => {
-            const instructions = getInstallInstructions();
-            const IconComponent = instructions.icon;
-            return (
-              <div className="bg-muted/50 rounded-lg p-4 inline-flex items-center gap-3">
-                <IconComponent className="h-5 w-5 text-primary shrink-0" />
-                <p className="text-sm text-left">
-                  <span>{instructions.text}</span>
-                </p>
-              </div>
-            );
-          })()}
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="px-4 py-16">
