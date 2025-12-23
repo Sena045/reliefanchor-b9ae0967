@@ -81,24 +81,42 @@ serve(async (req) => {
       .from('profiles')
       .select('is_premium, premium_until, messages_used_today, last_message_date')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
-      console.error('Profile error:', profileError);
-      return new Response(JSON.stringify({ error: 'Profile not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    // If profile doesn't exist, create one (handles race condition on new signups)
+    let userProfile = profile;
+    if (!userProfile) {
+      console.log('Profile not found for user, creating one:', user.id);
+      const { data: newProfile, error: createError } = await supabaseClient
+        .from('profiles')
+        .insert({ 
+          id: user.id, 
+          is_premium: true, 
+          premium_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          messages_used_today: 0,
+          last_message_date: new Date().toISOString().split('T')[0]
+        })
+        .select('is_premium, premium_until, messages_used_today, last_message_date')
+        .single();
+
+      if (createError) {
+        console.error('Failed to create profile:', createError);
+        return new Response(JSON.stringify({ error: 'Failed to initialize profile' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      userProfile = newProfile;
     }
 
     // Check if premium has expired
-    const premiumExpired = profile.premium_until && new Date(profile.premium_until) < new Date();
-    const isPremium = profile.is_premium && !premiumExpired;
+    const premiumExpired = userProfile.premium_until && new Date(userProfile.premium_until) < new Date();
+    const isPremium = userProfile.is_premium && !premiumExpired;
 
     // Check rate limits for non-premium users
     const today = new Date().toISOString().split('T')[0];
-    const isNewDay = profile.last_message_date !== today;
-    const messagesUsedToday = isNewDay ? 0 : profile.messages_used_today;
+    const isNewDay = userProfile.last_message_date !== today;
+    const messagesUsedToday = isNewDay ? 0 : userProfile.messages_used_today;
 
     if (!isPremium && messagesUsedToday >= FREE_MESSAGES_PER_DAY) {
       return new Response(JSON.stringify({ error: 'Daily message limit reached. Upgrade to Premium for unlimited messages.' }), {
