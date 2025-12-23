@@ -265,8 +265,8 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
   return (
     <main ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5" role="main">
       {/* Warm welcome message */}
-      <div className="bg-primary/5 border-b border-primary/10 py-3 px-4 text-center">
-        <p className="text-sm text-muted-foreground italic">
+      <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b border-primary/10 py-3 px-4 text-center animate-fade-in">
+        <p className="text-sm text-muted-foreground/80 italic animate-[fade-in_1.5s_ease-out]">
           If this helped you today, I'm glad you found it.
         </p>
       </div>
