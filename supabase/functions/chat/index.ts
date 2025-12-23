@@ -52,10 +52,26 @@ serve(async (req) => {
 
   try {
     // Authenticate user
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
+      console.error('Missing backend env vars', {
+        hasUrl: !!supabaseUrl,
+        hasAnonKey: !!supabaseAnonKey,
+        hasServiceRoleKey: !!supabaseServiceRoleKey,
+      });
+      return new Response(JSON.stringify({ error: 'Backend is not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Use anon client to validate the caller's JWT
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
+    // Use service-role client for profile bookkeeping (avoids RLS issues when profile row is missing)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -66,7 +82,7 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
 
     if (authError || !user) {
       console.error('Auth error:', authError);
@@ -77,24 +93,30 @@ serve(async (req) => {
     }
 
     // Get user profile to check premium status and rate limits
-    const { data: profile, error: profileError } = await supabaseClient
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('is_premium, premium_until, messages_used_today, last_message_date')
       .eq('id', user.id)
       .maybeSingle();
 
-    // If profile doesn't exist, create one (handles race condition on new signups)
+    if (profileError) {
+      console.warn('Profile lookup error:', profileError);
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    // If profile doesn't exist, create one (handles missing profile row)
     let userProfile = profile;
     if (!userProfile) {
       console.log('Profile not found for user, creating one:', user.id);
-      const { data: newProfile, error: createError } = await supabaseClient
+      const { data: newProfile, error: createError } = await supabaseAdmin
         .from('profiles')
-        .insert({ 
-          id: user.id, 
-          is_premium: true, 
+        .insert({
+          id: user.id,
+          is_premium: true,
           premium_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           messages_used_today: 0,
-          last_message_date: new Date().toISOString().split('T')[0]
+          last_message_date: today,
         })
         .select('is_premium, premium_until, messages_used_today, last_message_date')
         .single();
@@ -106,6 +128,7 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+
       userProfile = newProfile;
     }
 
@@ -114,7 +137,6 @@ serve(async (req) => {
     const isPremium = userProfile.is_premium && !premiumExpired;
 
     // Check rate limits for non-premium users
-    const today = new Date().toISOString().split('T')[0];
     const isNewDay = userProfile.last_message_date !== today;
     const messagesUsedToday = isNewDay ? 0 : userProfile.messages_used_today;
 
@@ -126,7 +148,7 @@ serve(async (req) => {
     }
 
     // Update message count
-    await supabaseClient
+    await supabaseAdmin
       .from('profiles')
       .update({
         messages_used_today: messagesUsedToday + 1,
