@@ -56,7 +56,7 @@ function AppContent() {
   if (!user) {
     // Show guest chat trial (via state or URL)
     if (showGuestChat || isTryChatUrl) {
-      return <GuestChatPage />;
+      return <GuestChatPage onSignUp={() => { setShowGuestChat(false); setShowAuth(true); }} />;
     }
     // Show about page
     if (showAbout) {

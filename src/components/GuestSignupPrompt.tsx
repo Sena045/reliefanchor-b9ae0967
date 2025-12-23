@@ -1,16 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sparkles, MessageCircle, Heart, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface GuestSignupPromptProps {
   messagesUsed: number;
   onDismiss?: () => void;
+  onSignUp: () => void;
 }
 
-export function GuestSignupPrompt({ messagesUsed, onDismiss }: GuestSignupPromptProps) {
-  const navigate = useNavigate();
-  
+export function GuestSignupPrompt({ messagesUsed, onDismiss, onSignUp }: GuestSignupPromptProps) {
   const isLimitReached = messagesUsed >= 3;
 
   return (
@@ -45,7 +43,7 @@ export function GuestSignupPrompt({ messagesUsed, onDismiss }: GuestSignupPrompt
         
         <div className="flex flex-col gap-2">
           <Button 
-            onClick={() => navigate('/auth')} 
+            onClick={onSignUp} 
             className="w-full"
           >
             Sign Up Free

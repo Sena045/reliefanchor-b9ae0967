@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { guestChatService } from '@/services/guestChatService';
 import { GuestSignupPrompt } from '@/components/GuestSignupPrompt';
-import { useNavigate } from 'react-router-dom';
 
 const GUEST_MESSAGES_KEY = 'relief_anchor_guest_chat';
 const GUEST_COUNT_KEY = 'relief_anchor_guest_count';
@@ -17,9 +16,12 @@ interface GuestMessage {
   content: string;
 }
 
-export function GuestChatPage() {
+interface GuestChatPageProps {
+  onSignUp: () => void;
+}
+
+export function GuestChatPage({ onSignUp }: GuestChatPageProps) {
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   const [messages, setMessages] = useState<GuestMessage[]>(() => {
     try {
@@ -133,7 +135,7 @@ export function GuestChatPage() {
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => navigate('/auth')}
+          onClick={onSignUp}
           className="gap-1"
         >
           Sign Up <ArrowRight className="h-3 w-3" />
@@ -189,6 +191,7 @@ export function GuestChatPage() {
             <GuestSignupPrompt 
               messagesUsed={messagesUsed}
               onDismiss={canSend ? () => setShowSignupPrompt(false) : undefined}
+              onSignUp={onSignUp}
             />
           </div>
         )}
@@ -227,7 +230,7 @@ export function GuestChatPage() {
             <p className="text-sm text-muted-foreground mb-3">
               You've used all trial messages!
             </p>
-            <Button onClick={() => navigate('/auth')} className="w-full">
+            <Button onClick={onSignUp} className="w-full">
               Sign Up to Continue Chatting
             </Button>
           </div>
