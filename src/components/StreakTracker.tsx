@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Flame, Calendar, Trophy } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useApp } from '@/context/AppContext';
+import { achievementService } from '@/services/achievementService';
+import { useToast } from '@/hooks/use-toast';
 
 const STREAK_STORAGE_KEY = 'relief_anchor_streak';
 
@@ -13,12 +15,20 @@ interface StreakData {
 
 export function StreakTracker() {
   const { profile } = useApp();
+  const { toast } = useToast();
   const [streakData, setStreakData] = useState<StreakData>({
     currentStreak: 0,
     longestStreak: 0,
     lastLoginDate: '',
   });
   const [showCelebration, setShowCelebration] = useState(false);
+
+  const checkStreakAchievements = (streak: number) => {
+    const unlocked = achievementService.checkStreakAchievements(streak);
+    unlocked.forEach(name => {
+      toast({ title: '🏆 Achievement Unlocked!', description: name });
+    });
+  };
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -38,6 +48,7 @@ export function StreakTracker() {
       data = { currentStreak: 1, longestStreak: 1, lastLoginDate: today };
       localStorage.setItem(STREAK_STORAGE_KEY, JSON.stringify(data));
       setStreakData(data);
+      checkStreakAchievements(1);
       return;
     }
 
@@ -64,6 +75,7 @@ export function StreakTracker() {
       };
       localStorage.setItem(STREAK_STORAGE_KEY, JSON.stringify(newData));
       setStreakData(newData);
+      checkStreakAchievements(newStreak);
       
       // Show celebration for milestones
       if (newStreak === 3 || newStreak === 7 || newStreak % 10 === 0) {

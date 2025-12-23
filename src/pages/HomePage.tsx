@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StreakTracker } from '@/components/StreakTracker';
+import { AchievementBadges } from '@/components/AchievementBadges';
 
 interface HomePageProps {
   onNavigate: (tab: string) => void;
@@ -66,6 +67,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
       {/* Streak Tracker */}
       <StreakTracker />
+
+      {/* Achievement Badges */}
+      <AchievementBadges />
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-3">
