@@ -21,6 +21,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
 
   const triggerSurvey = useCallback(() => {
     // Only show survey to visitors (non-authenticated users)
+    // Double-check user is not authenticated before showing
     if (user) return;
     
     const shownBefore = sessionStorage.getItem('exit_popup_shown');
@@ -30,6 +31,13 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
       sessionStorage.setItem('exit_popup_shown', 'true');
     }
   }, [hasTriggered, user]);
+
+  // Close popup immediately if user becomes authenticated
+  useEffect(() => {
+    if (user && isOpen) {
+      setIsOpen(false);
+    }
+  }, [user, isOpen]);
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (e.clientY <= 10) {
