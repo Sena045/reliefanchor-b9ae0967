@@ -10,7 +10,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-const CACHE_NAME = 'reliefanchor-runtime-v5';
+const CACHE_NAME = 'reliefanchor-runtime-v6';
 
 const PRECACHE_URLS = [
   '/',
