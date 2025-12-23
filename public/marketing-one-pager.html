@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReliefAnchor - Marketing One-Pager</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    
+    .controls {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 50;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .controls button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    }
+    
+    .page {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 40px;
+      background: white;
+      min-height: 297mm;
+    }
+    
+    /* Header */
+    header {
+      text-align: center;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      color: #7c3aed;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    
+    .tagline {
+      font-size: 1.25rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    
+    .website {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+    
+    /* Value Proposition */
+    .value-prop {
+      background: linear-gradient(135deg, #f3e8ff, #ede9fe);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .value-prop h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+    
+    .value-prop p {
+      color: #4b5563;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Trust Bar */
+    .trust-bar {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 12px;
+    }
+    
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+    }
+    
+    .trust-item strong {
+      font-weight: 600;
+    }
+    
+    .stars {
+      color: #facc15;
+    }
+    
+    .shield-icon {
+      color: #16a34a;
+    }
+    
+    .lock-icon {
+      color: #2563eb;
+    }
+    
+    /* Features Grid */
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #374151;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .feature-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    
+    .feature-icon {
+      width: 20px;
+      height: 20px;
+      color: #7c3aed;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    .feature-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #1a1a1a;
+    }
+    
+    .feature-desc {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .pricing-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    
+    .pricing-card.premium {
+      border-color: #7c3aed;
+      background: linear-gradient(180deg, #faf5ff, white);
+      position: relative;
+    }
+    
+    .best-value {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      color: white;
+      font-size: 0.75rem;
+      padding: 4px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    
+    .plan-name {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .crown-icon {
+      color: #7c3aed;
+    }
+    
+    .price {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .price-period {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #6b7280;
+    }
+    
+    .price-alt {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    
+    .pricing-list {
+      list-style: none;
+    }
+    
+    .pricing-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 8px;
+    }
+    
+    .check-icon {
+      width: 16px;
+      height: 16px;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+    
+    .check-icon.highlight {
+      color: #7c3aed;
+    }
+    
+    .pricing-note {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 12px;
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 8px;
+      border: 1px solid #bbf7d0;
+    }
+    
+    /* Audience */
+    .audience-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .audience-tag {
+      background: #f3f4f6;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    
+    /* Differentiators */
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .diff-item {
+      padding: 16px;
+    }
+    
+    .diff-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 8px;
+    }
+    
+    .diff-icon.green { color: #16a34a; }
+    .diff-icon.purple { color: #7c3aed; }
+    .diff-icon.blue { color: #2563eb; }
+    
+    .diff-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+    }
+    
+    .diff-desc {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 2px solid #e5e7eb;
+    }
+    
+    footer h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    footer p {
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.875rem;
+    }
+    
+    .contact-row span {
+      color: #374151;
+    }
+    
+    .divider {
+      color: #d1d5db;
+    }
+    
+    /* Print Styles */
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      
+      body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        background: white;
+      }
+      
+      .controls {
+        display: none !important;
+      }
+      
+      .page {
+        padding: 32px;
+        box-shadow: none;
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      .controls {
+        top: 8px;
+        right: 8px;
+      }
+      
+      .page {
+        padding: 20px;
+      }
+      
+      .features-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .diff-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .trust-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn-primary" onclick="window.print()">📄 Save as PDF</button>
+  </div>
+
+  <!-- Page Content -->
+  <div class="page">
+    <!-- Header -->
+    <header>
+      <div class="logo-row">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        </svg>
+        <h1>ReliefAnchor</h1>
+      </div>
+      <p class="tagline">Your Quiet Corner for Everyday Calm</p>
+      <p class="website">reliefanchor.com</p>
+    </header>
+
+    <!-- Value Proposition -->
+    <section class="value-prop">
+      <h2>When your mind feels full, this is your quiet corner</h2>
+      <p>A self-guided wellbeing app for people experiencing stress, overthinking, or emotional overload. Private, simple, and judgment-free.</p>
+    </section>
+
+    <!-- Trust Bar -->
+    <section class="trust-bar">
+      <div class="trust-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <strong>1,000+ Users</strong>
+      </div>
+      <div class="trust-item">
+        <span class="stars">★★★★★</span>
+        <strong>4.8/5 Rating</strong>
+      </div>
+      <div class="trust-item">
+        <svg class="shield-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <strong>100% Private</strong>
+      </div>
+      <div class="trust-item">
+        <svg class="lock-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <strong>End-to-End Encrypted</strong>
+      </div>
+    </section>
+
+    <!-- Core Features -->
+    <section>
+      <h3 class="section-title">Core Features</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <div>
+            <p class="feature-title">Anya AI Chat</p>
+            <p class="feature-desc">Supportive AI companion for talking through feelings, anytime</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
+          <div>
+            <p class="feature-title">Mood Tracking</p>
+            <p class="feature-desc">Log daily moods, view charts, and spot emotional patterns</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
+          <div>
+            <p class="feature-title">Breathing Exercises</p>
+            <p class="feature-desc">Guided 4-7-8 technique for calming the nervous system</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <div>
+            <p class="feature-title">5-4-3-2-1 Grounding</p>
+            <p class="feature-desc">Sensory awareness exercise for anxiety relief</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <div>
+            <p class="feature-title">Ambient Sounds</p>
+            <p class="feature-desc">Rain, forest, campfire, brown noise, and premium sounds</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          <div>
+            <p class="feature-title">Journaling</p>
+            <p class="feature-desc">Prompted reflections saved privately and securely</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>
+          <div>
+            <p class="feature-title">Wellness Games</p>
+            <p class="feature-desc">Bubble pop, memory, gratitude jar, body scan, and more</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <div>
+            <p class="feature-title">8 Languages</p>
+            <p class="feature-desc">EN, HI, ES, FR, DE, PT, ZH, JA — fully localized</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section>
+      <h3 class="section-title">Simple, Transparent Pricing</h3>
+      <div class="pricing-grid">
+        <!-- Free Plan -->
+        <div class="pricing-card">
+          <h4 class="plan-name">Free</h4>
+          <p class="price">$0 / ₹0 <span class="price-period">forever</span></p>
+          <p class="price-alt">No credit card required</p>
+          <ul class="pricing-list">
+            <li><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 5 AI messages per day</li>
+            <li><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Basic mood tracking</li>
+            <li><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Breathing & grounding exercises</li>
+            <li><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 4 ambient sounds</li>
+            <li><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Private journaling</li>
+          </ul>
+        </div>
+
+        <!-- Premium Plan -->
+        <div class="pricing-card premium">
+          <span class="best-value">Best Value</span>
+          <h4 class="plan-name">
+            <svg class="crown-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
+            Premium
+          </h4>
+          <p class="price">$4.99 / ₹149 <span class="price-period">/month</span></p>
+          <p class="price-alt">or $49.99 / ₹1,499 /year (save 2 months)</p>
+          <ul class="pricing-list">
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> <strong>Unlimited</strong> AI messages</li>
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Weekly mood insights & analytics</li>
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> All wellness games unlocked</li>
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Premium sounds (ocean, sleep)</li>
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Export journal entries</li>
+            <li><svg class="check-icon highlight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Priority AI responses</li>
+          </ul>
+        </div>
+      </div>
+      <p class="pricing-note">💰 <strong>30-day money-back guarantee</strong> · Cancel anytime · Secure payment via Razorpay</p>
+    </section>
+
+    <!-- Target Audience -->
+    <section>
+      <h3 class="section-title">Who It's For</h3>
+      <div class="audience-tags">
+        <span class="audience-tag">Adults dealing with everyday stress</span>
+        <span class="audience-tag">People seeking private self-reflection</span>
+        <span class="audience-tag">Users wanting gradual, gentle support</span>
+        <span class="audience-tag">Non-English speakers needing localized tools</span>
+      </div>
+    </section>
+
+    <!-- Differentiators -->
+    <section>
+      <h3 class="section-title">What Makes Us Different</h3>
+      <div class="diff-grid">
+        <div class="diff-item">
+          <svg class="diff-icon green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <p class="diff-title">Privacy-First</p>
+          <p class="diff-desc">End-to-end encrypted, never shared or sold</p>
+        </div>
+        <div class="diff-item">
+          <svg class="diff-icon purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <p class="diff-title">No Medical Claims</p>
+          <p class="diff-desc">Self-care companion, not therapy replacement</p>
+        </div>
+        <div class="diff-item">
+          <svg class="diff-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <p class="diff-title">Works Everywhere</p>
+          <p class="diff-desc">PWA, installable, works offline</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <h3>Start Your Wellness Journey Today</h3>
+      <p>Free to use. No credit card required. Your data stays private.</p>
+      <div class="contact-row">
+        <span>🌐 reliefanchor.com</span>
+        <span class="divider">|</span>
+        <span>📧 contact@reliefanchor.com</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
