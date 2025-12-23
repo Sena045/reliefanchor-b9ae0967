@@ -134,10 +134,12 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           first_exercise_at: string | null
           id: string
           is_premium: boolean
           language: string
+          last_active_at: string | null
           last_message_date: string | null
           messages_used_today: number
           premium_until: string | null
@@ -147,10 +149,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           first_exercise_at?: string | null
           id: string
           is_premium?: boolean
           language?: string
+          last_active_at?: string | null
           last_message_date?: string | null
           messages_used_today?: number
           premium_until?: string | null
@@ -160,10 +164,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           first_exercise_at?: string | null
           id?: string
           is_premium?: boolean
           language?: string
+          last_active_at?: string | null
           last_message_date?: string | null
           messages_used_today?: number
           premium_until?: string | null

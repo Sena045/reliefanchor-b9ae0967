@@ -115,11 +115,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
             lastMessageDate: profileData.last_message_date,
           });
 
-          // Reset message count if it's a new day
+          // Reset message count if it's a new day and update last_active_at
           if (isNewDay) {
             await supabase.from('profiles').update({
               messages_used_today: 0,
               last_message_date: today,
+              last_active_at: new Date().toISOString(),
+            }).eq('id', user.id);
+          } else {
+            // Just update last_active_at to track user activity
+            await supabase.from('profiles').update({
+              last_active_at: new Date().toISOString(),
             }).eq('id', user.id);
           }
 
