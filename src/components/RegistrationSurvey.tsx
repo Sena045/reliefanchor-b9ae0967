@@ -1,17 +1,11 @@
 import { useState } from 'react';
-import { MessageSquare, Send, X } from 'lucide-react';
+import { MessageSquare, Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 interface RegistrationSurveyProps {
   isOpen: boolean;
@@ -19,12 +13,12 @@ interface RegistrationSurveyProps {
 }
 
 const SURVEY_REASONS = [
-  { value: 'just_browsing', label: 'Just browsing, not ready yet' },
-  { value: 'privacy_concerns', label: 'Privacy or data concerns' },
-  { value: 'no_google', label: "Don't want to use Google sign-in" },
-  { value: 'not_sure_helpful', label: 'Not sure if this will help me' },
-  { value: 'too_complicated', label: 'Seems too complicated' },
-  { value: 'other', label: 'Other reason' },
+  { value: 'just_browsing', label: 'Just browsing, not ready yet', emoji: '👀' },
+  { value: 'privacy_concerns', label: 'Privacy or data concerns', emoji: '🔒' },
+  { value: 'no_google', label: "Don't want to use Google sign-in", emoji: '🚫' },
+  { value: 'not_sure_helpful', label: 'Not sure if this will help me', emoji: '🤔' },
+  { value: 'too_complicated', label: 'Seems too complicated', emoji: '😵' },
+  { value: 'other', label: 'Other reason', emoji: '💬' },
 ];
 
 export function RegistrationSurvey({ isOpen, onClose }: RegistrationSurveyProps) {
@@ -71,52 +65,81 @@ export function RegistrationSurvey({ isOpen, onClose }: RegistrationSurveyProps)
     setOtherReason('');
   };
 
+  if (!isOpen) return null;
+
   if (isSubmitted) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md">
-          <div className="text-center py-8">
-            <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-              <Send className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Thanks for sharing!</h3>
-            <p className="text-muted-foreground">Your feedback helps us make ReliefAnchor better for everyone.</p>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="text-center p-8 animate-in fade-in zoom-in duration-300">
+          <div className="mx-auto w-24 h-24 rounded-full bg-green-500 flex items-center justify-center mb-6 animate-pulse">
+            <Send className="w-12 h-12 text-white" />
           </div>
-        </DialogContent>
-      </Dialog>
+          <h3 className="text-3xl font-bold mb-3">Thanks for sharing! 🎉</h3>
+          <p className="text-muted-foreground text-lg">Your feedback helps us make ReliefAnchor better for everyone.</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-            <MessageSquare className="w-7 h-7 text-primary" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto">
+      {/* Animated gradient background */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-primary/10"
+        style={{
+          animation: 'pulse 3s ease-in-out infinite',
+        }}
+      />
+      
+      {/* Floating particles effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-3 h-3 rounded-full bg-primary/30"
+            style={{
+              left: `${15 + i * 15}%`,
+              top: `${20 + (i % 3) * 25}%`,
+              animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
+              animationDelay: `${i * 0.3}s`,
+            }}
+          />
+        ))}
+      </div>
+      
+      <div className="relative w-full max-w-lg mx-4 my-8 animate-in slide-in-from-bottom-8 fade-in duration-500">
+        {/* Glowing card effect */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/50 to-primary rounded-2xl blur-lg opacity-40 animate-pulse" />
+        
+        <div className="relative bg-card rounded-2xl shadow-2xl p-6 sm:p-8 border border-primary/20">
+          {/* Header with sparkle icon */}
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/60 mb-4 shadow-lg">
+              <Sparkles className="w-10 h-10 text-primary-foreground animate-pulse" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+              Wait! Quick question 🙋
+            </h2>
+            <p className="text-muted-foreground">
+              Help us understand what's stopping you. Takes 5 seconds!
+            </p>
           </div>
-          <DialogTitle className="text-center text-xl">
-            Quick question before you go
-          </DialogTitle>
-        </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <p className="text-center text-muted-foreground text-sm">
-            What's holding you back from signing up? Your honest feedback helps us improve.
-          </p>
-
-          <RadioGroup value={selectedReason} onValueChange={setSelectedReason} className="space-y-2">
+          {/* Survey options - larger touch targets */}
+          <RadioGroup value={selectedReason} onValueChange={setSelectedReason} className="space-y-3 mb-6">
             {SURVEY_REASONS.map((reason) => (
               <div
                 key={reason.value}
-                className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors cursor-pointer ${
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-[0.98] ${
                   selectedReason === reason.value
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
+                    ? 'border-primary bg-primary/10 shadow-md shadow-primary/20'
+                    : 'border-border hover:border-primary/50 hover:bg-muted/50'
                 }`}
                 onClick={() => setSelectedReason(reason.value)}
               >
-                <RadioGroupItem value={reason.value} id={reason.value} />
-                <Label htmlFor={reason.value} className="cursor-pointer flex-1 text-sm">
+                <span className="text-2xl">{reason.emoji}</span>
+                <RadioGroupItem value={reason.value} id={reason.value} className="sr-only" />
+                <Label htmlFor={reason.value} className="cursor-pointer flex-1 text-base font-medium">
                   {reason.label}
                 </Label>
               </div>
@@ -128,28 +151,49 @@ export function RegistrationSurvey({ isOpen, onClose }: RegistrationSurveyProps)
               placeholder="Please tell us more..."
               value={otherReason}
               onChange={(e) => setOtherReason(e.target.value)}
-              className="min-h-[80px] text-sm"
+              className="min-h-[100px] text-base mb-6 border-2"
               maxLength={500}
+              autoFocus
             />
           )}
 
-          <div className="flex flex-col gap-2 pt-2">
-            <Button
-              onClick={handleSubmit}
-              disabled={!selectedReason || isSubmitting}
-              className="w-full"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-            </Button>
-            <button
-              onClick={handleSkip}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
-            >
-              Skip
-            </button>
-          </div>
+          {/* Large, prominent submit button */}
+          <Button
+            onClick={handleSubmit}
+            disabled={!selectedReason || isSubmitting}
+            size="lg"
+            className="w-full h-14 text-lg font-semibold shadow-lg shadow-primary/30 mb-4"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Submitting...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Send className="w-5 h-5" />
+                Submit Feedback
+              </span>
+            )}
+          </Button>
+
+          {/* Skip button - less prominent but still visible */}
+          <button
+            onClick={handleSkip}
+            className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-3 rounded-lg hover:bg-muted/50"
+          >
+            Maybe later
+          </button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+
+      {/* CSS for floating animation */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
+          50% { transform: translateY(-20px) scale(1.2); opacity: 0.6; }
+        }
+      `}</style>
+    </div>
   );
 }
