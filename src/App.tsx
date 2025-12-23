@@ -20,6 +20,7 @@ const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ defa
 const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
 const PressKitPage = lazy(() => import('@/pages/PressKitPage').then(m => ({ default: m.PressKitPage })));
 const AboutPage = lazy(() => import('@/pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const MarketingOnePager = lazy(() => import('@/pages/MarketingOnePager').then(m => ({ default: m.MarketingOnePager })));
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -28,6 +29,7 @@ function AppContent() {
   const [showAuth, setShowAuth] = useState(false);
   const [showPressKit, setShowPressKit] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showMarketing, setShowMarketing] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -49,6 +51,14 @@ function AppContent() {
 
   // Not logged in
   if (!user) {
+    // Show marketing one-pager
+    if (showMarketing) {
+      return (
+        <Suspense fallback={<SplashLoader />}>
+          <MarketingOnePager onClose={() => setShowMarketing(false)} />
+        </Suspense>
+      );
+    }
     // Show about page
     if (showAbout) {
       return (
@@ -76,6 +86,7 @@ function AppContent() {
           onGetStarted={() => setShowAuth(true)} 
           onShowPressKit={() => setShowPressKit(true)}
           onShowAbout={() => setShowAbout(true)}
+          onShowMarketing={() => setShowMarketing(true)}
         />
         <ExitIntentPopup onSignUp={() => setShowAuth(true)} />
       </>
