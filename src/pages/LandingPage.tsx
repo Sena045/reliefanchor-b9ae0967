@@ -313,6 +313,15 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           <span>Free to use. No credit card needed. Your data stays private.</span>
         </p>
 
+        {/* Download App Link */}
+        <a 
+          href="/install" 
+          className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors mt-4"
+        >
+          <Download className="h-4 w-4" />
+          <span>Download App</span>
+        </a>
+
         {/* Premium transparency */}
         <p className="text-xs text-muted-foreground mt-4">
           Premium is optional and adds deeper insights and extended tools.
