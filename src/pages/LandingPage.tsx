@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap } from 'lucide-react';
+import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +19,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onTryChat?: () => void;
   onShowPressKit?: () => void;
   onShowAbout?: () => void;
 }
@@ -47,7 +48,7 @@ const FEATURES = [
 ];
 
 
-export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit, onShowAbout }, ref) {
+export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onTryChat, onShowPressKit, onShowAbout }, ref) {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
 
@@ -314,6 +315,20 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           </svg>
           Create Your Free Account
         </Button>
+
+        {/* Try Before Signup CTA */}
+        {onTryChat && (
+          <Button 
+            variant="outline"
+            size="lg"
+            onClick={onTryChat}
+            className="w-full max-w-sm mb-4 text-base border-primary/30 hover:bg-primary/5"
+            aria-label="Try talking to Anya without signing up"
+          >
+            <Sparkles className="h-4 w-4 mr-2 text-primary" />
+            Try Anya First — No Signup Needed
+          </Button>
+        )}
         
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
           <Shield className="h-3 w-3 text-green-600" aria-hidden="true" />

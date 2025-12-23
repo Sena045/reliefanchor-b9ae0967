@@ -9,6 +9,7 @@ import { LandingPage } from '@/pages/LandingPage';
 import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
+import { GuestChatPage } from '@/pages/GuestChatPage';
 
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -27,6 +28,7 @@ function AppContent() {
   const [showAuth, setShowAuth] = useState(false);
   const [showPressKit, setShowPressKit] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showGuestChat, setShowGuestChat] = useState(false);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -36,6 +38,10 @@ function AppContent() {
   // Check for referral code in URL (should show auth page)
   const hasReferralCode = typeof window !== 'undefined' && 
     new URLSearchParams(window.location.search).get('ref');
+
+  // Check for try-chat URL path
+  const isTryChatUrl = typeof window !== 'undefined' && 
+    (window.location.pathname === '/try' || window.location.pathname === '/try-chat');
 
   if (authLoading) {
     return <SplashLoader />;
@@ -48,6 +54,10 @@ function AppContent() {
 
   // Not logged in
   if (!user) {
+    // Show guest chat trial (via state or URL)
+    if (showGuestChat || isTryChatUrl) {
+      return <GuestChatPage />;
+    }
     // Show about page
     if (showAbout) {
       return (
@@ -72,6 +82,7 @@ function AppContent() {
     return (
       <LandingPage 
         onGetStarted={() => setShowAuth(true)} 
+        onTryChat={() => setShowGuestChat(true)}
         onShowPressKit={() => setShowPressKit(true)}
         onShowAbout={() => setShowAbout(true)}
       />
