@@ -10,6 +10,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { GuestChatPage } from '@/pages/GuestChatPage';
+import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
 
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -116,6 +117,9 @@ function AppContent() {
           {activeTab === 'settings' && <SettingsPage />}
         </Suspense>
       </ErrorBoundary>
+      
+      {/* Push notification opt-in prompt */}
+      <NotificationOptInPrompt trigger="session_count" />
     </Layout>
   );
 }
