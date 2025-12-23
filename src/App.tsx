@@ -9,7 +9,6 @@ import { LandingPage } from '@/pages/LandingPage';
 import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
-import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -71,14 +70,11 @@ function AppContent() {
     }
     // Show landing page by default
     return (
-      <>
-        <LandingPage 
-          onGetStarted={() => setShowAuth(true)} 
-          onShowPressKit={() => setShowPressKit(true)}
-          onShowAbout={() => setShowAbout(true)}
-        />
-        <ExitIntentPopup onSignUp={() => setShowAuth(true)} />
-      </>
+      <LandingPage 
+        onGetStarted={() => setShowAuth(true)} 
+        onShowPressKit={() => setShowPressKit(true)}
+        onShowAbout={() => setShowAbout(true)}
+      />
     );
   }
 
