@@ -313,14 +313,6 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           <span>Free to use. No credit card needed. Your data stays private.</span>
         </p>
 
-        {/* Download App Link */}
-        <button 
-          onClick={handleInstall}
-          className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors mt-4"
-        >
-          <Download className="h-4 w-4" />
-          <span>{installPrompt ? 'Download App' : getInstallInstructions().shortText}</span>
-        </button>
 
         {/* Premium transparency */}
         <p className="text-xs text-muted-foreground mt-4">
