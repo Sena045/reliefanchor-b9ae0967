@@ -21,6 +21,7 @@ interface LandingPageProps {
   onGetStarted: () => void;
   onShowPressKit?: () => void;
   onShowAbout?: () => void;
+  onShowMarketing?: () => void;
 }
 
 const FEATURES = [
@@ -47,7 +48,7 @@ const FEATURES = [
 ];
 
 
-export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit, onShowAbout }, ref) {
+export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function LandingPage({ onGetStarted, onShowPressKit, onShowAbout, onShowMarketing }, ref) {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
 
@@ -458,6 +459,18 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
                 aria-label="View press kit"
               >
                 Press Kit
+              </button>
+            </>
+          )}
+          {onShowMarketing && (
+            <>
+              <span aria-hidden="true">•</span>
+              <button 
+                onClick={onShowMarketing}
+                className="hover:text-primary transition-colors"
+                aria-label="View marketing one-pager"
+              >
+                Marketing
               </button>
             </>
           )}
