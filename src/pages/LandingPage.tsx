@@ -318,6 +318,22 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         <p className="text-xs text-muted-foreground mt-4">
           Premium is optional and adds deeper insights and extended tools.
         </p>
+
+        {/* Mobile-only Download App button */}
+        <Button
+          variant="outline"
+          className="mt-4 md:hidden flex items-center gap-2"
+          onClick={() => {
+            toast({
+              title: "Install ReliefAnchor",
+              description: "Tap the share button in your browser, then 'Add to Home Screen' to install the app.",
+              duration: 6000,
+            });
+          }}
+        >
+          <Download className="h-4 w-4" />
+          Download App
+        </Button>
       </header>
 
       {/* How It Works Section */}
