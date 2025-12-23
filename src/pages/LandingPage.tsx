@@ -318,24 +318,6 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         <p className="text-xs text-muted-foreground mt-4">
           Premium is optional and adds deeper insights and extended tools.
         </p>
-
-        {/* Mobile-only Download App button */}
-        <button
-          className="mt-6 md:hidden flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors underline underline-offset-4"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Mark session to prevent survey from triggering
-            sessionStorage.setItem('exit_popup_shown', 'true');
-            toast({
-              title: "📲 Install ReliefAnchor",
-              description: "Tap the Share button (↑) at the bottom of your browser, then select 'Add to Home Screen'.",
-              duration: 8000,
-            });
-          }}
-        >
-          <Smartphone className="h-4 w-4" />
-          Install as App
-        </button>
       </header>
 
       {/* How It Works Section */}
