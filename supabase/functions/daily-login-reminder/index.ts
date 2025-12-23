@@ -78,7 +78,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: JSON.stringify({
           from: "SukoonSphere <onboarding@resend.dev>",
           to: [email],
-          subject: "We miss you! 💙 Your mental wellness journey awaits",
+          subject: "We miss you! 💙 Take a moment for yourself today",
           html: `
             <!DOCTYPE html>
             <html>
@@ -90,18 +90,18 @@ const handler = async (req: Request): Promise<Response> => {
               <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
                 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); border-radius: 16px; padding: 40px; text-align: center;">
                   <h1 style="color: #ffffff; font-size: 28px; margin: 0 0 16px 0;">
-                    🌟 Your Wellness Journey Awaits
+                    🌟 Your Peaceful Moment Awaits
                   </h1>
                   <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
-                    We noticed you haven't visited SukoonSphere in a while. Taking care of your mental health is a daily practice, and we're here to support you every step of the way.
+                    We noticed you have not visited SukoonSphere in a while. Taking a few minutes for yourself each day can make a big difference. We are here to support you every step of the way.
                   </p>
                   <a href="https://sukoonsphere.com" style="display: inline-block; background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
                     Continue Your Journey
                   </a>
                   <p style="color: #64748b; font-size: 14px; margin-top: 32px;">
-                    💬 Chat with our AI companion<br>
-                    📝 Track your daily moods<br>
-                    🧘 Practice breathing exercises
+                    💬 Chat with our caring AI companion<br>
+                    📝 Track how you are feeling<br>
+                    🧘 Practice calming breathing exercises
                   </p>
                 </div>
                 <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 24px;">
