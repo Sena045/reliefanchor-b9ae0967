@@ -4,6 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { StreakTracker } from '@/components/StreakTracker';
 
 interface HomePageProps {
   onNavigate: (tab: string) => void;
@@ -62,6 +63,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
         </h1>
         <p className="text-muted-foreground mt-1">{t('welcomeSubtitle')}</p>
       </div>
+
+      {/* Streak Tracker */}
+      <StreakTracker />
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-3">
