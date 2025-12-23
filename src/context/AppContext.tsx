@@ -5,6 +5,7 @@ import { chatService } from '@/services/chatService';
 import { useAuth } from '@/hooks/useAuth';
 import { referralService } from '@/services/referralService';
 import { useToast } from '@/hooks/use-toast';
+import { achievementService } from '@/services/achievementService';
 
 interface UserProfile {
   language: Language;
@@ -290,11 +291,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         content: response,
         timestamp: new Date(assistantMsg.created_at).getTime(),
       };
-      setChatHistory(prev => [...prev, newAssistantMessage]);
+      setChatHistory(prev => {
+        const updated = [...prev, newAssistantMessage];
+        // Check chat achievements (count user messages only)
+        const userMsgCount = updated.filter(m => m.role === 'user').length;
+        const unlocked = achievementService.checkChatAchievements(userMsgCount);
+        unlocked.forEach(name => {
+          toast({ title: '🏆 Achievement Unlocked!', description: name });
+        });
+        return updated;
+      });
     }
 
     return response;
-  }, [user, canSendMessage, chatHistory, profile.language, profile.messagesUsedToday, updateProfile]);
+  }, [user, canSendMessage, chatHistory, profile.language, profile.messagesUsedToday, updateProfile, toast]);
 
   const clearChat = useCallback(async () => {
     if (!user) return;
@@ -317,9 +327,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         note: data.note || '',
         timestamp: new Date(data.created_at).getTime(),
       };
-      setMoods(prev => [newMood, ...prev]);
+      setMoods(prev => {
+        const updated = [newMood, ...prev];
+        // Check mood achievements
+        const unlocked = achievementService.checkMoodAchievements(updated.length);
+        unlocked.forEach(name => {
+          toast({ title: '🏆 Achievement Unlocked!', description: name });
+        });
+        return updated;
+      });
     }
-  }, [user]);
+  }, [user, toast]);
 
   const getMoods = useCallback((days?: number) => {
     if (!days) return moods;
@@ -342,9 +360,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         content: data.content,
         timestamp: new Date(data.created_at).getTime(),
       };
-      setJournals(prev => [newJournal, ...prev]);
+      setJournals(prev => {
+        const updated = [newJournal, ...prev];
+        // Check journal achievements
+        const unlocked = achievementService.checkJournalAchievements(updated.length);
+        unlocked.forEach(name => {
+          toast({ title: '🏆 Achievement Unlocked!', description: name });
+        });
+        return updated;
+      });
     }
-  }, [user]);
+  }, [user, toast]);
 
   const value: AppContextType = {
     profile,
