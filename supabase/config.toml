@@ -3,6 +3,9 @@ project_id = "urbllfogetzvckloyrld"
 [functions.chat]
 verify_jwt = false
 
+[functions.guest-chat]
+verify_jwt = false
+
 [functions.mood-insights]
 verify_jwt = false
 
