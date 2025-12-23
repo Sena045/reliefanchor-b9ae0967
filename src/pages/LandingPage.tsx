@@ -264,6 +264,13 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
   return (
     <main ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5" role="main">
+      {/* Warm welcome message */}
+      <div className="bg-primary/5 border-b border-primary/10 py-3 px-4 text-center">
+        <p className="text-sm text-muted-foreground italic">
+          If this helped you today, I'm glad you found it.
+        </p>
+      </div>
+
       <PromoBanner />
 
       {/* Hero Section */}
