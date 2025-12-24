@@ -1,7 +1,6 @@
 import { AppState, MoodEntry, ChatMessage, JournalEntry, UserSettings } from '@/types';
 
 const STORAGE_KEY = 'reliefanchor_data';
-const PROMO_END_DATE = new Date('2025-12-28T23:59:59').getTime();
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 const defaultSettings: UserSettings = {
@@ -24,21 +23,18 @@ export const storageService = {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) {
-        // New user - grant 7 days free premium if before Dec 28, 2024
+        // New user - grant 7 days free premium
         const now = Date.now();
-        if (now <= PROMO_END_DATE) {
-          const newState = {
-            ...defaultState,
-            settings: {
-              ...defaultSettings,
-              isPremium: true,
-              premiumUntil: now + SEVEN_DAYS_MS,
-            },
-          };
-          this.saveState(newState);
-          return newState;
-        }
-        return defaultState;
+        const newState = {
+          ...defaultState,
+          settings: {
+            ...defaultSettings,
+            isPremium: true,
+            premiumUntil: now + SEVEN_DAYS_MS,
+          },
+        };
+        this.saveState(newState);
+        return newState;
       }
       
       const parsed = JSON.parse(stored) as AppState;
