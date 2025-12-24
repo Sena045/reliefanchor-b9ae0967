@@ -555,7 +555,7 @@ export function AuthPage() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      {isLogin ? 'Sign In' : 'Create Account'}
+                      {isLogin ? 'Sign In' : 'Create My Private Space'}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   )}
