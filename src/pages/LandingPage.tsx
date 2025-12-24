@@ -499,8 +499,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </nav>
       </footer>
 
-      {/* Conversion Components */}
-      <StickySignupBar onSignUp={onGetStarted} />
+      
       
     </main>
   );
