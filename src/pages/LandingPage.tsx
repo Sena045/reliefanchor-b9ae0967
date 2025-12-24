@@ -487,7 +487,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           )}
           <span aria-hidden="true">•</span>
           <a 
-            href="mailto:senarindam747@gmail.com"
+            href="mailto:arindamsen.2024@outlook.com"
             className="hover:text-primary transition-colors flex items-center gap-1"
             aria-label="Contact us via email"
           >
