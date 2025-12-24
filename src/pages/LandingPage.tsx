@@ -319,16 +319,21 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
         {/* Try Before Signup CTA */}
         {onTryChat && (
-          <Button 
-            variant="outline"
-            size="lg"
-            onClick={onTryChat}
-            className="w-full max-w-sm mb-4 text-base border-primary/30 hover:bg-primary/5"
-            aria-label="Try talking to Anya without signing up"
-          >
-            <Sparkles className="h-4 w-4 mr-2 text-primary" />
-            Try Anya First — No Account Needed
-          </Button>
+          <div className="w-full max-w-sm mx-auto mb-4">
+            <Button 
+              variant="outline"
+              size="lg"
+              onClick={onTryChat}
+              className="w-full text-base border-primary/30 hover:bg-primary/5"
+              aria-label="Try talking to Anya without signing up"
+            >
+              <Sparkles className="h-4 w-4 mr-2 text-primary" />
+              Try Anya First — No Account Needed
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 italic">
+              ReliefAnchor is meant to be used daily. Calm builds over time.
+            </p>
+          </div>
         )}
         
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
