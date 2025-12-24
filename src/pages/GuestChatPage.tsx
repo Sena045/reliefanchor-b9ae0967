@@ -128,7 +128,7 @@ export function GuestChatPage({ onSignUp }: GuestChatPageProps) {
           <p className="text-xs text-muted-foreground">
             {canSend 
               ? `${remainingMessages} free trial message${remainingMessages !== 1 ? 's' : ''} remaining`
-              : 'Trial complete! Sign up to continue'
+              : 'Trial complete! Create your space to continue'
             }
           </p>
         </div>
@@ -136,9 +136,9 @@ export function GuestChatPage({ onSignUp }: GuestChatPageProps) {
           variant="outline" 
           size="sm"
           onClick={onSignUp}
-          className="gap-1"
+          className="gap-1 text-xs"
         >
-          Sign Up <ArrowRight className="h-3 w-3" />
+          Create a private space <ArrowRight className="h-3 w-3" />
         </Button>
       </div>
 
@@ -231,7 +231,7 @@ export function GuestChatPage({ onSignUp }: GuestChatPageProps) {
               You've used all trial messages!
             </p>
             <Button onClick={onSignUp} className="w-full">
-              Sign Up to Continue Chatting
+              Create a Private Space to Continue
             </Button>
           </div>
         )}
