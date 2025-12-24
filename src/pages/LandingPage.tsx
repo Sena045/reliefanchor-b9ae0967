@@ -1,4 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
+import { Mail } from 'lucide-react';
 import { Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -484,6 +485,15 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               </button>
             </>
           )}
+          <span aria-hidden="true">•</span>
+          <a 
+            href="mailto:senarindam747@gmail.com"
+            className="hover:text-primary transition-colors flex items-center gap-1"
+            aria-label="Contact us via email"
+          >
+            <Mail className="h-3 w-3" />
+            Contact Us
+          </a>
           <span aria-hidden="true">•</span>
           <span>Made with ❤️ for your mental wellness</span>
         </nav>
