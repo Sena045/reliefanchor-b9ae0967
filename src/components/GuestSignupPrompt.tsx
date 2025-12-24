@@ -20,8 +20,8 @@ export function GuestSignupPrompt({ messagesUsed, onDismiss, onSignUp }: GuestSi
         </CardTitle>
         <CardDescription>
           {isLimitReached 
-            ? "Sign up free to continue your conversation and unlock all features."
-            : `${3 - messagesUsed} trial messages remaining. Sign up to keep chatting!`
+            ? "Create a private space to continue your conversation and unlock all features."
+            : `${3 - messagesUsed} trial messages remaining. Create your space to keep chatting!`
           }
         </CardDescription>
       </CardHeader>
@@ -46,7 +46,7 @@ export function GuestSignupPrompt({ messagesUsed, onDismiss, onSignUp }: GuestSi
             onClick={onSignUp} 
             className="w-full"
           >
-            Sign Up Free
+            Create Your Private Space — Free
           </Button>
           {!isLimitReached && onDismiss && (
             <Button 

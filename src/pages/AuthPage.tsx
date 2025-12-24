@@ -572,7 +572,7 @@ export function AuthPage() {
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   disabled={loading}
                 >
-                  {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+                  {isLogin ? "Don't have an account? Create one" : 'Already have an account? Sign in'}
                 </button>
               </div>
             </>
