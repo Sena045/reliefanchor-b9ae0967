@@ -305,7 +305,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           size="lg" 
           onClick={handleGoogleSignIn} 
           className="w-full max-w-sm mb-4 text-base bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 shadow-md"
-          aria-label="Sign up with Google for free"
+          aria-label="Create a private space for free"
         >
           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -326,7 +326,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             aria-label="Try talking to Anya without signing up"
           >
             <Sparkles className="h-4 w-4 mr-2 text-primary" />
-            Try Anya First — No Signup Needed
+            Try Anya First — No Account Needed
           </Button>
         )}
         
@@ -357,7 +357,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
               </div>
               <h3 className="font-semibold mb-2">Create Your Space</h3>
               <p className="text-sm text-muted-foreground">
-                Sign up with Google. It takes a few seconds. Nothing to install.
+                Create a private space with Google. It takes a few seconds. Nothing to install.
               </p>
             </li>
             
@@ -452,8 +452,8 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             Join thousands finding peace with ReliefAnchor. Free to start, always private.
           </p>
           
-          <Button size="lg" onClick={onGetStarted} className="text-lg px-8" aria-label="Sign up now for free">
-            Sign Up Now
+          <Button size="lg" onClick={onGetStarted} className="text-lg px-8" aria-label="Create a private space for free">
+            Create Your Private Space
             <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
