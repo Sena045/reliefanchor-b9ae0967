@@ -259,6 +259,48 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        {/* Premium Gate for all wellness tools */}
+        {!isPremium ? (
+          <Card>
+            <CardContent className="p-8 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-4">
+                <Lock className="h-8 w-8 text-amber-500" />
+              </div>
+              <h2 className="text-xl font-semibold mb-2">
+                {lang === 'hi' ? 'प्रीमियम आवश्यक' :
+                 lang === 'es' ? 'Se requiere Premium' :
+                 lang === 'fr' ? 'Premium requis' :
+                 lang === 'de' ? 'Premium erforderlich' :
+                 lang === 'pt' ? 'Premium necessário' :
+                 lang === 'zh' ? '需要高级版' :
+                 lang === 'ja' ? 'プレミアムが必要です' :
+                 'Premium Required'}
+              </h2>
+              <p className="text-muted-foreground mb-6 max-w-sm">
+                {lang === 'hi' ? 'वेलनेस टूल्स का उपयोग करने के लिए प्रीमियम अपग्रेड करें। सांस लेने के व्यायाम, ग्राउंडिंग तकनीक, ध्वनियां और बहुत कुछ अनलॉक करें।' :
+                 lang === 'es' ? 'Actualiza a premium para acceder a las herramientas de bienestar. Desbloquea ejercicios de respiración, técnicas de conexión, sonidos y más.' :
+                 lang === 'fr' ? 'Passez à premium pour accéder aux outils de bien-être. Débloquez des exercices de respiration, des techniques d\'ancrage, des sons et plus encore.' :
+                 lang === 'de' ? 'Upgrade auf Premium, um auf Wellness-Tools zuzugreifen. Schalten Sie Atemübungen, Erdungstechniken, Klänge und mehr frei.' :
+                 lang === 'pt' ? 'Atualize para premium para acessar ferramentas de bem-estar. Desbloqueie exercícios de respiração, técnicas de ancoragem, sons e muito mais.' :
+                 lang === 'zh' ? '升级到高级版以访问健康工具。解锁呼吸练习、接地技术、声音等。' :
+                 lang === 'ja' ? 'プレミアムにアップグレードしてウェルネスツールにアクセスしてください。呼吸エクササイズ、グラウンディングテクニック、サウンドなどをアンロックしてください。' :
+                 'Upgrade to premium to access wellness tools. Unlock breathing exercises, grounding techniques, sounds, and more.'}
+              </p>
+              <Button onClick={onShowPremium} className="gap-2">
+                <Lock className="h-4 w-4" />
+                {lang === 'hi' ? 'प्रीमियम में अपग्रेड करें' :
+                 lang === 'es' ? 'Actualizar a Premium' :
+                 lang === 'fr' ? 'Passer à Premium' :
+                 lang === 'de' ? 'Auf Premium upgraden' :
+                 lang === 'pt' ? 'Atualizar para Premium' :
+                 lang === 'zh' ? '升级到高级版' :
+                 lang === 'ja' ? 'プレミアムにアップグレード' :
+                 'Upgrade to Premium'}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+        <>
         {activeTab === 'breathing' && (
           <Card><CardContent className="p-6 flex flex-col items-center">
             <h2 className="text-lg font-medium mb-4">{t('breathing')} (4-7-8)</h2>
@@ -465,6 +507,8 @@ export function ToolsPage({ onShowPremium }: ToolsPageProps) {
             <h2 className="text-lg font-medium mb-4">{t('games')}</h2>
             <MentalWellnessGames onShowPremium={onShowPremium} />
           </div>
+        )}
+        </>
         )}
       </main>
     </div>
