@@ -5,6 +5,17 @@ interface ChatMessage {
   content: string;
 }
 
+// Generate or retrieve a persistent session ID for tracking
+const getSessionId = (): string => {
+  const STORAGE_KEY = 'guest_session_id';
+  let sessionId = localStorage.getItem(STORAGE_KEY);
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem(STORAGE_KEY, sessionId);
+  }
+  return sessionId;
+};
+
 export const guestChatService = {
   async sendMessage(messages: ChatMessage[]): Promise<string> {
     const response = await fetch(GUEST_CHAT_URL, {
@@ -12,6 +23,7 @@ export const guestChatService = {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        'x-session-id': getSessionId(),
       },
       body: JSON.stringify({ messages }),
     });

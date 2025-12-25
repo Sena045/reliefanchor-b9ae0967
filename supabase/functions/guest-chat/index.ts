@@ -1,9 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-id',
 };
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
 
 const getSystemPrompt = () => {
   return `You are Anya, a compassionate and supportive mental health companion. 
@@ -86,6 +92,44 @@ serve(async (req) => {
     }
 
     console.log(`Guest chat request with ${userMessages.length} user messages`);
+
+    // Track guest trial usage
+    const sessionId = req.headers.get('x-session-id') || crypto.randomUUID();
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+    const userAgent = req.headers.get('user-agent') || null;
+
+    try {
+      // Check if session exists
+      const { data: existing } = await supabase
+        .from('guest_trials')
+        .select('id, messages_sent')
+        .eq('session_id', sessionId)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing session
+        await supabase
+          .from('guest_trials')
+          .update({ 
+            messages_sent: existing.messages_sent + 1,
+            last_message_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+      } else {
+        // Create new session
+        await supabase
+          .from('guest_trials')
+          .insert({
+            session_id: sessionId,
+            messages_sent: 1,
+            ip_address: ipAddress,
+            user_agent: userAgent
+          });
+      }
+    } catch (trackError) {
+      console.error("Error tracking guest trial:", trackError);
+      // Don't fail the request if tracking fails
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
