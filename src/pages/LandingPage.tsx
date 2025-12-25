@@ -428,6 +428,43 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="px-4 py-16" aria-labelledby="testimonials-heading">
+        <div className="max-w-4xl mx-auto">
+          <h2 id="testimonials-heading" className="text-2xl md:text-3xl font-bold text-center mb-12">
+            What People Are Saying
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="border-primary/10 bg-gradient-to-br from-background to-primary/5">
+              <CardContent className="p-6">
+                <p className="text-muted-foreground italic mb-4">
+                  "I use Relief Anchor every day—it only takes 5 minutes, and I feel more focused and relaxed."
+                </p>
+                <p className="text-sm font-semibold text-primary">— Arindam, Founder</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-primary/10 bg-gradient-to-br from-background to-primary/5">
+              <CardContent className="p-6">
+                <p className="text-muted-foreground italic mb-4">
+                  "I tried Relief Anchor and it helped me calm my mind during a stressful day."
+                </p>
+                <p className="text-sm font-semibold text-primary">— A., Friend</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-primary/10 bg-gradient-to-br from-background to-primary/5">
+              <CardContent className="p-6">
+                <p className="text-muted-foreground italic mb-4">
+                  "Guided relaxation exercises like those in Relief Anchor are proven to reduce stress and improve focus."
+                </p>
+                <p className="text-sm font-semibold text-primary">— Wellness Expert</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Email Capture Section */}
       <section className="px-4 py-16 bg-primary/5" aria-labelledby="newsletter-heading">
