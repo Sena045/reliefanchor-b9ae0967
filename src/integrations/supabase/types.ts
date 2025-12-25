@@ -83,6 +83,36 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_trials: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          last_message_at: string
+          messages_sent: number
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          last_message_at?: string
+          messages_sent?: number
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          last_message_at?: string
+          messages_sent?: number
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string
