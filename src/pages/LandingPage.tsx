@@ -266,6 +266,15 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
   return (
     <main ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5" role="main">
+      {/* Free trial banner */}
+      <div className="bg-gradient-to-r from-primary via-primary/90 to-primary py-3 px-4 text-center">
+        <p className="text-sm font-medium text-primary-foreground flex items-center justify-center gap-2">
+          <Sparkles className="h-4 w-4" aria-hidden="true" />
+          Start your 7-day free trial—no credit card required!
+          <Sparkles className="h-4 w-4" aria-hidden="true" />
+        </p>
+      </div>
+
       {/* Warm welcome message */}
       <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b border-primary/10 py-3 px-4 text-center animate-fade-in">
         <p className="text-sm text-muted-foreground/80 italic animate-[fade-in_1.5s_ease-out]">
