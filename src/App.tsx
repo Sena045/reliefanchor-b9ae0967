@@ -21,6 +21,7 @@ const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ defa
 const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ default: m.PremiumPage })));
 const PressKitPage = lazy(() => import('@/pages/PressKitPage').then(m => ({ default: m.PressKitPage })));
 const AboutPage = lazy(() => import('@/pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const LegalPage = lazy(() => import('@/pages/LegalPage').then(m => ({ default: m.LegalPage })));
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -30,6 +31,7 @@ function AppContent() {
   const [showPressKit, setShowPressKit] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showGuestChat, setShowGuestChat] = useState(false);
+  const [showLegal, setShowLegal] = useState<'privacy' | 'terms' | null>(null);
 
   const isRecoveryUrl =
     typeof window !== 'undefined' &&
@@ -44,6 +46,10 @@ function AppContent() {
   const isTryChatUrl = typeof window !== 'undefined' && 
     (window.location.pathname === '/try' || window.location.pathname === '/try-chat');
 
+  // Check for legal page URLs
+  const isPrivacyUrl = typeof window !== 'undefined' && window.location.pathname === '/privacy';
+  const isTermsUrl = typeof window !== 'undefined' && window.location.pathname === '/terms';
+
   if (authLoading) {
     return <SplashLoader />;
   }
@@ -51,6 +57,24 @@ function AppContent() {
   // Show AuthPage for password recovery even if user is logged in
   if (isPasswordRecovery || isRecoveryUrl) {
     return <AuthPage />;
+  }
+
+  // Show legal pages (accessible with or without login)
+  if (showLegal || isPrivacyUrl || isTermsUrl) {
+    const tab = showLegal || (isPrivacyUrl ? 'privacy' : 'terms');
+    return (
+      <Suspense fallback={<SplashLoader />}>
+        <LegalPage 
+          initialTab={tab} 
+          onClose={() => {
+            setShowLegal(null);
+            if (isPrivacyUrl || isTermsUrl) {
+              window.history.pushState({}, '', '/');
+            }
+          }} 
+        />
+      </Suspense>
+    );
   }
 
   // Not logged in
