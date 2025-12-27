@@ -291,14 +291,6 @@ export function AuthPage() {
                     ? 'Welcome back! Sign in to continue.' 
                     : 'Create an account to get started.'}
             </CardDescription>
-            {!isLogin && !isForgotPassword && !showReset && (
-              <div className="flex items-center justify-center gap-2 mt-3 px-4 py-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
-                <Gift className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                  7 days free premium trial included!
-                </span>
-              </div>
-            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -582,6 +574,14 @@ export function AuthPage() {
                 >
                   {isLogin ? "Don't have an account? Create one" : 'Already have an account? Sign in'}
                 </button>
+                {isLogin && (
+                  <div className="flex items-center justify-center gap-2 mt-3 px-4 py-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                    <Gift className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                      7 days free premium trial included!
+                    </span>
+                  </div>
+                )}
               </div>
             </>
           )}
