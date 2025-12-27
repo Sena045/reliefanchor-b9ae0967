@@ -270,7 +270,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       <div className="bg-gradient-to-r from-primary via-primary/90 to-primary py-3 px-4 text-center">
         <p className="text-sm font-medium text-primary-foreground flex items-center justify-center gap-2">
           <Sparkles className="h-4 w-4" aria-hidden="true" />
-          Start your 7-day free trial—no credit card required!
+          Start your 7-day free trial today!
           <Sparkles className="h-4 w-4" aria-hidden="true" />
         </p>
       </div>
