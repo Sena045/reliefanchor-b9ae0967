@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Trash2, Send, Sun, Moon, Monitor } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Trash2, Send, Sun, Moon, Monitor, UserX } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -95,6 +95,15 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
           <Button variant="outline" size="sm" onClick={signOut} className="w-full">
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => window.location.href = '/delete-account'}
+            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <UserX className="h-4 w-4 mr-2" />
+            Delete Account
           </Button>
         </CardContent>
       </Card>
