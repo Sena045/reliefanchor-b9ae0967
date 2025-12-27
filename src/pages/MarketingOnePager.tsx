@@ -43,7 +43,7 @@ export function MarketingOnePager({ onClose }: MarketingOnePagerProps) {
         <section className="mb-8">
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 print:bg-gray-100 rounded-xl p-6 text-center">
             <h2 className="text-2xl font-bold mb-3 text-gray-900">
-              When your mind feels full, this is your quiet corner
+              A private space to organize your thoughts and emotions
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto">
               A self-guided wellbeing app for people experiencing stress, overthinking, or emotional overload. 
