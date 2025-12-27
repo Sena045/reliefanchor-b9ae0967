@@ -538,6 +538,22 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           )}
           <span aria-hidden="true">•</span>
           <a 
+            href="/privacy"
+            className="hover:text-primary transition-colors"
+            aria-label="View privacy policy"
+          >
+            Privacy
+          </a>
+          <span aria-hidden="true">•</span>
+          <a 
+            href="/terms"
+            className="hover:text-primary transition-colors"
+            aria-label="View terms of service"
+          >
+            Terms
+          </a>
+          <span aria-hidden="true">•</span>
+          <a 
             href="mailto:arindamsen.2024@outlook.com"
             className="hover:text-primary transition-colors flex items-center gap-1"
             aria-label="Contact us via email"
