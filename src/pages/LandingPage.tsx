@@ -287,7 +287,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
       {/* Hero Section */}
       <header className="px-4 pt-8 pb-8 text-center max-w-4xl mx-auto" aria-label="Welcome to ReliefAnchor">
         <h1 className="text-2xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          When your mind feels full, this is your quiet corner
+          A private space to organize your thoughts and emotions
         </h1>
         
         <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
