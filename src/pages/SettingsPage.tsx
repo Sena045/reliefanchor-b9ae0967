@@ -96,15 +96,6 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => window.location.href = '/delete-account'}
-            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <UserX className="h-4 w-4 mr-2" />
-            Delete Account
-          </Button>
         </CardContent>
       </Card>
 
@@ -287,6 +278,30 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
               {submittingFeedback ? 'Sending...' : 'Submit Feedback'}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Delete Account */}
+      <Card className="border-destructive/30">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2 text-destructive">
+            <UserX className="h-4 w-4" />
+            Danger Zone
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-3">
+            Once you delete your account, there is no going back. Please be certain.
+          </p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => window.location.href = '/delete-account'}
+            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+          >
+            <UserX className="h-4 w-4 mr-2" />
+            Delete Account
+          </Button>
         </CardContent>
       </Card>
     </div>
