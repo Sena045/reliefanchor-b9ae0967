@@ -34,14 +34,15 @@ export function NotificationSettings() {
     reminderTime: '09:00',
     lastScheduled: null,
   });
-  const [isSupported, setIsSupported] = useState(true);
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default');
 
   useEffect(() => {
-    // Check support
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      setIsSupported(false);
-      return;
+    // Check if notifications are supported but don't block UI
+    const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator;
+    
+    if (!notificationsSupported) {
+      // Still allow the UI to render, just won't actually send notifications
+      console.log('Push notifications not fully supported, but UI remains enabled');
     }
 
     setPermissionStatus(Notification.permission);
@@ -196,24 +197,6 @@ export function NotificationSettings() {
       });
     }
   };
-
-  if (!isSupported) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Push notifications are not supported on this device/browser.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
