@@ -22,6 +22,7 @@ const PremiumPage = lazy(() => import('@/pages/PremiumPage').then(m => ({ defaul
 const PressKitPage = lazy(() => import('@/pages/PressKitPage').then(m => ({ default: m.PressKitPage })));
 const AboutPage = lazy(() => import('@/pages/AboutPage').then(m => ({ default: m.AboutPage })));
 const LegalPage = lazy(() => import('@/pages/LegalPage').then(m => ({ default: m.LegalPage })));
+const DeleteAccountPage = lazy(() => import('@/pages/DeleteAccountPage').then(m => ({ default: m.DeleteAccountPage })));
 
 function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
@@ -49,6 +50,7 @@ function AppContent() {
   // Check for legal page URLs
   const isPrivacyUrl = typeof window !== 'undefined' && window.location.pathname === '/privacy';
   const isTermsUrl = typeof window !== 'undefined' && window.location.pathname === '/terms';
+  const isDeleteAccountUrl = typeof window !== 'undefined' && window.location.pathname === '/delete-account';
 
   if (authLoading) {
     return <SplashLoader />;
@@ -57,6 +59,20 @@ function AppContent() {
   // Show AuthPage for password recovery even if user is logged in
   if (isPasswordRecovery || isRecoveryUrl) {
     return <AuthPage />;
+  }
+
+  // Show delete account page (accessible with or without login)
+  if (isDeleteAccountUrl) {
+    return (
+      <Suspense fallback={<SplashLoader />}>
+        <DeleteAccountPage 
+          onClose={() => {
+            window.history.pushState({}, '', '/');
+            window.location.reload();
+          }} 
+        />
+      </Suspense>
+    );
   }
 
   // Show legal pages (accessible with or without login)
