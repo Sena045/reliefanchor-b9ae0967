@@ -11,7 +11,7 @@ import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { GuestChatPage } from '@/pages/GuestChatPage';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
-
+import { InstallAppPrompt } from '@/components/InstallAppPrompt';
 // Lazy load pages for better initial load performance
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const ChatPage = lazy(() => import('@/pages/ChatPage').then(m => ({ default: m.ChatPage })));
@@ -179,6 +179,7 @@ export default function App() {
         <AuthenticatedApp />
         <Toaster />
         <UpdatePrompt />
+        <InstallAppPrompt />
       </AuthProvider>
     </ThemeProvider>
   );
