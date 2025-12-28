@@ -344,6 +344,39 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             </p>
           </div>
         )}
+
+        {/* Install App CTA - Mobile */}
+        {browserInfo.isMobile && !browserInfo.isStandalone && (
+          <div className="w-full max-w-sm mx-auto mb-4">
+            {installPrompt ? (
+              <Button 
+                variant="outline"
+                size="lg"
+                onClick={handleInstall}
+                className="w-full text-base border-primary/30 hover:bg-primary/5"
+                aria-label="Install app to home screen"
+              >
+                <Smartphone className="h-4 w-4 mr-2 text-primary" />
+                Install App
+              </Button>
+            ) : (
+              <div className="bg-primary/5 rounded-lg p-3 border border-primary/10">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {(() => {
+                    const instructions = getInstallInstructions();
+                    const IconComponent = instructions.icon;
+                    return (
+                      <>
+                        <IconComponent className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span>{instructions.shortText}</span>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
           <Shield className="h-3 w-3 text-green-600" aria-hidden="true" />
