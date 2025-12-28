@@ -81,7 +81,15 @@ export function LegalPage({ onClose, initialTab = 'privacy' }: LegalPageProps) {
                   <ul className="list-disc pl-6 text-muted-foreground space-y-1">
                     <li>Access your personal data</li>
                     <li>Export your data at any time</li>
-                    <li>Delete your account and all associated data</li>
+                    <li>
+                      Delete your account and all associated data – 
+                      <a 
+                        href="/delete-account" 
+                        className="text-primary hover:underline ml-1"
+                      >
+                        Request deletion here
+                      </a>
+                    </li>
                     <li>Opt-out of notifications</li>
                   </ul>
                 </section>
