@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Mail, Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles, User } from 'lucide-react';
+import { Mail, Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -388,110 +388,6 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
           Premium is optional and adds deeper insights and extended tools.
         </p>
       </header>
-
-      {/* Demo Conversation Preview */}
-      <section className="px-4 py-12 bg-gradient-to-b from-background to-muted/30" aria-labelledby="demo-heading">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 id="demo-heading" className="text-2xl md:text-3xl font-bold mb-3">
-              See What Talking to Anya Feels Like
-            </h2>
-            <p className="text-muted-foreground">
-              A glimpse of how Anya responds with care and understanding
-            </p>
-          </div>
-
-          <div className="bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
-            {/* Chat Header */}
-            <div className="bg-primary/10 px-4 py-3 flex items-center gap-3 border-b border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm">Anya</p>
-                <p className="text-xs text-muted-foreground">Your wellness companion</p>
-              </div>
-            </div>
-
-            {/* Demo Messages */}
-            <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
-              {/* User message */}
-              <div className="flex justify-end">
-                <div className="flex items-end gap-2 max-w-[85%]">
-                  <div className="bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3">
-                    <p className="text-sm">I've been feeling really overwhelmed lately. Work has been stressful and I can't seem to relax.</p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Anya response */}
-              <div className="flex justify-start">
-                <div className="flex items-end gap-2 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
-                    <p className="text-sm text-foreground">I hear you, and I'm glad you're sharing this with me. Feeling overwhelmed by work is something many people experience, and it's completely valid to feel this way. 💙</p>
-                    <p className="text-sm text-foreground mt-2">When stress builds up, it can feel like there's no escape. Would you like to try a quick breathing exercise together? Sometimes just 2 minutes of focused breathing can help create a small moment of calm.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* User follow-up */}
-              <div className="flex justify-end">
-                <div className="flex items-end gap-2 max-w-[85%]">
-                  <div className="bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3">
-                    <p className="text-sm">Yes, I'd like to try that.</p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Anya breathing guide */}
-              <div className="flex justify-start">
-                <div className="flex items-end gap-2 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
-                    <p className="text-sm text-foreground">Let's do this together. Find a comfortable position and when you're ready:</p>
-                    <ul className="text-sm text-foreground mt-2 space-y-1">
-                      <li>• Breathe in slowly for 4 seconds...</li>
-                      <li>• Hold gently for 4 seconds...</li>
-                      <li>• Breathe out for 6 seconds...</li>
-                    </ul>
-                    <p className="text-sm text-foreground mt-2">Take your time. I'm here with you. 🌿</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA at bottom of chat */}
-            <div className="bg-muted/50 px-4 py-4 border-t border-border">
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <p className="text-sm text-muted-foreground text-center sm:text-left flex-1">
-                  Ready to start your own conversation?
-                </p>
-                {onTryChat && (
-                  <Button 
-                    onClick={onTryChat} 
-                    className="w-full sm:w-auto"
-                    aria-label="Start chatting with Anya"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Talk to Anya Now
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* How It Works Section */}
       <section className="px-4 py-12 bg-muted/30" aria-labelledby="how-it-works-heading">
