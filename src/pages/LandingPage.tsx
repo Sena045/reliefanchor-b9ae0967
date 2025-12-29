@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react';
-import { Mail, Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles } from 'lucide-react';
+import { Mail, Heart, MessageCircle, Brain, Gamepad2, Shield, Globe, ArrowRight, Check, Download, Share, Bookmark, Smartphone, Zap, Sparkles, Anchor } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -265,6 +265,16 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
 
   return (
     <main ref={ref} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5" role="main">
+      {/* Header with logo */}
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border/50 py-3 px-4">
+        <div className="max-w-7xl mx-auto flex items-center">
+          <div className="flex items-center gap-2">
+            <Anchor className="h-6 w-6 text-primary" aria-hidden="true" />
+            <span className="text-lg font-semibold text-foreground">Relief Anchor</span>
+          </div>
+        </div>
+      </header>
+
       {/* Free trial banner */}
       <div className="bg-gradient-to-r from-primary via-primary/90 to-primary py-3 px-4 text-center">
         <p className="text-sm font-medium text-primary-foreground flex items-center justify-center gap-2">
