@@ -172,10 +172,39 @@
     <link rel="preload" href="/favicon.png" as="image" type="image/png" />
     <link rel="preload" href="/icon-192.png" as="image" type="image/png" />
     
+    <!-- Preconnect for faster API calls -->
+    <link rel="preconnect" href="https://urbllfogetzvckloyrld.supabase.co" />
+    
     <!-- DNS Prefetch for External Resources -->
     <link rel="dns-prefetch" href="https://urbllfogetzvckloyrld.supabase.co" />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    
+    <!-- Critical CSS for instant splash screen -->
+    <style>
+      #root:empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #f5f9f9;
+      }
+      #root:empty::before {
+        content: '';
+        width: 64px;
+        height: 64px;
+        border: 3px solid #14b8a6;
+        border-radius: 50%;
+        animation: splash-pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes splash-pulse {
+        0%, 100% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1); opacity: 1; }
+      }
+      @media (prefers-color-scheme: dark) {
+        #root:empty { background: #0f1a1a; }
+      }
+    </style>
     
     <!-- Fonts - Optimized with display=swap and preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

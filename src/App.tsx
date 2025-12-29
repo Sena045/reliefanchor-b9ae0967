@@ -4,15 +4,16 @@ import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { AppProvider } from '@/context/AppContext';
 import { Layout } from '@/components/layout/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { AuthPage } from '@/pages/AuthPage';
-import { LandingPage } from '@/pages/LandingPage';
 import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
-import { GuestChatPage } from '@/pages/GuestChatPage';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
 import { InstallAppPrompt } from '@/components/InstallAppPrompt';
-// Lazy load pages for better initial load performance
+
+// Lazy load ALL pages for faster initial load
+const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ default: m.LandingPage })));
+const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })));
+const GuestChatPage = lazy(() => import('@/pages/GuestChatPage').then(m => ({ default: m.GuestChatPage })));
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
 const ChatPage = lazy(() => import('@/pages/ChatPage').then(m => ({ default: m.ChatPage })));
 const MoodPage = lazy(() => import('@/pages/MoodPage').then(m => ({ default: m.MoodPage })));
@@ -58,7 +59,11 @@ function AppContent() {
 
   // Show AuthPage for password recovery even if user is logged in
   if (isPasswordRecovery || isRecoveryUrl) {
-    return <AuthPage />;
+    return (
+      <Suspense fallback={<SplashLoader />}>
+        <AuthPage />
+      </Suspense>
+    );
   }
 
   // Show delete account page (accessible with or without login)
@@ -97,7 +102,11 @@ function AppContent() {
   if (!user) {
     // Show guest chat trial (via state or URL)
     if (showGuestChat || isTryChatUrl) {
-      return <GuestChatPage onSignUp={() => { setShowGuestChat(false); setShowAuth(true); }} />;
+      return (
+        <Suspense fallback={<SplashLoader />}>
+          <GuestChatPage onSignUp={() => { setShowGuestChat(false); setShowAuth(true); }} />
+        </Suspense>
+      );
     }
     // Show about page
     if (showAbout) {
@@ -117,16 +126,22 @@ function AppContent() {
     }
     // Show auth page if explicitly requested or has referral code
     if (showAuth || hasReferralCode) {
-      return <AuthPage />;
+      return (
+        <Suspense fallback={<SplashLoader />}>
+          <AuthPage />
+        </Suspense>
+      );
     }
     // Show landing page by default
     return (
-      <LandingPage 
-        onGetStarted={() => setShowAuth(true)} 
-        onTryChat={() => setShowGuestChat(true)}
-        onShowPressKit={() => setShowPressKit(true)}
-        onShowAbout={() => setShowAbout(true)}
-      />
+      <Suspense fallback={<SplashLoader />}>
+        <LandingPage 
+          onGetStarted={() => setShowAuth(true)} 
+          onTryChat={() => setShowGuestChat(true)}
+          onShowPressKit={() => setShowPressKit(true)}
+          onShowAbout={() => setShowAbout(true)}
+        />
+      </Suspense>
     );
   }
 
