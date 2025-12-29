@@ -594,7 +594,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
             Contact Us
           </a>
           <span aria-hidden="true">•</span>
-          <span>Made with ❤️ for your mental wellness</span>
+          <span>Made with ❤️ for your wellbeing</span>
         </nav>
       </footer>
 
