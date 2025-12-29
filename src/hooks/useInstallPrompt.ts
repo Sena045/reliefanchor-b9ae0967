@@ -1,78 +1,111 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+type InstallPromptState = {
+  deferredPrompt: BeforeInstallPromptEvent | null;
+  isInstallable: boolean;
+  isInstalled: boolean;
+};
+
+let globalState: InstallPromptState = {
+  deferredPrompt: null,
+  isInstallable: false,
+  isInstalled: false,
+};
+
+let listenersInitialized = false;
+const subscribers = new Set<(s: InstallPromptState) => void>();
+
+function setGlobalState(next: Partial<InstallPromptState>) {
+  globalState = { ...globalState, ...next };
+  subscribers.forEach((fn) => fn(globalState));
+}
+
+function detectInstalledOnce() {
+  // Check if already installed (standalone mode)
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    setGlobalState({ isInstalled: true, isInstallable: false, deferredPrompt: null });
+    return;
+  }
+
+  // iOS standalone
+  if ((navigator as any).standalone === true) {
+    setGlobalState({ isInstalled: true, isInstallable: false, deferredPrompt: null });
+  }
+}
+
+function ensureListeners() {
+  if (listenersInitialized) return;
+  listenersInitialized = true;
+
+  detectInstalledOnce();
+
+  const handleBeforeInstallPrompt = (e: Event) => {
+    // Allow us to show our own UI
+    e.preventDefault();
+    setGlobalState({ deferredPrompt: e as BeforeInstallPromptEvent, isInstallable: true });
+  };
+
+  const handleAppInstalled = () => {
+    setGlobalState({ isInstalled: true, isInstallable: false, deferredPrompt: null });
+  };
+
+  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  window.addEventListener('appinstalled', handleAppInstalled);
+}
+
 export function useInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [state, setState] = useState<InstallPromptState>(globalState);
 
   useEffect(() => {
-    // Check if already installed (standalone mode)
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-      return;
-    }
+    ensureListeners();
 
-    // Check if running in iOS standalone
-    if ((navigator as any).standalone === true) {
-      setIsInstalled(true);
-      return;
-    }
+    // Keep local state in sync with the shared global state
+    const sub = (s: InstallPromptState) => setState(s);
+    subscribers.add(sub);
 
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setIsInstallable(true);
-    };
-
-    const handleAppInstalled = () => {
-      setIsInstalled(true);
-      setIsInstallable(false);
-      setDeferredPrompt(null);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    // In case install state changed between imports/mounts
+    detectInstalledOnce();
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      subscribers.delete(sub);
     };
   }, []);
 
   const promptInstall = useCallback(async () => {
-    if (!deferredPrompt) return false;
+    if (!globalState.deferredPrompt) return false;
 
     try {
-      await deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
+      await globalState.deferredPrompt.prompt();
+      const { outcome } = await globalState.deferredPrompt.userChoice;
+
       if (outcome === 'accepted') {
-        setIsInstalled(true);
-        setIsInstallable(false);
+        setGlobalState({ isInstalled: true, isInstallable: false });
       }
-      
-      setDeferredPrompt(null);
+
+      // Chrome won't let us reuse the prompt; clear it either way
+      setGlobalState({ deferredPrompt: null });
       return outcome === 'accepted';
     } catch (error) {
       console.error('Install prompt error:', error);
       return false;
     }
-  }, [deferredPrompt]);
+  }, []);
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   return {
-    isInstallable,
-    isInstalled,
+    isInstallable: state.isInstallable,
+    isInstalled: state.isInstalled,
     promptInstall,
     isIOS,
     isSafari,
-    showIOSInstructions: isIOS && !isInstalled,
+    showIOSInstructions: isIOS && !state.isInstalled,
   };
 }
+
