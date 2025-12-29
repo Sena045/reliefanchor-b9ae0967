@@ -5,6 +5,16 @@ import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 
 export function InstallAppPrompt() {
   const [dismissed, setDismissed] = useState(() => {
+    // Reset dismissed state after 7 days to re-show prompt
+    const dismissedAt = localStorage.getItem('install-prompt-dismissed-at');
+    if (dismissedAt) {
+      const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismissed > 7) {
+        localStorage.removeItem('install-prompt-dismissed');
+        localStorage.removeItem('install-prompt-dismissed-at');
+        return false;
+      }
+    }
     return localStorage.getItem('install-prompt-dismissed') === 'true';
   });
   
@@ -13,6 +23,7 @@ export function InstallAppPrompt() {
   const handleDismiss = () => {
     setDismissed(true);
     localStorage.setItem('install-prompt-dismissed', 'true');
+    localStorage.setItem('install-prompt-dismissed-at', Date.now().toString());
   };
 
   const handleInstall = async () => {
