@@ -10,14 +10,16 @@ self.addEventListener('message', (event) => {
   }
 });
 
-const CACHE_NAME = 'reliefanchor-runtime-v6';
+const CACHE_NAME = 'reliefanchor-runtime-v7';
 
+// Core assets that should be cached for offline/instant loading
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/favicon.png',
 ];
 
 self.addEventListener('install', (event) => {
