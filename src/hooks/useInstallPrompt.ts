@@ -11,17 +11,20 @@ type InstallPromptState = {
   isInstalled: boolean;
 };
 
-let globalState: InstallPromptState = {
+const DEFAULT_STATE: InstallPromptState = {
   deferredPrompt: null,
   isInstallable: false,
   isInstalled: false,
 };
 
+let globalState: InstallPromptState = DEFAULT_STATE;
 let listenersInitialized = false;
 const subscribers = new Set<(s: InstallPromptState) => void>();
 
 function setGlobalState(next: Partial<InstallPromptState>) {
-  globalState = { ...globalState, ...next };
+  // Guard against HMR/module edge cases where globalState could be reset unexpectedly.
+  const base = globalState ?? DEFAULT_STATE;
+  globalState = { ...base, ...next };
   subscribers.forEach((fn) => fn(globalState));
 }
 
@@ -59,17 +62,24 @@ function ensureListeners() {
 }
 
 export function useInstallPrompt() {
-  const [state, setState] = useState<InstallPromptState>(globalState);
+  const [state, setState] = useState<InstallPromptState>(() => globalState ?? DEFAULT_STATE);
 
   useEffect(() => {
     ensureListeners();
 
     // Keep local state in sync with the shared global state
-    const sub = (s: InstallPromptState) => setState(s);
+    const sub = (s: InstallPromptState) => {
+      if (!s) return;
+      setState(s);
+    };
+
     subscribers.add(sub);
 
     // In case install state changed between imports/mounts
     detectInstalledOnce();
+
+    // Also sync immediately after subscribing
+    setState(globalState ?? DEFAULT_STATE);
 
     return () => {
       subscribers.delete(sub);
@@ -77,11 +87,12 @@ export function useInstallPrompt() {
   }, []);
 
   const promptInstall = useCallback(async () => {
-    if (!globalState.deferredPrompt) return false;
+    const prompt = globalState?.deferredPrompt;
+    if (!prompt) return false;
 
     try {
-      await globalState.deferredPrompt.prompt();
-      const { outcome } = await globalState.deferredPrompt.userChoice;
+      await prompt.prompt();
+      const { outcome } = await prompt.userChoice;
 
       if (outcome === 'accepted') {
         setGlobalState({ isInstalled: true, isInstallable: false });
@@ -96,16 +107,18 @@ export function useInstallPrompt() {
     }
   }, []);
 
+  const safe = state ?? globalState ?? DEFAULT_STATE;
+
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   return {
-    isInstallable: state.isInstallable,
-    isInstalled: state.isInstalled,
+    isInstallable: safe.isInstallable,
+    isInstalled: safe.isInstalled,
     promptInstall,
     isIOS,
     isSafari,
-    showIOSInstructions: isIOS && !state.isInstalled,
+    showIOSInstructions: isIOS && !safe.isInstalled,
   };
 }
 
