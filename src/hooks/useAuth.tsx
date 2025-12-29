@@ -114,6 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setIsPasswordRecovery(false);
     
+    // Reset theme to system default on logout
+    localStorage.removeItem('theme');
+    
     // Clear Supabase's local storage (no API call needed)
     try {
       await supabase.auth.signOut({ scope: 'local' });
