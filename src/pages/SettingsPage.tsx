@@ -31,17 +31,22 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
     // Clear any dismissed state to allow reinstall prompt
     localStorage.removeItem('install-prompt-dismissed');
     localStorage.removeItem('install-prompt-dismissed-at');
-    
+
     const success = await promptInstall();
+
     if (success) {
       toast({ title: 'App installed successfully!' });
-    } else if (!showIOSInstructions) {
-      toast({ 
-        title: 'Installation not available', 
-        description: 'Try opening the app in Chrome browser to install.',
-        variant: 'destructive' 
-      });
+      return;
     }
+
+    // iOS uses the on-screen instructions
+    if (showIOSInstructions) return;
+
+    // If Chrome didn't give us a prompt, guide user to the browser menu install.
+    toast({
+      title: 'Install from Chrome menu',
+      description: "Tap ⋮ (top-right) → 'Install app' / 'Add to Home screen'.",
+    });
   };
 
   // Prevent hydration mismatch
@@ -152,10 +157,9 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
                   onClick={handleInstall}
                   size="sm" 
                   className="w-full"
-                  disabled={!isInstallable}
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  {isInstallable ? 'Install App' : 'Open in Chrome to Install'}
+                  {isInstallable ? 'Install App' : 'How to install'}
                 </Button>
               </div>
             )}
