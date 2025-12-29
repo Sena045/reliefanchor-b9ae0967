@@ -270,7 +270,7 @@ export const LandingPage = forwardRef<HTMLDivElement, LandingPageProps>(function
         <div className="max-w-7xl mx-auto flex items-center">
           <div className="flex items-center gap-2">
             <Anchor className="h-6 w-6 text-primary" aria-hidden="true" />
-            <span className="text-lg font-semibold text-foreground">Relief Anchor</span>
+            <span className="text-lg font-semibold text-foreground">Relief Anchor Lovable</span>
           </div>
         </div>
       </header>
