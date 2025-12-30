@@ -6,7 +6,14 @@ import { useTranslation } from '@/lib/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { razorpayService, PRICING, PlanType } from '@/services/razorpayService';
+import { 
+  initiatePayment, 
+  PRICING, 
+  PlanType, 
+  isNativeAndroid, 
+  initializeBilling,
+  getGooglePlayPrice 
+} from '@/services/billingService';
 import { cn } from '@/lib/utils';
 
 interface PremiumPageProps { onClose: () => void; }
@@ -29,8 +36,14 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
   const [plan, setPlan] = useState<PlanType>('yearly');
   
-  // Detect user's country on mount using ipapi.co (supports HTTPS)
+  // Initialize billing and detect country on mount
   useEffect(() => {
+    // Initialize Google Play Billing if on Android
+    if (isNativeAndroid()) {
+      initializeBilling();
+    }
+    
+    // Detect user's country using ipapi.co
     fetch('https://ipapi.co/country/')
       .then(res => res.text())
       .then(countryCode => {
@@ -53,6 +66,16 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
     ? `Save $${(4.99 * 12 - 49.99).toFixed(0)}` 
     : `Save ₹${(149 * 12 - 1499)}`;
 
+  // Get display prices - use Google Play prices on Android if available
+  const getDisplayPrice = (plan: PlanType): string => {
+    if (isNativeAndroid()) {
+      const googlePrice = getGooglePlayPrice(plan);
+      if (googlePrice) return googlePrice;
+    }
+    const pricing = PRICING[plan][currency];
+    return `${pricing.symbol}${pricing.display}`;
+  };
+
   const handlePayment = async (selectedPlan: PlanType) => {
     if (!user) {
       toast({ title: 'Error', description: 'Please sign in first', variant: 'destructive' });
@@ -60,13 +83,13 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
     }
     
     setLoading(true);
-    await razorpayService.initiatePayment(
+    await initiatePayment(
       selectedPlan,
       currency,
       user.id,
       user.email || '',
       () => {
-        // Optimistic update - webhook will confirm
+        // Optimistic update - backend will confirm
         activatePremium(selectedPlan);
         toast({ 
           title: 'Payment Successful!', 
@@ -151,8 +174,8 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         <p className="text-muted-foreground">{t('unlockFeatures')}</p>
       </div>
       
-      {/* Currency Toggle - Only show if in India */}
-      {isIndia && (
+      {/* Currency Toggle - Only show if in India and not on Android */}
+      {isIndia && !isNativeAndroid() && (
         <div className="flex justify-center gap-2 mb-6">
           <Button 
             variant={currency === 'USD' ? 'default' : 'outline'} 
@@ -239,7 +262,7 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
           <>
-            Subscribe {plan === 'monthly' ? 'Monthly' : 'Yearly'} - {selectedPricing.symbol}{selectedPricing.display}
+            Subscribe {plan === 'monthly' ? 'Monthly' : 'Yearly'} - {getDisplayPrice(plan)}
           </>
         )}
       </Button>
