@@ -170,6 +170,14 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Mental Health Disclaimer */}
+      <div className="p-3 border border-muted rounded-lg bg-muted/30">
+        <p className="text-xs text-muted-foreground text-center leading-relaxed">
+          ReliefAnchor is a wellness tool and is not a substitute for professional mental health care. 
+          If you are in crisis, please contact emergency services or a mental health professional.
+        </p>
+      </div>
     </div>
   );
 }

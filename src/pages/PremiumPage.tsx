@@ -1,4 +1,4 @@
-import { Crown, Check, Loader2 } from 'lucide-react';
+import { Crown, Check, Loader2, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,6 +15,7 @@ import {
   getGooglePlayPrice 
 } from '@/services/billingService';
 import { cn } from '@/lib/utils';
+import { Capacitor } from '@capacitor/core';
 
 interface PremiumPageProps { onClose: () => void; }
 
@@ -123,6 +124,17 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const trialInfo = getTrialCountdown();
   const [showUpgrade, setShowUpgrade] = useState(false);
 
+  // Open Google Play subscription management
+  const openSubscriptionManagement = () => {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      // Deep link to Google Play subscription management
+      window.open('https://play.google.com/store/account/subscriptions', '_system');
+    } else {
+      // Web fallback - direct to Google Play
+      window.open('https://play.google.com/store/account/subscriptions', '_blank');
+    }
+  };
+
   if (isPremium && !showUpgrade) {
     return (
       <div className="p-4 max-w-lg mx-auto safe-top">
@@ -160,7 +172,18 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
               Upgrade Now
             </Button>
           )}
-          <Button variant="outline" onClick={onClose}>Back</Button>
+          
+          {/* Manage Subscription Link */}
+          <Button 
+            variant="outline" 
+            className="w-full mb-3 gap-2" 
+            onClick={openSubscriptionManagement}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Manage Subscription
+          </Button>
+          
+          <Button variant="ghost" onClick={onClose}>Back</Button>
         </Card>
       </div>
     );
@@ -266,7 +289,45 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
           </>
         )}
       </Button>
-      <Button variant="ghost" className="w-full mt-2" onClick={onClose}>Maybe later</Button>
+      
+      {/* Subscription Terms - Google Play Policy Compliance */}
+      <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+        <p className="text-xs text-muted-foreground text-center leading-relaxed">
+          {plan === 'monthly' 
+            ? `Subscription automatically renews monthly at ${getDisplayPrice('monthly')} unless cancelled.`
+            : `Subscription automatically renews yearly at ${getDisplayPrice('yearly')} unless cancelled.`
+          }
+          {' '}You can cancel anytime through{' '}
+          {isNativeAndroid() ? (
+            <button 
+              className="text-primary underline"
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('https://play.google.com/store/account/subscriptions', '_system');
+              }}
+            >
+              Google Play settings
+            </button>
+          ) : (
+            'your account settings'
+          )}
+          . By subscribing, you agree to our{' '}
+          <a href="/legal?tab=terms" className="text-primary underline">Terms of Service</a>
+          {' '}and{' '}
+          <a href="/legal?tab=privacy" className="text-primary underline">Privacy Policy</a>.
+        </p>
+      </div>
+      
+      {/* Mental Health Disclaimer */}
+      <div className="mt-3 p-3 border border-amber-500/30 bg-amber-500/5 rounded-lg">
+        <p className="text-xs text-amber-600 dark:text-amber-400 text-center leading-relaxed">
+          <strong>Important:</strong> ReliefAnchor is a wellness tool and is not a substitute for professional 
+          mental health care, diagnosis, or treatment. If you are in crisis, please contact emergency services 
+          or a mental health professional immediately.
+        </p>
+      </div>
+      
+      <Button variant="ghost" className="w-full mt-3" onClick={onClose}>Maybe later</Button>
     </div>
   );
 }

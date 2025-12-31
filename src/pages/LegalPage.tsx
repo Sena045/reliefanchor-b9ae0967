@@ -134,15 +134,27 @@ export function LegalPage({ onClose, initialTab = 'privacy' }: LegalPageProps) {
                 </section>
 
                 <section>
-                  <h3 className="text-lg font-semibold">3. Important Disclaimer</h3>
-                  <p className="text-muted-foreground font-medium text-amber-600 dark:text-amber-400">
-                    ReliefAnchor is NOT a substitute for professional mental health care. If you are experiencing 
-                    a mental health crisis, please contact emergency services or a mental health professional immediately.
-                  </p>
-                  <p className="text-muted-foreground mt-2">
-                    Our AI companion Anya is designed to provide supportive conversation but is not a licensed 
-                    therapist or counselor.
-                  </p>
+                  <h3 className="text-lg font-semibold">3. Important Mental Health Disclaimer</h3>
+                  <div className="p-4 border border-amber-500/30 bg-amber-500/10 rounded-lg my-3">
+                    <p className="text-amber-700 dark:text-amber-400 font-medium">
+                      ⚠️ ReliefAnchor is a wellness tool and is NOT a substitute for professional mental health care, 
+                      diagnosis, or treatment.
+                    </p>
+                  </div>
+                  <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-3">
+                    <li>Our AI companion Anya is designed to provide supportive conversation but is <strong>not</strong> a licensed therapist, counselor, or medical professional.</li>
+                    <li>This app does not provide medical advice, mental health diagnosis, or crisis intervention services.</li>
+                    <li>If you are experiencing a mental health crisis, suicidal thoughts, or need immediate help, please contact:
+                      <ul className="list-disc pl-6 mt-2 space-y-1">
+                        <li><strong>Emergency Services:</strong> Call 911 (US) or your local emergency number</li>
+                        <li><strong>National Suicide Prevention Lifeline:</strong> 988 (US)</li>
+                        <li><strong>Crisis Text Line:</strong> Text HOME to 741741 (US)</li>
+                        <li><strong>International Association for Suicide Prevention:</strong> https://www.iasp.info/resources/Crisis_Centres/</li>
+                      </ul>
+                    </li>
+                    <li>Always consult with a qualified healthcare provider for medical or mental health concerns.</li>
+                    <li>The app is intended for general wellness purposes only and should be used as a complement to, not a replacement for, professional care.</li>
+                  </ul>
                 </section>
 
                 <section>
@@ -159,10 +171,23 @@ export function LegalPage({ onClose, initialTab = 'privacy' }: LegalPageProps) {
                   <h3 className="text-lg font-semibold">5. Premium Subscription</h3>
                   <ul className="list-disc pl-6 text-muted-foreground space-y-1">
                     <li>Premium features require a paid subscription</li>
-                    <li>Subscriptions are billed monthly or annually</li>
-                    <li>You may cancel your subscription at any time</li>
-                    <li>Refunds are subject to our refund policy</li>
+                    <li>Subscriptions are billed monthly ($7.99/month or ₹249/month) or annually ($69.99/year or ₹1,999/year)</li>
+                    <li>Subscriptions automatically renew unless cancelled at least 24 hours before the end of the current period</li>
+                    <li>You may cancel your subscription at any time through Google Play Store settings</li>
+                    <li>Payment will be charged to your Google Play account at confirmation of purchase</li>
+                    <li>Refunds are handled by Google Play according to their refund policy</li>
+                    <li>To cancel: Open Google Play Store → Menu → Subscriptions → ReliefAnchor → Cancel</li>
                   </ul>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-semibold">6. Refund Policy</h3>
+                  <p className="text-muted-foreground">
+                    Refund requests are processed through Google Play. You may request a refund within 48 hours 
+                    of purchase by contacting Google Play support. After 48 hours, refunds are at our discretion 
+                    and may be granted for technical issues or billing errors. Contact us at support@reliefanchor.app 
+                    for assistance.
+                  </p>
                 </section>
 
                 <section>
