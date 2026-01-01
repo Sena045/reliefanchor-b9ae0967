@@ -30,6 +30,10 @@ class PushNotificationService {
   }
 
   async requestPermission(): Promise<NotificationPermission> {
+    if (typeof Notification === 'undefined') {
+      console.log('Notification API not available');
+      return 'denied';
+    }
     const permission = await Notification.requestPermission();
     return permission;
   }
@@ -135,7 +139,7 @@ class PushNotificationService {
   async showLocalNotification(title: string, options?: NotificationOptions): Promise<void> {
     if (!this.registration) return;
 
-    if (Notification.permission === 'granted') {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       await this.registration.showNotification(title, {
         icon: '/icon-192.png',
         badge: '/icon-192.png',
