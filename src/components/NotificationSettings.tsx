@@ -38,14 +38,15 @@ export function NotificationSettings() {
 
   useEffect(() => {
     // Check if notifications are supported but don't block UI
-    const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator;
+    const notificationsSupported = typeof Notification !== 'undefined' && 'serviceWorker' in navigator;
     
     if (!notificationsSupported) {
       // Still allow the UI to render, just won't actually send notifications
       console.log('Push notifications not fully supported, but UI remains enabled');
+      setPermissionStatus('default');
+    } else {
+      setPermissionStatus(Notification.permission);
     }
-
-    setPermissionStatus(Notification.permission);
 
     // Load saved preferences
     const saved = localStorage.getItem(NOTIFICATION_PREFS_KEY);
