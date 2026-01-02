@@ -1,4 +1,4 @@
-import { Crown, Check, Loader2 } from 'lucide-react';
+import { Crown, Check, Loader2, ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,9 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   initiatePayment, 
   PRICING, 
-  PlanType
+  PlanType,
+  isNativeAndroid,
+  initializeBilling,
+  getGooglePlayPrice
 } from '@/services/billingService';
 import { cn } from '@/lib/utils';
+import { Capacitor } from '@capacitor/core';
 
 interface PremiumPageProps { onClose: () => void; }
 
@@ -33,8 +37,13 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
   const [currency, setCurrency] = useState<'USD' | 'INR'>('USD');
   const [plan, setPlan] = useState<PlanType>('yearly');
   
-  // Detect country on mount
+  // Initialize billing and detect country on mount
   useEffect(() => {
+    // Initialize Google Play Billing if on Android
+    if (isNativeAndroid()) {
+      initializeBilling();
+    }
+    
     // Detect user's country using ipapi.co
     fetch('https://ipapi.co/country/')
       .then(res => res.text())
@@ -58,10 +67,23 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
     ? `Save $${(4.99 * 12 - 49.99).toFixed(0)}` 
     : `Save ₹${(149 * 12 - 1499)}`;
 
-  // Get display prices
+  // Get display prices - use Google Play prices on Android if available
   const getDisplayPrice = (planType: PlanType): string => {
+    if (isNativeAndroid()) {
+      const googlePrice = getGooglePlayPrice(planType);
+      if (googlePrice) return googlePrice;
+    }
     const pricing = PRICING[planType][currency];
     return `${pricing.symbol}${pricing.display}`;
+  };
+
+  // Open Google Play subscription management
+  const openSubscriptionManagement = () => {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+      window.open('https://play.google.com/store/account/subscriptions', '_system');
+    } else {
+      window.open('https://play.google.com/store/account/subscriptions', '_blank');
+    }
   };
 
   const handlePayment = async (selectedPlan: PlanType) => {
@@ -149,6 +171,17 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
             </Button>
           )}
           
+          {/* Manage Subscription Link - Android only */}
+          {isNativeAndroid() && (
+            <Button 
+              variant="outline" 
+              className="w-full mb-3 gap-2" 
+              onClick={openSubscriptionManagement}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Manage Subscription
+            </Button>
+          )}
           
           <Button variant="ghost" onClick={onClose}>Back</Button>
         </Card>
@@ -164,8 +197,8 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         <p className="text-muted-foreground">{t('unlockFeatures')}</p>
       </div>
       
-      {/* Currency Toggle - Only show if in India */}
-      {isIndia && (
+      {/* Currency Toggle - Only show if in India and not on Android */}
+      {isIndia && !isNativeAndroid() && (
         <div className="flex justify-center gap-2 mb-6">
           <Button 
             variant={currency === 'USD' ? 'default' : 'outline'} 
@@ -257,14 +290,28 @@ export function PremiumPage({ onClose }: PremiumPageProps) {
         )}
       </Button>
       
-      {/* Subscription Terms */}
+      {/* Subscription Terms - Google Play Policy Compliance */}
       <div className="mt-4 p-3 bg-muted/50 rounded-lg">
         <p className="text-xs text-muted-foreground text-center leading-relaxed">
           {plan === 'monthly' 
             ? `Subscription automatically renews monthly at ${getDisplayPrice('monthly')} unless cancelled.`
             : `Subscription automatically renews yearly at ${getDisplayPrice('yearly')} unless cancelled.`
           }
-          {' '}You can cancel anytime through your account settings. By subscribing, you agree to our{' '}
+          {' '}You can cancel anytime through{' '}
+          {isNativeAndroid() ? (
+            <button 
+              className="text-primary underline"
+              onClick={(e) => {
+                e.preventDefault();
+                window.open('https://play.google.com/store/account/subscriptions', '_system');
+              }}
+            >
+              Google Play settings
+            </button>
+          ) : (
+            'your account settings'
+          )}
+          . By subscribing, you agree to our{' '}
           <a href="/legal?tab=terms" className="text-primary underline">Terms of Service</a>
           {' '}and{' '}
           <a href="/legal?tab=privacy" className="text-primary underline">Privacy Policy</a>.
