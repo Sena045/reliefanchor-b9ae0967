@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
-import { InstallAppPrompt } from '@/components/InstallAppPrompt';
+
 
 // Lazy load ALL pages for faster initial load
 const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ default: m.LandingPage })));
@@ -194,7 +194,7 @@ export default function App() {
         <AuthenticatedApp />
         <Toaster />
         <UpdatePrompt />
-        <InstallAppPrompt />
+        
       </AuthProvider>
     </ThemeProvider>
   );

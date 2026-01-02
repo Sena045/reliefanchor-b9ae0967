@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Trash2, Send, Sun, Moon, Monitor, UserX, Smartphone, Share, Plus } from 'lucide-react';
+import { Languages, Crown, MessageCircle, BarChart3, Gamepad2, FileText, LogOut, Download, Shield, Trash2, Send, Sun, Moon, Monitor, UserX } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ReferralCard } from '@/components/ReferralCard';
 import { NotificationSettings } from '@/components/NotificationSettings';
-import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 
 interface SettingsPageProps {
   onShowLegal?: (tab: 'privacy' | 'terms') => void;
@@ -22,32 +21,9 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
   const { signOut, user } = useAuth();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
-  const { isInstallable, isInstalled, promptInstall, showIOSInstructions } = useInstallPrompt();
   const [mounted, setMounted] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
-
-  const handleInstall = async () => {
-    // Clear any dismissed state to allow reinstall prompt
-    localStorage.removeItem('install-prompt-dismissed');
-    localStorage.removeItem('install-prompt-dismissed-at');
-
-    const success = await promptInstall();
-
-    if (success) {
-      toast({ title: 'App installed successfully!' });
-      return;
-    }
-
-    // iOS uses the on-screen instructions
-    if (showIOSInstructions) return;
-
-    // If Chrome didn't give us a prompt, guide user to the browser menu install.
-    toast({
-      title: 'Install from Chrome menu',
-      description: "Tap ⋮ (top-right) → 'Install app' / 'Add to Home screen'.",
-    });
-  };
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -122,50 +98,6 @@ export function SettingsPage({ onShowLegal }: SettingsPageProps) {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Install App - show only if not already installed */}
-      {!isInstalled && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Smartphone className="h-4 w-4" />
-              Install App
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {showIOSInstructions ? (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Add to your home screen for quick access:
-                </p>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground p-3 bg-muted rounded-lg">
-                  <span className="flex items-center gap-1">
-                    <Share className="h-4 w-4" /> Tap Share
-                  </span>
-                  <span>→</span>
-                  <span className="flex items-center gap-1">
-                    <Plus className="h-4 w-4" /> Add to Home Screen
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Install for faster access and offline support
-                </p>
-                <Button 
-                  onClick={handleInstall}
-                  size="sm" 
-                  className="w-full"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  {isInstallable ? 'Install App' : 'How to install'}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Referral Program */}
       <ReferralCard />
