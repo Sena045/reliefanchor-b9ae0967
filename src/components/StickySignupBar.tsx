@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithGoogleNative } from '@/services/googleAuthService';
 
 interface StickySignupBarProps {
   onSignUp: () => void;
@@ -29,12 +29,7 @@ export function StickySignupBar({ onSignUp }: StickySignupBarProps) {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
+      const { error } = await signInWithGoogleNative();
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       }
