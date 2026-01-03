@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift, AlertCircle } from 'lucide-react';
 import { referralService } from '@/services/referralService';
+import { signInWithGoogleNative, initGoogleAuth } from '@/services/googleAuthService';
+import { Capacitor } from '@capacitor/core';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -53,6 +55,11 @@ export function AuthPage() {
   const showReset = isPasswordRecovery || isRecoveryUrl;
 
   useEffect(() => {
+    // Initialize Google Auth for native platforms
+    if (Capacitor.isNativePlatform()) {
+      initGoogleAuth();
+    }
+
     // Check for referral code in URL
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
@@ -424,12 +431,8 @@ export function AuthPage() {
                       }
                     }
                     
-                    const { error } = await supabase.auth.signInWithOAuth({
-                      provider: 'google',
-                      options: {
-                        redirectTo: `${window.location.origin}/`,
-                      },
-                    });
+                    // Use native Google Auth on Android/iOS, web OAuth on web
+                    const { error } = await signInWithGoogleNative();
                     if (error) {
                       toast({ title: 'Error', description: error.message, variant: 'destructive' });
                       localStorage.removeItem('pendingReferralCode');
