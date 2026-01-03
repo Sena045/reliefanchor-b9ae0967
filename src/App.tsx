@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
+import { Capacitor } from '@capacitor/core';
 
 
 // Lazy load ALL pages for faster initial load
@@ -124,15 +125,15 @@ function AppContent() {
         </Suspense>
       );
     }
-    // Show auth page if explicitly requested or has referral code
-    if (showAuth || hasReferralCode) {
+    // Show auth page if explicitly requested, has referral code, or on native app (skip landing page)
+    if (showAuth || hasReferralCode || Capacitor.isNativePlatform()) {
       return (
         <Suspense fallback={<SplashLoader />}>
           <AuthPage />
         </Suspense>
       );
     }
-    // Show landing page by default
+    // Show landing page by default (web only)
     return (
       <Suspense fallback={<SplashLoader />}>
         <LandingPage 
