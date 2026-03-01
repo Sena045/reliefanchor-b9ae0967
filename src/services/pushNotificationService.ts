@@ -10,8 +10,12 @@ interface PushSubscriptionData {
   };
 }
 
+interface ServiceWorkerRegistrationWithPush extends ServiceWorkerRegistration {
+  pushManager: PushManager;
+}
+
 class PushNotificationService {
-  private registration: ServiceWorkerRegistration | null = null;
+  private registration: ServiceWorkerRegistrationWithPush | null = null;
 
   async init(): Promise<boolean> {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -20,7 +24,7 @@ class PushNotificationService {
     }
 
     try {
-      this.registration = await navigator.serviceWorker.register('/sw.js');
+      this.registration = await navigator.serviceWorker.register('/sw.js') as ServiceWorkerRegistrationWithPush;
       console.log('Service Worker registered');
       return true;
     } catch (error) {
