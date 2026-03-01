@@ -8,11 +8,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
-import { Capacitor } from '@capacitor/core';
-
 
 // Lazy load ALL pages for faster initial load
-const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ default: m.LandingPage })));
 const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })));
 const GuestChatPage = lazy(() => import('@/pages/GuestChatPage').then(m => ({ default: m.GuestChatPage })));
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -30,9 +27,6 @@ function AppContent() {
   const { user, loading: authLoading, isPasswordRecovery } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showPremium, setShowPremium] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
-  const [showPressKit, setShowPressKit] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
   const [showGuestChat, setShowGuestChat] = useState(false);
   const [showLegal, setShowLegal] = useState<'privacy' | 'terms' | null>(null);
 
@@ -40,10 +34,6 @@ function AppContent() {
     typeof window !== 'undefined' &&
     (new URLSearchParams(window.location.search).get('recovery') === '1' ||
       new URLSearchParams(window.location.hash.substring(1)).get('type') === 'recovery');
-
-  // Check for referral code in URL (should show auth page)
-  const hasReferralCode = typeof window !== 'undefined' && 
-    new URLSearchParams(window.location.search).get('ref');
 
   // Check for try-chat URL path
   const isTryChatUrl = typeof window !== 'undefined' && 
@@ -99,49 +89,18 @@ function AppContent() {
     );
   }
 
-  // Not logged in
+  // Not logged in — show auth page directly
   if (!user) {
-    // Show guest chat trial (via state or URL)
     if (showGuestChat || isTryChatUrl) {
       return (
         <Suspense fallback={<SplashLoader />}>
-          <GuestChatPage onSignUp={() => { setShowGuestChat(false); setShowAuth(true); }} />
+          <GuestChatPage onSignUp={() => setShowGuestChat(false)} />
         </Suspense>
       );
     }
-    // Show about page
-    if (showAbout) {
-      return (
-        <Suspense fallback={<SplashLoader />}>
-          <AboutPage onClose={() => setShowAbout(false)} />
-        </Suspense>
-      );
-    }
-    // Show press kit page
-    if (showPressKit) {
-      return (
-        <Suspense fallback={<SplashLoader />}>
-          <PressKitPage onClose={() => setShowPressKit(false)} />
-        </Suspense>
-      );
-    }
-    // Show auth page if explicitly requested, has referral code, or on native app (skip landing page)
-    if (showAuth || hasReferralCode || Capacitor.isNativePlatform()) {
-      return (
-        <Suspense fallback={<SplashLoader />}>
-          <AuthPage />
-        </Suspense>
-      );
-    }
-    // Show landing page by default (web only)
     return (
       <Suspense fallback={<SplashLoader />}>
-        <LandingPage 
-          onGetStarted={() => setShowAuth(true)} 
-          onTryChat={() => setShowGuestChat(true)}
-          onShowPressKit={() => setShowPressKit(true)}
-          onShowAbout={() => setShowAbout(true)}
-        />
+        <AuthPage />
       </Suspense>
     );
   }
