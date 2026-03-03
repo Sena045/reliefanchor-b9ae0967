@@ -283,7 +283,42 @@ export function AuthPage() {
 
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4 relative">
+      {/* Value proposition section - only show on login/signup, not reset */}
+      {!showReset && !isForgotPassword && (
+        <div className="w-full max-w-md mb-6 text-center space-y-3 animate-fade-in">
+          <h2 className="text-lg font-semibold text-foreground">Your private mental wellness companion</h2>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-card border border-border">
+              <span className="text-xl">💬</span>
+              <span className="text-[10px] text-muted-foreground leading-tight">Talk to Anya, your AI companion</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-card border border-border">
+              <span className="text-xl">📊</span>
+              <span className="text-[10px] text-muted-foreground leading-tight">Track moods & see insights</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-card border border-border">
+              <span className="text-xl">🧘</span>
+              <span className="text-[10px] text-muted-foreground leading-tight">Breathing, grounding & more</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+            <span>🔒 100% Private</span>
+            <span>🌐 8 Languages</span>
+            <span>✨ Free to start</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = '/try';
+            }}
+            className="text-sm font-medium text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          >
+            Try it free — no signup needed →
+          </button>
+        </div>
+      )}
+
       <Card className="w-full max-w-md shadow-xl border-primary/20">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -599,13 +634,6 @@ export function AuthPage() {
             Your data is securely stored and never shared. Your mental health journey stays private.
           </p>
 
-          <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
-            <p className="text-xs text-center text-muted-foreground">
-              <span className="font-medium text-foreground">🌐 8 Languages Supported</span>
-              <br />
-              English, Hindi, Spanish, French, German, Portuguese, Chinese & Japanese. Change anytime in Settings.
-            </p>
-          </div>
 
           {/* Hide bookmark and install prompts on native app */}
           {!isNative && (
