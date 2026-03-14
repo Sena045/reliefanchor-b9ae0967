@@ -285,7 +285,7 @@ export function AuthPage() {
 
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start py-8 p-4 relative overflow-y-auto">
       {/* Value proposition section - only show on login/signup, not reset */}
       {!showReset && !isForgotPassword && (
         <div className="w-full max-w-md mb-6 text-center space-y-3 animate-fade-in">
