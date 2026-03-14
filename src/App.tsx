@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { SplashLoader } from '@/components/SplashLoader';
 import { NotificationOptInPrompt } from '@/components/NotificationOptInPrompt';
+import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 
 // Lazy load ALL pages for faster initial load
 const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })));

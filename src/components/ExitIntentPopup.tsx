@@ -82,7 +82,7 @@ export function ExitIntentPopup({ onSignUp }: ExitIntentPopupProps) {
   }, [isMobile, timeOnPage, hasTriggered, triggerSurvey]);
 
   useEffect(() => {
-    let inactivityTimer: NodeJS.Timeout;
+    let inactivityTimer: ReturnType<typeof setTimeout>;
     
     // Shorter inactivity time for mobile (12s vs 45s desktop)
     const inactivityDelay = isMobile ? 12000 : 45000;
