@@ -101,6 +101,7 @@ function AppContent() {
     return (
       <Suspense fallback={<SplashLoader />}>
         <AuthPage />
+        <ExitIntentPopup onSignUp={() => {}} />
       </Suspense>
     );
   }
