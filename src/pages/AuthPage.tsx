@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift, AlertCircle } from 'lucide-react';
+import { AuthTestimonials } from '@/components/AuthTestimonials';
+import { LiveCounter } from '@/components/LiveCounter';
 import { referralService } from '@/services/referralService';
 import { signInWithGoogleNative, initGoogleAuth } from '@/services/googleAuthService';
 import { Capacitor } from '@capacitor/core';
