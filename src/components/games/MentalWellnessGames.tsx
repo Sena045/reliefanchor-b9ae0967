@@ -516,7 +516,7 @@ function BodyScanGame({ onBack }: { onBack: () => void }) {
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isActive && timer > 0) {
       interval = setInterval(() => {
         setTimer(t => t - 1);
