@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Loader2, Mail, Lock, ArrowRight, Download, Share, ArrowLeft, Gift, AlertCircle } from 'lucide-react';
+import { AuthTestimonials } from '@/components/AuthTestimonials';
+import { LiveCounter } from '@/components/LiveCounter';
 import { referralService } from '@/services/referralService';
 import { signInWithGoogleNative, initGoogleAuth } from '@/services/googleAuthService';
 import { Capacitor } from '@capacitor/core';
@@ -283,7 +285,7 @@ export function AuthPage() {
 
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-start py-8 p-4 relative overflow-y-auto">
       {/* Value proposition section - only show on login/signup, not reset */}
       {!showReset && !isForgotPassword && (
         <div className="w-full max-w-md mb-6 text-center space-y-3 animate-fade-in">
@@ -673,6 +675,14 @@ export function AuthPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Social proof below card - only on login/signup */}
+      {!showReset && !isForgotPassword && (
+        <>
+          <LiveCounter />
+          <AuthTestimonials />
+        </>
+      )}
     </div>
   );
 }

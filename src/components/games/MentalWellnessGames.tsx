@@ -516,7 +516,7 @@ function BodyScanGame({ onBack }: { onBack: () => void }) {
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isActive && timer > 0) {
       interval = setInterval(() => {
         setTimer(t => t - 1);
@@ -740,7 +740,7 @@ function ColorBreathGame({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (!isBreathing) return;
     
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     
     if (phase === 'inhale') {
       timeout = setTimeout(() => setPhase('hold'), 4000);
