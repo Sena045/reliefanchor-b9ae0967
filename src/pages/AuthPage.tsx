@@ -675,6 +675,14 @@ export function AuthPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Social proof below card - only on login/signup */}
+      {!showReset && !isForgotPassword && (
+        <>
+          <LiveCounter />
+          <AuthTestimonials />
+        </>
+      )}
     </div>
   );
 }
