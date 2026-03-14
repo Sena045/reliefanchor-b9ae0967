@@ -740,7 +740,7 @@ function ColorBreathGame({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (!isBreathing) return;
     
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     
     if (phase === 'inhale') {
       timeout = setTimeout(() => setPhase('hold'), 4000);
